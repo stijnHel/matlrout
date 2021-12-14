@@ -1,0 +1,5 @@
+Commentaren in verband met routines bij gebruik van matlab5
+
+- addstr kan vervangen worden door strvcat
+- fstrmat kan (soms) vervangen worden door strmatch
+- hier en daar kan strjust gebruikt worden.

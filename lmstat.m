@@ -1,0 +1,1 @@
+dos('c:\matlab6p1\bin\win32\lmutil lmstat -c c:\matlab6p1\bin\win32\license.dat -A');

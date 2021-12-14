@@ -1,0 +1,1 @@
+function Y=fdct2(X)% FDCT2 - twee-dimensionele DCT-tranformatieY=dct(dct(X)')';%trage versie%n=size(X,1);%Y=zeros(n);%for u=1:n%	for v=1:n%		s=0;%		for x=1:n%			s=s+cos((2*x-1)*(u-1)*pi/n/2)*(cos((1:2:2*n-1)*(v-1)*pi/n/2)*X(:,x));%		end%		Y(v,u)=s;%	end%end%Y=Y/4;%Y(:,1)=Y(:,1)/sqrt(2);%Y(1,:)=Y(1,:)/sqrt(2);

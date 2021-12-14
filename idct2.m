@@ -1,0 +1,1 @@
+function Y=idct2(X)% IDCT2 - twee-dimensionele DCT-inverse tranformatieY=idct(idct(X)')';% trage versie%n=size(X,1);%Y=zeros(n);%C=[1/sqrt(2);ones(n-1,1)];%for x=1:n%	for y=1:n%		s=0;%		for u=1:n%			s=s+cos((2*x-1)*(u-1)*pi/n/2)*C(u)*(cos((2*y-1)*(0:n-1)*pi/n/2)*(C.*X(:,u)));%		end%		Y(y,x)=s;%	end%end%Y=Y/4;

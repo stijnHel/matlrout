@@ -1,0 +1,1 @@
+function disp(c)%clens/disp - Diplays information about a lens objectfprintf('Lens : %s (n=%g)\n',c.type,c.n)if isstruct(c.D)	if isfield(c.D,'f')		fprintf('   f = %g\n',c.D.f)	endend

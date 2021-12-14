@@ -1,0 +1,1 @@
+function plot(A,varargin)% bezier/plot : plot bezier-kurvet=0:0.01:1;pt=zeros(length(t),2);for i=1:length(t)	pt(i,:)=getpt(A,t(i));endplot(pt(:,1),pt(:,2),varargin{:});

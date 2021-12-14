@@ -1,0 +1,1 @@
+function save(c,f)% CSWF/SAVE - Bewaart swf%    save(c,f)%       f:filenamefid=fopen(f,'w');if fid<3	error('Kan file niet openen');endfwrite(f,c.x);fclose(fid);

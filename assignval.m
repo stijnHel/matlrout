@@ -1,0 +1,1 @@
+function assignval(v,w)% ASSIGNVAL - Zet waarde in variabele%   assignval(varname,value)%assignin('caller',v,w)

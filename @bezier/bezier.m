@@ -1,0 +1,1 @@
+function A=bezier(varargin)% BEZIER/BEZIER - Bezier-kurve constructor%   bezier(pt1,pt2,pt3,pt4) : initialiseert cubische bezier%   bezier(pt) : initialiseert bezier (met length(pt) punten)if nargin==4	A=struct('pt_lijst',[varargin{1};varargin{2};varargin{3};varargin{4}]);	A=class(A,'bezier');elseif nargin==1	A=struct('pt_lijst',varargin{1});	A=class(A,'bezier');end

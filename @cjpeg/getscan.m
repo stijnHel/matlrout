@@ -1,0 +1,1 @@
+function d=getscan(c,nr)% CJPEG/GETSCAN - Geeft scan uit JPEG-data%    d=getscan(c,nr)n=0;i=0;while n<nr	i=i+1;	if strcmp(c.data(i).markerName,'SOS')		n=n+1;	endendi1=c.data(i).index+4+length(c.data(i).data);i=i+1;while strcmp(c.data(i).markerName(1:3),'RST')	i=i+1;endd=c.ruw(i1:c.data(i).index-1);

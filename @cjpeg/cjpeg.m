@@ -1,0 +1,1 @@
+function c=cjpeg(f)% CJPEG/CJPEG - constructor voor jpeg-object%   c=cjpeg(f)global LASTJPEGdatad=leesjpegstruc(f);S=struct('fname',f,'data',d,'ruw','');if ischar(LASTJPEGdata)	S.ruw=LASTJPEGdata;else	S.ruw=uint8(LASTJPEGdata);endc=class(S,'cjpeg');

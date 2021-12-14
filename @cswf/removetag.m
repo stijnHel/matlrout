@@ -1,0 +1,1 @@
+function removetag(c,i,j)% CSWF/REMOVETAG - Verwijdert tag uit file%    removetag(c,i,j)%    removetag(c,[i,j])if nargin==2	j=i(2);	i=i(1);endt=c.frames{i}(j);if isfield(t,'tagStart')else	error('niet klaar met dit type object, en ik weet niet of dit ooit komt - lees swf met leesswf1 of met cswf(xxxx,1)')end

@@ -1,0 +1,1 @@
+function Y=idct2f(X)% IDCT2F - twee-dimensionele DCT-inverse tranformatie met even lengtesn = length(X);i1=[1:n/2;n:-1:n/2+1];i1=i1(:);ww = sqrt(2*n) * exp(j*(0:n-1)*pi/(2*n)).';ww(1) = ww(1)/sqrt(2);W = ww(:,ones(1,n));Y = ifft(W.*X);Y = real(Y(i1,:));Y = ifft(W.'.*Y,[],2);Y = real(Y(:,i1));

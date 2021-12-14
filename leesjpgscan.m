@@ -1,0 +1,1 @@
+function [a,i,j]=leesjpgscan(x,i,j,n,H)% LEESJPGSCAN - Leest scan uit jpg-dataerror('Deze functie werkt alleen binnen een cjpeg-object')

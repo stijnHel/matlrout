@@ -1,0 +1,1 @@
+function d=getmarkerdata(c,i)% CJPEG/GETMARKERDATA - Geeft data van marker van JPEG-data%     d=getmarkerdata(c,i)d=c.data(i).data;

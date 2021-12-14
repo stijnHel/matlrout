@@ -1,0 +1,1 @@
+function y=char(x)% UINT8/CHAR - conversie van uint8 naar char% still needed?y=char(double(x));

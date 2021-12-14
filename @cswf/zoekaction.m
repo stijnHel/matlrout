@@ -1,0 +1,1 @@
+function u=zoekaction(c,action)% CSWF/ZOEKACTION - Zoekt naar een bepaalde actie ----niet klaar%    u=zoekaction(c,action)global SWF_tagserror('niet klaar')

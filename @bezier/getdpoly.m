@@ -1,0 +1,1 @@
+function p=getdpoly(A)% GETDPOLY - Geeft polynomen die afgeleide van bezier bepalen.if size(A.pt_lijst,1)~=4	error('Dit is enkel nog voorzien voor kubische bezier-kurves')endp=3*[A.pt_lijst(4,:)-3*(A.pt_lijst(3,:)-A.pt_lijst(2,:))-A.pt_lijst(1,:);	2*A.pt_lijst(1,:)-4*A.pt_lijst(2,:)+2*A.pt_lijst(3,:);	A.pt_lijst(2,:)-A.pt_lijst(1,:)];

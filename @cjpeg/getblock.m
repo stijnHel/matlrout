@@ -1,0 +1,1 @@
+function d=getblock(c,nr)% CJPEG/GETBLOCK - Geeft blok van JPEG-data%    d=getblock(c,nr)%    d=getblock(c) - geeft alle data-blokkenif nargin==1	d=c.data;else	d=c.data(nr);end

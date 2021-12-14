@@ -1,0 +1,1 @@
+function l=lengte(A,t1,t2)% bezier/lengte : bepaalt lengte%   lengte(A) : totale lengte%   lengte(A,t) : lengte van begin tot pt(t)%   lengte(A,t1,t2) : lengte van t1 tot t2if (nargin==2)	t2=t1;	t1=0;endif (nargin<2)|isempty(t1)	t1=0;	t2=1;endpt=getpt(A,t1+(0:0.001:1)*(t2-t1));dpt=diff(pt);l=sum(sqrt(dpt(:,1).^2+dpt(:,2).^2));

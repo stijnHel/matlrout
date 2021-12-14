@@ -1,0 +1,1705 @@
+.:
+total 3914
+ 106563 -r--r--r-- 1 matlab matlab    836 2007-06-07 16:53 addlog.m
+ 568360 -r--r--r-- 1 matlab matlab   2230 2009-07-07 17:08 AddPicture.m
+ 106569 -r--r--r-- 1 matlab matlab   1090 2009-02-09 13:12 addpunt.m
+  35965 -r--r--r-- 1 matlab matlab    119 2007-09-04 10:01 addstdir.m
+ 106582 -r--r--r-- 1 matlab matlab    295 2007-06-07 16:53 addstr.m
+ 106733 -r--r--r-- 1 matlab matlab   1643 2007-06-07 16:53 an2f.m
+ 106734 -r--r--r-- 1 matlab matlab  54586 2007-06-07 16:53 arrow.m
+ 106738 -r--r--r-- 1 matlab matlab    117 2007-06-07 16:53 assignval.m
+ 106739 -r--r--r-- 1 matlab matlab    570 2007-06-07 16:53 avgdnsample.m
+ 106742 -r--r--r-- 1 matlab matlab   1105 2007-06-07 16:53 barnone.m
+ 106743 -r--r--r-- 1 matlab matlab   1203 2008-02-05 14:01 bepfig.m
+ 106745 -r--r--r-- 1 matlab matlab    634 2007-06-07 16:53 bepfigs.m
+ 106749 -r--r--r-- 1 matlab matlab   3128 2007-06-07 16:53 bepmatr.m
+ 106750 -r--r--r-- 1 matlab matlab   3235 2009-04-24 13:42 beprout.m
+ 106752 -r--r--r-- 1 matlab matlab   2906 2007-06-07 16:53 berhell.m
+ 106753 -r--r--r-- 1 matlab matlab    840 2007-06-07 16:53 berhmoon.m
+ 106756 -r-------- 1 matlab matlab   4318 2007-11-12 16:27 bertconst.m
+ 106757 -r--r--r-- 1 matlab matlab   2049 2007-06-07 16:53 bertijd.m
+ 106758 -r--r--r-- 1 matlab matlab    786 2007-06-07 16:53 binzoek.m
+ 106759 -r--r--r-- 1 matlab matlab   1604 2007-06-07 16:53 breiduit.m
+ 106760 -r--r--r-- 1 matlab matlab    311 2007-06-07 16:53 calcasurf.m
+ 106762 -r--r--r-- 1 matlab matlab   1808 2007-06-07 16:53 calccanmask.m
+ 106765 -r--r--r-- 1 matlab matlab    862 2007-06-07 16:53 calccent.m
+ 106767 -r--r--r-- 1 matlab matlab    455 2007-06-07 16:53 calcdc2.m
+ 106766 -r--r--r-- 1 matlab matlab    809 2007-06-07 16:53 calcdc.m
+ 106768 -r--r--r-- 1 matlab matlab   1893 2007-06-07 16:53 calcfreq.m
+ 106769 -r--r--r-- 1 matlab matlab    331 2007-06-07 16:53 calci.m
+ 106770 -r--r--r-- 1 matlab matlab   1622 2007-06-07 16:53 calclenssyst.m
+ 106771 -r--r--r-- 1 matlab matlab   1089 2007-06-07 16:53 calcmeans.m
+ 225110 -r--r--r-- 1 matlab matlab    285 2006-07-04 14:11 calcperdiffs.m
+  35587 -r--r--r-- 1 matlab matlab    832 2007-10-30 15:42 calcptr.m
+1095156 -r--r--r-- 1 matlab matlab   2789 2009-10-14 13:06 calcThermT.m
+ 106772 -r--r--r-- 1 matlab matlab  33256 2007-06-07 16:53 canmsgs.m
+ 106773 -r--r--r-- 1 matlab matlab   2158 2007-06-07 16:53 canpr.m
+ 106774 -r--r--r-- 1 matlab matlab   5454 2007-06-07 16:53 cansigui.m
+ 107783 drwxr-xr-x 3 matlab matlab    496 2007-06-07 16:53 @casap
+   4120 -r--r--r-- 1 matlab matlab   1600 2009-07-29 16:54 cattrunc.m
+ 107756 drwxr-xr-x 2 matlab matlab    792 2007-06-07 16:53 @ccvt
+ 107748 drwxr-xr-x 2 matlab matlab    240 2007-06-07 16:53 @ccvtcont
+ 107742 drwxr-xr-x 2 matlab matlab    192 2007-06-07 16:53 @cdriver
+ 107740 drwxr-xr-x 2 matlab matlab    112 2009-08-05 11:17 @cell
+ 106775 -r--r--r-- 1 matlab matlab    662 2007-06-07 16:53 chlijn.m
+ 107730 drwxr-xr-x 2 matlab matlab    320 2007-06-07 16:53 @cjpeg
+ 107722 drwxr-xr-x 2 matlab matlab    216 2010-01-06 13:51 @clens
+ 106776 -r--r--r-- 1 matlab matlab   3186 2007-06-07 16:53 cline.m
+   2880 -r--r--r-- 1 matlab matlab    119 2009-02-06 17:10 closeEditWin.m
+ 107713 drwxr-xr-x 2 matlab matlab    256 2007-06-07 16:53 @cmotor
+ 106777 -r--r--r-- 1 matlab matlab    982 2009-09-04 10:13 cmpflatdir.m
+ 107710 drwxr-xr-x 2 matlab matlab    184 2010-01-06 13:52 @cnavmsrs
+ 106778 -r--r--r-- 1 matlab matlab    449 2007-06-07 16:53 cntsucc.m
+1086834 -r--r--r-- 1 matlab matlab   3041 2009-10-13 16:31 colorbarSlider.m
+ 106779 -r--r--r-- 1 matlab matlab   2146 2007-06-07 16:53 compbinfiles.m
+ 106780 -r--r--r-- 1 matlab matlab   3287 2007-06-07 16:53 compdcm.m
+ 106781 -r--r--r-- 1 matlab matlab   1032 2007-06-07 16:53 compstr.m
+ 106782 -r--r--r-- 1 matlab matlab    539 2007-06-07 16:53 compstrs.m
+1082172 -r--r--r-- 1 matlab matlab    400 2009-07-31 11:58 compVectors.m
+ 106783 -r--r--r-- 1 matlab matlab  23086 2007-06-07 16:53 contents.m
+ 106784 -r--r--r-- 1 matlab matlab   1381 2007-06-07 16:53 conv2bit.m
+ 106785 -r--r--r-- 1 matlab matlab   2603 2007-06-07 16:53 conva2ml.m
+ 254072 -r-------- 1 matlab matlab   2785 2008-01-15 09:00 convRaw2Color.m
+ 107706 drwxr-xr-x 2 matlab matlab    128 2007-06-07 16:53 @cpkop
+ 107702 drwxr-xr-x 2 matlab matlab    120 2007-06-07 16:53 @cpomp
+ 107699 drwxr-xr-x 2 matlab matlab     96 2007-06-07 16:53 @cpsec
+ 107694 drwxr-xr-x 2 matlab matlab    160 2007-06-07 16:53 @crijcyclus
+ 107678 drwxr-xr-x 2 matlab matlab    504 2007-06-07 16:53 @cswf
+ 227765 -r--r--r-- 1 matlab matlab    348 2010-01-05 15:54 cumnzel.m
+   2743 -r--r--r-- 1 matlab matlab   2996 2009-08-06 09:34 cumSineFollow.m
+ 106786 -r--r--r-- 1 matlab matlab   2073 2007-06-07 16:53 cursread.m
+ 107661 drwxr-xr-x 2 matlab matlab    488 2007-06-07 16:53 @cwagen
+  59959 -r--r--r-- 1 matlab matlab    491 2008-10-24 13:26 cws2fws.m
+ 106787 -r--r--r-- 1 matlab matlab    706 2007-06-07 16:53 deblankfile.m
+ 106788 -r--r--r-- 1 matlab matlab   1533 2007-06-07 16:53 deelmaxf.m
+1081059 -r--r--r-- 1 matlab matlab    300 2009-08-13 09:28 defSetFcn.m
+ 106789 -r--r--r-- 1 matlab matlab    169 2007-06-07 16:53 deldate.m
+ 106790 -r--r--r-- 1 matlab matlab   1595 2007-06-07 16:53 demotextlabels.m
+ 106791 -r--r--r-- 1 matlab matlab   1214 2007-06-07 16:53 detfiletype.m
+ 106792 -r--r--r-- 1 matlab matlab    392 2007-06-07 16:53 diffdiff.m
+ 106793 -r--r--r-- 1 matlab matlab    362 2007-06-07 16:53 differ.m
+ 106794 -r--r--r-- 1 matlab matlab    670 2007-06-07 16:53 diffm.m
+ 106795 -r--r--r-- 1 matlab matlab    518 2007-06-07 16:53 dinterp1.m
+ 106796 -r--r--r-- 1 matlab matlab    536 2007-06-07 16:53 dinterpm.m
+ 106797 -r--r--r-- 1 matlab matlab    354 2007-06-07 16:53 dirdelim.m
+ 106798 -r--r--r-- 1 matlab matlab   3684 2007-06-07 16:53 dirdiffs.m
+ 106799 -r--r--r-- 1 matlab matlab   3195 2009-06-29 09:23 direv.m
+ 106800 -r--r--r-- 1 matlab matlab    632 2009-10-02 12:12 dirrecurs.m
+ 106801 -r--r--r-- 1 matlab matlab   2837 2007-06-07 16:53 DisplayNI4472.m
+ 106802 -r--r--r-- 1 matlab matlab   2414 2007-06-07 16:53 DisplayNI6251.m
+ 106803 -r--r--r-- 1 matlab matlab   5669 2007-06-07 16:53 disp_r.m
+ 106804 -r--r--r-- 1 matlab matlab    160 2007-06-07 16:53 dubfilt.m
+ 106805 -r--r--r-- 1 matlab matlab   7191 2007-06-07 16:53 dupfig.m
+ 107657 drwxr-xr-x 2 matlab matlab    128 2007-06-07 16:53 @dznach
+ 107511 drwxr-xr-x 2 matlab matlab   1080 2007-06-07 16:53 ecu
+ 106807 -r--r--r-- 1 matlab matlab   1233 2007-06-07 16:53 envelopefilter1.m
+  56229 -r-------- 1 matlab matlab   1396 2008-02-21 14:19 envelopefilter2.m
+ 106808 -r--r--r-- 1 matlab matlab    818 2007-06-07 16:53 envelopefilter_.m
+ 106806 -r--r--r-- 1 matlab matlab   1430 2008-03-04 15:22 envelopefilter.m
+ 378525 -r--r--r-- 1 matlab matlab   1276 2009-07-07 15:37 EqualizeAxLim.m
+ 106809 -r--r--r-- 1 matlab matlab    577 2007-06-07 16:53 equalizeXlim.m
+ 410755 -r--r--r-- 1 matlab matlab    531 2008-08-26 11:31 estimf_FFT.m
+ 887422 -r--r--r-- 1 matlab matlab    236 2009-08-05 10:06 evopen.m
+ 106810 -r--r--r-- 1 matlab matlab   1704 2007-06-07 16:53 extr.m
+ 106812 -r--r--r-- 1 matlab matlab    383 2007-06-07 16:53 fdct2f.m
+ 106811 -r--r--r-- 1 matlab matlab    329 2007-06-07 16:53 fdct2.m
+ 106813 -rwxr-xr-x 1 matlab matlab 955355 2007-06-07 16:53 fffff.txt
+ 106814 -r--r--r-- 1 matlab matlab    509 2007-06-07 16:53 ffilt.m
+ 106815 -r--r--r-- 1 matlab matlab  10280 2007-06-07 16:53 fig2xls.m
+ 106816 -r--r--r-- 1 matlab matlab    320 2007-06-07 16:53 figmenu.m
+ 106817 -r--r--r-- 1 matlab matlab    265 2007-06-07 16:53 figrot.m
+ 106818 -r--r--r-- 1 matlab matlab    363 2007-06-07 16:53 fildiff.m
+ 106819 -r--r--r-- 1 matlab matlab  14805 2009-05-12 09:52 filever.m
+ 137915 -r--r--r-- 1 matlab matlab    663 2009-05-15 09:54 filtconv.m
+ 106820 -r--r--r-- 1 matlab matlab    395 2009-05-06 13:55 findclose.m
+ 106821 -r--r--r-- 1 matlab matlab    294 2007-06-07 16:53 findhex.m
+ 106822 -r--r--r-- 1 matlab matlab    694 2007-06-07 16:53 findkarak.m
+ 106823 -r--r--r-- 1 matlab matlab   2364 2007-06-07 16:53 findlocalextremes.m
+ 106824 -r--r--r-- 1 matlab matlab   1412 2007-06-07 16:53 findlocalminima.m
+ 106825 -r--r--r-- 1 matlab matlab   2529 2007-06-07 16:53 findpersig.m
+  83699 -r--r--r-- 1 matlab matlab   1300 2008-08-12 16:17 findsignal.m
+ 107724 -r--r--r-- 1 matlab matlab   3149 2008-01-03 11:23 findsurfcross.m
+ 391620 -r--r--r-- 1 matlab matlab  14560 2008-11-04 11:21 fitDsine.m
+ 106827 -r--r--r-- 1 matlab matlab    783 2007-06-07 16:53 fitlinedist.m
+    307 -r--r--r-- 1 matlab matlab   7520 2007-11-12 16:22 fitsineg.m
+  32705 -r--r--r-- 1 matlab matlab  13679 2009-04-14 09:11 fitsine.m
+  45801 drwxr-xr-x 2 matlab matlab     80 2008-12-23 08:28 @FMTCfile
+ 107653 drwxr-xr-x 2 matlab matlab    136 2007-06-07 16:53 @fstcalib
+ 106831 -r--r--r-- 1 matlab matlab    967 2007-06-07 16:53 fstrmat.m
+ 106832 -r--r--r-- 1 matlab matlab   1263 2007-06-07 16:53 funfilt.m
+ 106833 -r--r--r-- 1 matlab matlab    386 2007-06-07 16:53 getbits.m
+ 106834 -r--r--r-- 1 matlab matlab    246 2007-06-07 16:53 getcval.m
+ 106835 -r--r--r-- 1 matlab matlab   1718 2007-06-07 16:53 getelems.m
+ 106836 -r--r--r-- 1 matlab matlab    632 2009-05-12 13:42 getindex.m
+ 106837 -r--r--r-- 1 matlab matlab    590 2007-06-07 16:53 getjpgbits.m
+ 106838 -r--r--r-- 1 matlab matlab    718 2007-06-07 16:53 getjpghufcode.m
+ 106839 -r--r--r-- 1 matlab matlab    705 2007-06-07 16:53 getkan.m
+ 106840 -r--r--r-- 1 matlab matlab    610 2007-06-07 16:53 getkanx.m
+ 106841 -r--r--r-- 1 matlab matlab    152 2007-06-07 16:53 getlast.m
+ 106842 -r--r--r-- 1 matlab matlab    734 2009-01-22 10:39 getmakefig.m
+ 106843 -r--r--r-- 1 matlab matlab   1569 2007-06-07 16:53 getmatr.m
+ 106844 -r--r--r-- 1 matlab matlab   2146 2007-06-07 16:53 getmounts.m
+   2902 -r--r--r-- 1 matlab matlab   1501 2009-09-08 11:29 getplotdata.m
+ 106845 -r--r--r-- 1 matlab matlab   2386 2008-07-14 08:45 getprocdata.m
+ 106846 -r--r--r-- 1 matlab matlab    889 2007-06-07 16:53 getsigs.m
+ 926906 -r--r--r-- 1 matlab matlab    464 2009-06-23 11:12 GetSimOutPorts.m
+ 757462 -r--r--r-- 1 matlab matlab   1471 2009-06-09 11:09 GetSimulInfo.m
+ 106847 -r--r--r-- 1 matlab matlab   1835 2007-06-07 16:53 getundoc.m
+1164584 drwxr-xr-x 2 matlab matlab     80 2010-01-06 13:56 @HEATdata
+ 106848 -r--r--r-- 1 matlab matlab    461 2009-09-04 10:18 hierdir.m
+ 106849 -r--r--r-- 1 matlab matlab   3215 2007-06-07 16:53 hierstruct.m
+ 106850 -r--r--r-- 1 matlab matlab   3413 2008-06-16 11:29 horselect.m
+ 106851 -r--r--r-- 1 matlab matlab   2574 2007-06-07 16:53 icft.m
+ 106853 -r--r--r-- 1 matlab matlab    309 2007-06-07 16:53 idct2f.m
+ 106852 -r--r--r-- 1 matlab matlab    329 2007-06-07 16:53 idct2.m
+ 106855 -r--r--r-- 1 matlab matlab   1397 2007-06-07 16:53 ident1st2.m
+ 106854 -r--r--r-- 1 matlab matlab   1207 2007-06-07 16:53 ident1st.m
+ 107504 drwxr-xr-x 2 matlab matlab    240 2007-06-07 16:53 iges2matlab
+ 106856 -r--r--r-- 1 matlab matlab   1836 2007-06-07 16:53 imagesc2.m
+ 106857 -r--r--r-- 1 matlab matlab    249 2007-06-07 16:53 insignal.m
+ 106858 -r--r--r-- 1 matlab matlab    327 2007-06-07 16:53 integ.m
+ 106859 -r--r--r-- 1 matlab matlab   1118 2007-06-07 16:53 interfcn.m
+ 106860 -r--r--r-- 1 matlab matlab   2094 2007-06-07 16:53 interp3d.m
+ 106861 -r--r--r-- 1 matlab matlab   5857 2007-06-07 16:53 interpa2ml.m
+ 106862 -r--r--r-- 1 matlab matlab   2793 2007-06-07 16:53 interpkline.m
+ 106863 -r--r--r-- 1 matlab matlab   1322 2007-06-07 16:53 interplijnen.m
+ 106864 -r--r--r-- 1 matlab matlab    153 2007-06-07 16:53 interpm.m
+  35876 -r--r--r-- 1 matlab matlab   4509 2007-07-03 11:56 intsrdata.m
+ 106865 -r--r--r-- 1 matlab matlab  23406 2007-06-07 16:53 IRtcTabel.txt
+ 106866 -r--r--r-- 1 matlab matlab   1076 2009-04-01 11:37 ispecgram.m
+ 106867 -r--r--r-- 1 matlab matlab 133956 2007-06-07 16:53 its90all.tab
+  36188 -r--r--r-- 1 matlab matlab   1156 2007-08-08 14:23 JthermCon.m
+  36151 -r--r--r-- 1 matlab matlab   2112 2007-08-08 13:51 Jthermistor.txt
+ 106868 -r--r--r-- 1 matlab matlab   1254 2007-06-07 16:53 kalkavl.m
+ 106869 -r--r--r-- 1 matlab matlab    576 2007-06-07 16:53 kalval.m
+1159054 -r--r--r-- 1 matlab matlab   1990 2009-10-29 09:16 keyLog.m
+ 106870 -rwxr-xr-x 1 matlab matlab  71712 2007-06-07 16:53 komb.exe
+ 106871 -r--r--r-- 1 matlab matlab   2246 2007-06-07 16:53 komb.m
+ 106872 -r--r--r-- 1 matlab matlab    169 2007-06-07 16:53 kopeven.m
+ 106873 -r--r--r-- 1 matlab matlab   1830 2007-06-07 16:53 kurtosis.m
+ 106874 -r--r--r-- 1 matlab matlab   1363 2007-06-07 16:53 lasso.m
+ 106875 -r--r--r-- 1 matlab matlab   1021 2007-06-07 16:53 lees1get.m
+ 106876 -r--r--r-- 1 matlab matlab    934 2007-06-07 16:53 lees1str.m
+ 106877 -r--r--r-- 1 matlab matlab   1725 2007-06-07 16:53 leesalg.m
+ 106878 -r--r--r-- 1 matlab matlab   6031 2007-06-07 16:53 leesansysdata.m
+ 106879 -r--r--r-- 1 matlab matlab   3263 2007-06-07 16:53 leesansysout.m
+ 106880 -r--r--r-- 1 matlab matlab   4033 2007-06-07 16:53 leesansysstruc.m
+ 106881 -r--r--r-- 1 matlab matlab  15889 2007-06-07 16:53 leesasap.m
+ 106882 -r--r--r-- 1 matlab matlab   1452 2007-06-07 16:53 leesasccan.m
+ 106883 -r--r--r-- 1 matlab matlab    793 2007-06-07 16:53 leesasccans.m
+ 106884 -r--r--r-- 1 matlab matlab   5495 2007-06-07 16:53 leesbas.m
+ 106885 -r--r--r-- 1 matlab matlab   2063 2007-06-07 16:53 leescana.m
+ 886636 -r--r--r-- 1 matlab matlab  12740 2009-07-31 10:50 leesCDfaultlog.m
+ 106886 -r--r--r-- 1 matlab matlab   1993 2007-06-07 16:53 leesdaf.m
+ 106887 -r--r--r-- 1 matlab matlab   6873 2007-06-07 16:53 leesdago.m
+ 106888 -r--r--r-- 1 matlab matlab   1062 2007-06-07 16:53 leesdat.m
+ 106889 -r--r--r-- 1 matlab matlab   2657 2007-06-07 16:53 leesdbc.m
+ 106890 -r--r--r-- 1 matlab matlab   3153 2007-06-07 16:53 leesdcm.m
+ 106891 -r--r--r-- 1 matlab matlab   7964 2009-04-16 16:52 leesdtlg.m
+ 106893 -r--r--r-- 1 matlab matlab   9530 2007-06-07 16:53 leeseasy2.m
+ 106892 -r--r--r-- 1 matlab matlab   3003 2007-06-07 16:53 leeseasy.m
+ 106894 -r--r--r-- 1 matlab matlab   1464 2007-08-06 08:54 leeseulg.m
+  15462 -r--r--r-- 1 matlab matlab   3005 2009-05-29 14:02 leesFMTClvXMLmeas.m
+ 106895 -r--r--r-- 1 matlab matlab   2069 2007-06-07 16:53 leesfst.m
+ 106896 -r--r--r-- 1 matlab matlab    249 2007-06-07 16:53 leesgets.m
+ 106897 -r--r--r-- 1 matlab matlab   1178 2007-06-07 16:53 leesgifmet.m
+ 106898 -r--r--r-- 1 matlab matlab   9450 2007-06-07 16:53 leeshead.m
+ 821423 -r--r--r-- 1 matlab matlab   4039 2009-10-26 09:55 leesHSmeas.m
+ 106899 -r--r--r-- 1 matlab matlab    286 2007-06-07 16:53 leesImg.m
+ 106900 -r--r--r-- 1 matlab matlab   2052 2007-06-07 16:53 leesImgs.m
+ 106901 -r--r--r-- 1 matlab matlab   1299 2007-06-07 16:53 leesini.m
+ 106902 -r--r--r-- 1 matlab matlab   4762 2007-06-07 16:53 leesjpegstruc.m
+ 106903 -r--r--r-- 1 matlab matlab    140 2007-06-07 16:53 leesjpgscan.m
+ 106904 -r--r--r-- 1 matlab matlab    874 2007-06-07 16:53 leeskar.m
+ 106905 -r--r--r-- 1 matlab matlab   2018 2007-06-07 16:53 leeskont.m
+ 106906 -r--r--r-- 1 matlab matlab   2468 2007-06-07 16:53 leeskopp.m
+ 106908 -r--r--r-- 1 matlab matlab  21670 2007-06-07 16:53 leeslgw0.m
+ 106907 -r--r--r-- 1 matlab matlab  21862 2007-06-07 16:53 leeslgw.m
+ 106909 -r--r--r-- 1 matlab matlab   2701 2007-06-07 16:53 leeslogboek.m
+ 106910 -r--r--r-- 1 matlab matlab   8271 2007-06-07 16:53 leeslphd.m
+ 106911 -r--r--r-- 1 matlab matlab  13628 2007-06-07 16:53 leeslphpref.m
+  87082 -r--r--r-- 1 matlab matlab   3437 2009-08-12 13:53 leesLTspice.m
+ 106912 -r--r--r-- 1 matlab matlab   3456 2009-08-05 10:34 leeslvsvdp.m
+ 106914 -r--r--r-- 1 matlab matlab   2369 2007-06-07 16:53 leeslvtxt0.m
+  59449 -r--r--r-- 1 matlab matlab   5902 2008-11-04 10:17 leeslvtxt1.m
+ 106915 -r--r--r-- 1 matlab matlab   4423 2007-06-07 16:53 leeslvtxt2.m
+ 137923 -r-------- 1 matlab matlab   5444 2007-10-09 10:40 leeslvtxt3.m
+ 106913 -r--r--r-- 1 matlab matlab   6044 2009-09-15 14:06 leeslvtxt.m
+ 106917 -r--r--r-- 1 matlab matlab   3987 2007-06-07 16:53 leesmdf2.m
+ 106918 -r--r--r-- 1 matlab matlab   1121 2007-06-07 16:53 leesmdff.m
+ 106916 -r--r--r-- 1 matlab matlab   6135 2009-12-24 15:05 leesmdf.m
+ 106919 -r--r--r-- 1 matlab matlab   3225 2007-06-07 16:53 leesmdf_oud.m
+  11891 -r-------- 1 matlab matlab   5893 2007-11-29 13:26 leesMIraw.m
+ 106920 -r--r--r-- 1 matlab matlab  22375 2007-06-07 16:53 leesmusi.m
+ 106921 -r--r--r-- 1 matlab matlab  21927 2007-06-07 16:53 leesmusy.m
+ 106922 -r--r--r-- 1 matlab matlab   2263 2007-06-07 16:53 leesmx.m
+ 106923 -r--r--r-- 1 matlab matlab  14734 2007-06-07 16:53 leesnlph.m
+ 106924 -r--r--r-- 1 matlab matlab   2512 2008-08-28 14:55 leesoscmeas.m
+ 106925 -r--r--r-- 1 matlab matlab   3244 2007-06-07 16:53 leespaf.m
+ 106926 -r--r--r-- 1 matlab matlab   3732 2007-06-07 16:53 leespwm.m
+ 106927 -r--r--r-- 1 matlab matlab   3460 2007-06-07 16:53 leesrawlvmeas.m
+ 106928 -r--r--r-- 1 matlab matlab    535 2007-06-07 16:53 leessdevmat.m
+ 106929 -r--r--r-- 1 matlab matlab   1523 2007-06-07 16:53 leesseri.m
+ 106930 -r--r--r-- 1 matlab matlab   1042 2007-06-07 16:53 leessimvt1f.m
+ 106931 -r--r--r-- 1 matlab matlab  40460 2007-06-07 16:53 leesswf.m
+  83145 -r--r--r-- 1 matlab matlab   3921 2008-07-18 13:06 leesTDM.m
+ 426162 -r--r--r-- 1 matlab matlab   7876 2009-04-20 09:54 leesTDMS0.m
+  20305 -r--r--r-- 1 matlab matlab  13648 2009-12-03 08:49 leesTDMS1.m
+ 222478 -r--r--r-- 1 matlab matlab  16312 2009-12-22 16:34 leesTDMSchan.m
+ 182368 -r--r--r-- 1 matlab matlab  16294 2009-12-21 09:11 leesTDMS.m
+  45557 -r--r--r-- 1 matlab matlab    670 2008-10-21 09:19 leestekdir.m
+ 106932 -r--r--r-- 1 matlab matlab   1717 2007-08-07 09:27 leestestdat.m
+ 106933 -r--r--r-- 1 matlab matlab   3076 2007-06-07 16:53 leestiff.m
+ 106934 -r--r--r-- 1 matlab matlab    694 2007-10-16 15:06 leesuid.m
+ 106935 -r--r--r-- 1 matlab matlab   1125 2007-06-07 16:53 leesvdmg.m
+ 106936 -r--r--r-- 1 matlab matlab   5710 2007-06-07 16:53 leesvrml.m
+ 106937 -r--r--r-- 1 matlab matlab   1163 2007-06-07 16:53 leesvsim.m
+ 106938 -r--r--r-- 1 matlab matlab    528 2007-06-07 16:53 legnumbers.m
+ 106939 -r--r--r-- 1 matlab matlab   1349 2007-06-07 16:53 legtitel.m
+ 106940 -r--r--r-- 1 matlab matlab   7800 2007-06-07 16:53 lensstr3d.m
+ 106941 -r--r--r-- 1 matlab matlab   5693 2007-06-07 16:53 lensstr3ds.m
+ 106942 -r--r--r-- 1 matlab matlab   4123 2007-06-07 16:53 lensstr3dss.m
+ 106944 -r--r--r-- 1 matlab matlab   1448 2007-06-07 16:53 lensstraal0.m
+ 106945 -r--r--r-- 1 matlab matlab   6118 2007-06-07 16:53 lensstraal1.m
+ 106946 -r--r--r-- 1 matlab matlab   2300 2007-06-07 16:53 lensstraal2.m
+ 106947 -r--r--r-- 1 matlab matlab   6788 2007-06-07 16:53 lensstraal_.m
+ 106943 -r--r--r-- 1 matlab matlab   7120 2007-06-07 16:53 lensstraal.m
+ 106948 -r--r--r-- 1 matlab matlab   5751 2007-06-07 16:53 lensstrds0.m
+  15772 -r--r--r-- 1 matlab matlab   2602 2007-06-21 09:37 lenssurf.m
+ 106950 -r--r--r-- 1 matlab matlab   2102 2007-06-07 16:53 lijnptzoeker.m
+ 106951 -r--r--r-- 1 matlab matlab   1282 2007-06-07 16:53 limpar.m
+ 106952 -r--r--r-- 1 matlab matlab   3898 2007-06-07 16:53 linepointdispui.m
+ 106953 -r--r--r-- 1 matlab matlab    160 2007-06-07 16:53 linkfigs.m
+ 106954 -r--r--r-- 1 matlab matlab   3800 2007-06-07 16:53 listcontents.m
+ 106955 -r--r--r-- 1 matlab matlab   2927 2007-06-07 16:53 listlphsettings.m
+ 106956 -r--r--r-- 1 matlab matlab    587 2007-06-07 16:53 lkurtosis.m
+ 106957 -r--r--r-- 1 matlab matlab     85 2007-06-07 16:53 lmstat.m
+ 107624 drwxr-xr-x 2 matlab matlab    816 2007-06-07 16:53 @long
+ 106958 -r--r--r-- 1 matlab matlab   1249 2007-06-07 16:53 loopdooreenlijn.m
+ 106959 -r--r--r-- 1 matlab matlab   1123 2007-06-07 16:53 lphstatus.m
+  40952 drwxr-xr-x 2 matlab matlab    840 2008-04-07 14:36 lsge
+ 106960 -r--r--r-- 1 matlab matlab   1432 2007-06-07 16:53 ltorqnn.mat
+1080459 -r--r--r-- 1 matlab matlab   1855 2009-12-03 13:54 lvData2struct.m
+ 822510 -r--r--r-- 1 matlab matlab    348 2009-06-10 15:24 lvpath2string.m
+ 412493 drwxr-xr-x 2 matlab matlab    296 2010-01-06 13:57 @lvtime
+ 106961 -r--r--r-- 1 matlab matlab    338 2007-06-07 16:53 m2d.m
+ 106962 -r--r--r-- 1 matlab matlab   2624 2007-06-07 16:53 m2txt.m
+ 106963 -r--r--r-- 1 matlab matlab   4289 2007-06-07 16:53 maakdriverstimul.m
+ 106964 -r--r--r-- 1 matlab matlab   1291 2007-06-07 16:53 maakeier.m
+ 106965 -r--r--r-- 1 matlab matlab    974 2007-06-07 16:53 maakjpghuftable.m
+ 106966 -r--r--r-- 1 matlab matlab   1153 2007-06-07 16:53 maakkopp.m
+ 106967 -r--r--r-- 1 matlab matlab   2821 2007-06-07 16:53 maaklens.m
+ 106968 -r--r--r-- 1 matlab matlab    495 2007-06-07 16:53 maakrifft.m
+ 106969 -r--r--r-- 1 matlab matlab    542 2007-06-07 16:53 maaktinifor.m
+ 106970 -r--r--r-- 1 matlab matlab   6688 2007-06-07 16:53 maaktstr.m
+ 106971 -r--r--r-- 1 matlab matlab   1794 2007-06-07 16:53 mac2dos.m
+ 106972 -r--r--r-- 1 matlab matlab    971 2007-06-07 16:53 mac2unix.m
+  11848 -r-------- 1 matlab matlab    283 2008-01-16 09:59 makeopts.m
+ 568537 -r--r--r-- 1 matlab matlab   1191 2009-07-07 12:03 makeOrderList.m
+   1670 -r--r--r-- 1 matlab matlab    342 2007-10-29 09:11 MakeStructFromVars.m
+ 106973 -rwxr-xr-x 1 matlab matlab    205 2007-06-07 16:53 mat5com.txt
+ 106974 -r--r--r-- 1 matlab matlab   6686 2007-06-07 16:53 matchlphcyc.m
+ 106975 -r--r--r-- 1 matlab matlab   5102 2007-06-07 16:53 matchmeas.m
+ 230105 -rw-r--r-- 1 matlab matlab      0 2010-01-06 14:18 matlroutlist.txt
+ 107466 drwxr-xr-x 7 matlab matlab    616 2010-01-06 14:15 matlzlib
+ 106977 -r--r--r-- 1 matlab matlab   1277 2007-06-07 16:53 matrix2vars.m
+ 106978 -r--r--r-- 1 matlab matlab   1875 2007-06-07 16:53 medfilt1.m
+ 106979 -r--r--r-- 1 matlab matlab    376 2007-06-07 16:53 middlepoints.m
+ 107571 drwxr-xr-x 4 matlab matlab    912 2010-01-06 14:17 @model3d
+ 106980 -r--r--r-- 1 matlab matlab   2658 2007-06-07 16:53 morse.m
+ 106981 -r--r--r-- 1 matlab matlab   2400 2007-06-07 16:53 morspeak.m
+ 106982 -r--r--r-- 1 matlab matlab   2508 2007-06-07 16:53 moveass.m
+ 106983 -r--r--r-- 1 matlab matlab   2266 2007-06-07 16:53 movfft.m
+ 106984 -r--r--r-- 1 matlab matlab   3133 2007-06-07 16:53 movmedian.m
+ 106985 -r--r--r-- 1 matlab matlab   1193 2007-06-07 16:53 mvlijnen.m
+ 106987 -r--r--r-- 1 matlab matlab   3995 2007-06-07 16:53 navfig0.m
+ 106986 -r--r--r-- 1 matlab matlab  25211 2009-08-13 09:36 navfig.m
+ 254075 -r--r--r-- 1 matlab matlab  13974 2009-08-06 10:51 navimgs.m
+ 106988 -r--r--r-- 1 matlab matlab   1204 2007-06-07 16:53 navline.m
+ 106989 -r--r--r-- 1 matlab matlab    790 2007-06-07 16:53 nextfig.m
+ 106990 -r-------- 1 matlab matlab    472 2007-08-10 09:43 nfigure.m
+ 106991 -r--r--r-- 1 matlab matlab    446 2007-06-07 16:53 nsecond.m
+ 107378 drwxr-xr-x 2 matlab matlab   2800 2007-06-07 16:53 nurbs_R2006b
+  71422 -r--r--r-- 1 matlab matlab   1753 2009-02-24 09:55 ontpiek1.m
+ 106993 -r--r--r-- 1 matlab matlab   1752 2007-06-07 16:53 ontpiek2.m
+ 106994 -r--r--r-- 1 matlab matlab   2934 2007-06-07 16:53 ontpiek3.m
+ 106992 -r--r--r-- 1 matlab matlab   3380 2009-06-04 09:57 ontpiek.m
+ 107366 drwxr-xr-x 2 matlab matlab    392 2007-06-07 16:53 peta
+ 106995 -r--r--r-- 1 matlab matlab   2987 2007-06-07 16:53 plot1vanreeks.m
+ 106996 -r--r--r-- 1 matlab matlab   4232 2009-04-27 13:34 plotcarr.m
+ 106997 -r--r--r-- 1 matlab matlab   2470 2007-06-07 16:53 plotdat.m
+ 106998 -r--r--r-- 1 matlab matlab   3301 2009-09-28 16:36 plotffts.m
+ 106999 -r--r--r-- 1 matlab matlab   3713 2007-06-07 16:53 plotflag.m
+ 107000 -r--r--r-- 1 matlab matlab   2542 2007-06-07 16:53 plotlgw.m
+ 107001 -r--r--r-- 1 matlab matlab   9093 2007-06-07 16:53 plotlphprog.m
+ 107002 -r--r--r-- 1 matlab matlab  11949 2009-08-06 09:18 plotmat.m
+ 107003 -r--r--r-- 1 matlab matlab   2848 2009-01-15 14:03 plotopvolg.m
+ 107004 -r--r--r-- 1 matlab matlab   1528 2007-06-07 16:53 plotsurf.m
+ 107005 -r--r--r-- 1 matlab matlab  11816 2009-12-07 09:03 plotui.m
+ 107006 -r--r--r-- 1 matlab matlab   4214 2007-06-07 16:53 plotvar.m
+ 107007 -r--r--r-- 1 matlab matlab   1732 2007-06-07 16:53 plotvol.m
+ 107008 -r--r--r-- 1 matlab matlab  12728 2007-06-07 16:53 plotyy.m
+ 107009 -r--r--r-- 1 matlab matlab   1323 2007-06-07 16:53 pprnosl.m
+ 107010 -r--r--r-- 1 matlab matlab   9654 2007-06-07 16:53 presnosl.m
+ 107012 -r--r--r-- 1 matlab matlab   2461 2007-06-07 16:53 print1dv.m
+ 107011 -r--r--r-- 1 matlab matlab   2212 2007-06-07 16:53 print1.m
+ 107013 -r--r--r-- 1 matlab matlab  18873 2009-08-06 15:46 print2html.m
+ 107014 -r--r--r-- 1 matlab matlab   1460 2007-06-07 16:53 print2xls.m
+ 107016 -r--r--r-- 1 matlab matlab   6879 2007-06-07 16:53 printcalhtml.m
+ 107015 -r--r--r-- 1 matlab matlab   1326 2007-06-07 16:53 printcal.m
+ 107017 -r--r--r-- 1 matlab matlab    895 2007-06-07 16:53 printhe2.m
+ 107018 -r--r--r-- 1 matlab matlab   1678 2007-06-07 16:53 printhe3.m
+ 107019 -r--r--r-- 1 matlab matlab    362 2007-06-07 16:53 printhead.m
+ 107021 -r--r--r-- 1 matlab matlab   1272 2007-06-07 16:53 printhex2.m
+ 107020 -r--r--r-- 1 matlab matlab   1350 2007-06-07 16:53 printhex.m
+ 107022 -r--r--r-- 1 matlab matlab    105 2007-06-07 16:53 printkl.m
+ 107023 -r--r--r-- 1 matlab matlab   3799 2007-06-07 16:53 printlphalarmcond.m
+ 107024 -r--r--r-- 1 matlab matlab    780 2007-06-07 16:53 printlphsettings.m
+ 107025 -r--r--r-- 1 matlab matlab   4810 2007-06-07 16:53 printlphtestprog.m
+ 107026 -r--r--r-- 1 matlab matlab    694 2007-06-07 16:53 printn.m
+ 107027 -rwxr-xr-x 1 matlab matlab    399 2007-06-07 16:53 printn.vor
+ 107028 -r--r--r-- 1 matlab matlab   1371 2008-07-23 09:53 printstr.m
+ 107029 -r--r--r-- 1 matlab matlab    573 2007-06-07 16:53 printvar.m
+ 131514 -r-------- 1 matlab matlab  13902 2008-04-21 09:27 ps2pdf.m
+ 107030 -r--r--r-- 1 matlab matlab    192 2007-06-07 16:53 r50v2t.m
+ 107031 -r--r--r-- 1 matlab matlab   3379 2007-06-07 16:53 rbline.m
+  35919 -r--r--r-- 1 matlab matlab    869 2007-06-28 08:49 readcantrace.m
+ 107032 -r--r--r-- 1 matlab matlab   3855 2008-02-05 10:59 readDOSdirFile.m
+ 183509 -r--r--r-- 1 matlab matlab    796 2009-06-17 10:39 readgraf.m
+ 789619 -r--r--r-- 1 matlab matlab   2076 2009-11-03 16:14 readIXXATtrace.m
+1080450 -r--r--r-- 1 matlab matlab   5141 2009-11-18 10:01 readLVtypeString.m
+ 177441 -r--r--r-- 1 matlab matlab    639 2009-11-13 11:34 readLVvariantData.m
+ 107033 -r--r--r-- 1 matlab matlab    731 2007-06-07 16:53 reads1p.m
+ 107034 -r--r--r-- 1 matlab matlab  11885 2007-06-07 16:53 readstdtcdata_r13.m
+ 107035 -r--r--r-- 1 matlab matlab  21225 2007-06-07 16:53 readstdtcdata_r14.m
+ 886634 -r--r--r-- 1 matlab matlab   5156 2009-07-31 10:25 readTrigMeas.m
+ 107036 -r--r--r-- 1 matlab matlab   2746 2007-06-07 16:53 readUXdirFile.m
+ 107037 -r--r--r-- 1 matlab matlab   1410 2007-06-07 16:53 readvcard.m
+ 107038 -r--r--r-- 1 matlab matlab   2331 2007-06-07 16:53 readwdoc.m
+ 431862 -r--r--r-- 1 matlab matlab   2205 2009-04-20 09:30 readwfm.m
+  96850 -r--r--r-- 1 matlab matlab   3527 2008-07-04 07:57 readxml.m
+ 107039 -r--r--r-- 1 matlab matlab   2746 2007-06-07 16:53 real48_as_uint8_to_double.m
+ 413381 -r--r--r-- 1 matlab matlab   1319 2008-11-26 10:30 realSpec.m
+ 107040 -r--r--r-- 1 matlab matlab   3097 2007-06-07 16:53 realtimepointer.m
+ 107041 -r--r--r-- 1 matlab matlab    777 2007-06-07 16:53 rearrangergb.m
+ 567696 -r--r--r-- 1 matlab matlab   1572 2009-07-24 14:31 reformatTDMS.m
+ 107042 -r--r--r-- 1 matlab matlab   1198 2008-03-19 14:16 resamplefft.m
+  36131 -r--r--r-- 1 matlab matlab   1191 2009-03-24 15:47 reshapetrunc.m
+ 107043 -r--r--r-- 1 matlab matlab  18546 2007-06-07 16:53 riffread.m
+ 107044 -r--r--r-- 1 matlab matlab    278 2007-06-07 16:53 rmelnaamend.m
+ 107045 -r--r--r-- 1 matlab matlab    412 2007-06-07 16:53 rmnaamend.m
+ 107046 -r--r--r-- 1 matlab matlab    131 2007-06-07 16:53 rotx.m
+ 107047 -r--r--r-- 1 matlab matlab    139 2007-06-07 16:53 rotxr.m
+ 107048 -r--r--r-- 1 matlab matlab    131 2007-06-07 16:53 roty.m
+ 107049 -r--r--r-- 1 matlab matlab    139 2007-06-07 16:53 rotyr.m
+ 107050 -r--r--r-- 1 matlab matlab    131 2007-06-07 16:53 rotz.m
+ 107051 -r--r--r-- 1 matlab matlab    139 2007-06-07 16:53 rotzr.m
+ 107052 -r--r--r-- 1 matlab matlab    356 2007-06-07 16:53 rotzz.m
+ 407375 -r--r--r-- 1 matlab matlab   2356 2009-04-01 09:38 rtpointer.m
+ 107053 -rwxr-xr-x 1 matlab matlab      0 2007-06-07 16:53 runbashlogout
+ 184634 -r--r--r-- 1 matlab matlab   3817 2009-12-07 09:30 runthroughgraph.m
+ 107353 drwxr-xr-x 2 matlab matlab    432 2007-06-07 16:53 sam2000
+ 107054 -r--r--r-- 1 matlab matlab   1370 2008-02-21 15:52 savefig.m
+ 107055 -r--r--r-- 1 matlab matlab   2644 2007-06-07 16:53 schrdbc.m
+ 107056 -r--r--r-- 1 matlab matlab   5981 2007-06-07 16:53 schrlphcanset.m
+ 107057 -r--r--r-- 1 matlab matlab   3492 2007-06-07 16:53 schrlphpref.m
+ 107058 -r--r--r-- 1 matlab matlab    287 2007-06-07 16:53 setlowcase.m
+ 107059 -r--r--r-- 1 matlab matlab   4357 2009-08-13 09:17 setoptions.m
+ 107060 -r--r--r-- 1 matlab matlab   1373 2007-06-07 16:53 setpstitle.m
+ 758030 -r--r--r-- 1 matlab matlab   1082 2009-05-27 11:08 SetPtsNaN.m
+ 107061 -r--r--r-- 1 matlab matlab   3057 2007-06-07 16:53 showpt.m
+ 107333 drwxr-xr-x 2 matlab matlab    608 2007-06-07 16:53 simulink
+ 107062 -r--r--r-- 1 matlab matlab    950 2007-06-07 16:53 sineenvelope.m
+ 107063 -r--r--r-- 1 matlab matlab    238 2007-06-07 16:53 sortdirdate.m
+ 107064 -r--r--r-- 1 matlab matlab    426 2007-06-07 16:53 sortstr.m
+ 107065 -r--r--r-- 1 matlab matlab   3747 2007-06-07 16:53 specanal.m
+ 378782 -r--r--r-- 1 matlab matlab    631 2009-06-04 08:27 splitfile.m
+ 107066 -r--r--r-- 1 matlab matlab    348 2007-06-07 16:53 splits.m
+ 107067 -r--r--r-- 1 matlab matlab   1419 2007-06-07 16:53 sprnosl.m
+ 107330 drwxr-xr-x 2 matlab matlab    280 2008-05-15 10:13 src
+   2620 -r--r--r-- 1 matlab matlab    249 2009-07-08 12:18 startSPFD.m
+ 107068 -r--r--r-- 1 matlab matlab   3405 2008-05-19 13:03 status.m
+ 177491 -r--r--r-- 1 matlab matlab   1217 2009-11-19 08:58 steppedline.m
+ 107069 -r--r--r-- 1 matlab matlab    645 2007-06-07 16:53 str2num2.m
+ 107070 -r--r--r-- 1 matlab matlab    648 2007-06-07 16:53 straalsnijd.m
+ 170793 -r--r--r-- 1 matlab matlab   2910 2008-09-29 09:39 stralingsdata.m
+ 107071 -r--r--r-- 1 matlab matlab    579 2007-06-07 16:53 strcmpc.m
+ 107554 drwxr-xr-x 2 matlab matlab    376 2010-01-06 14:00 @struct
+  35830 -r--r--r-- 1 matlab matlab    224 2009-03-06 08:16 struct2var.m
+ 107072 -r--r--r-- 1 matlab matlab   6126 2007-06-07 16:53 subp.m
+  12050 -r--r--r-- 1 matlab matlab    771 2008-05-29 15:01 succOutlierRemove.m
+ 107073 -r--r--r-- 1 matlab matlab  15623 2007-06-07 16:53 tathena.m
+ 107075 -r--r--r-- 1 matlab matlab   1847 2007-06-07 16:53 tcconversief.m
+ 107074 -r--r--r-- 1 matlab matlab    311 2007-06-07 16:53 tcconversie.m
+ 107076 -r--r--r-- 1 matlab matlab   4747 2007-06-07 16:53 tcconversion.m
+ 107077 -r--r--r-- 1 matlab matlab    858 2007-06-07 16:53 tekenbits.m
+ 107078 -r--r--r-- 1 matlab matlab   1383 2007-06-07 16:53 tekstsel.m
+ 107079 -r--r--r-- 1 matlab matlab    383 2007-06-07 16:53 telec.m
+ 107080 -r--r--r-- 1 matlab matlab    360 2007-06-07 16:53 tempkar.mat
+ 107081 -r--r--r-- 1 matlab matlab    827 2007-06-07 16:53 testcomma.m
+ 107082 -r--r--r-- 1 matlab matlab    269 2007-06-07 16:53 testfunio.m
+ 107083 -r--r--r-- 1 matlab matlab   2380 2007-06-07 16:53 testnav.m
+ 107084 -r--r--r-- 1 matlab matlab    334 2007-06-07 16:53 testsort.m
+ 107085 -r--r--r-- 1 matlab matlab   1801 2007-06-07 16:53 testtype.m
+ 107086 -r--r--r-- 1 matlab matlab   1928 2007-06-07 16:53 tex2txt.m
+1095155 -r--r--r-- 1 matlab matlab   3355 2009-10-14 10:29 ThermSensors.txt
+ 107087 -r--r--r-- 1 matlab matlab    112 2007-06-07 16:53 tijd.m
+ 107088 -r--r--r-- 1 matlab matlab   1280 2007-06-07 16:53 tile.m
+  46151 -r--r--r-- 1 matlab matlab   2013 2009-06-05 08:59 timedurl.m
+ 107089 -r--r--r-- 1 matlab matlab   1187 2007-06-07 16:53 timeshif.m
+ 107090 -r--r--r-- 1 matlab matlab    127 2007-06-07 16:53 tlemans.m
+ 107091 -r--r--r-- 1 matlab matlab   2768 2007-06-07 16:53 tlemans.mat
+ 107093 -r--r--r-- 1 matlab matlab    122 2007-06-07 16:53 todoublele.m
+  81856 -r-------- 1 matlab matlab    125 2008-05-05 12:08 todouble.m
+ 107092 -rwxr-xr-x 1 matlab matlab  10054 2007-06-07 16:53 todouble.mexglx
+ 107094 -r--r--r-- 1 matlab matlab    625 2007-06-07 16:53 toonchil.m
+ 107095 -r--r--r-- 1 matlab matlab    209 2007-06-07 16:53 toonfigs.m
+ 107096 -r--r--r-- 1 matlab matlab    484 2007-06-07 16:53 toontext.m
+ 107097 -rwxr-xr-x 1 matlab matlab   9533 2007-06-07 16:53 tosinglebe.mexglx
+  58817 -r-------- 1 matlab matlab    467 2008-05-05 12:02 touint8.m
+  32581 -rwxr-xr-x 1 matlab matlab   8320 2008-05-15 10:12 touint8.mexglx
+ 107098 -r--r--r-- 1 matlab matlab   8427 2007-06-07 16:53 tox14.m
+ 107099 -r--r--r-- 1 matlab matlab   4830 2007-06-07 16:53 tox15.m
+ 107100 -r--r--r-- 1 matlab matlab   4732 2007-06-07 16:53 tox16.m
+ 107101 -r--r--r-- 1 matlab matlab   9589 2007-06-07 16:53 toxf.m
+ 107102 -r--r--r-- 1 matlab matlab    312 2007-06-07 16:53 toxford.m
+ 107103 -r--r--r-- 1 matlab matlab  63095 2007-06-07 16:53 ttucson.m
+ 567683 -r--r--r-- 1 matlab matlab    296 2009-07-02 09:22 tvec.m
+ 107104 -r--r--r-- 1 matlab matlab    326 2007-06-07 16:53 u2dall.m
+ 107549 drwxr-xr-x 2 matlab matlab    144 2007-06-07 16:53 @uint8
+ 107105 -r--r--r-- 1 matlab matlab    235 2007-06-07 16:53 uniquerows.m
+ 107106 -r--r--r-- 1 matlab matlab   6880 2008-12-15 08:39 unitcon.m
+ 107107 -r--r--r-- 1 matlab matlab   1333 2007-06-07 16:53 unix2dos.m
+1093955 -r--r--r-- 1 matlab matlab   1135 2010-01-04 14:18 unixpath.m
+ 107108 -r--r--r-- 1 matlab matlab    919 2007-06-07 16:53 updatelphstatus.m
+ 107109 -r--r--r-- 1 matlab matlab    842 2007-06-07 16:53 updmetlijst.m
+  32283 -r--r--r-- 1 matlab matlab   3609 2009-04-24 08:51 urlbinread.m
+  68508 -r--r--r-- 1 matlab matlab   1631 2009-04-20 12:15 urlbreadwrite.m
+   2789 -r--r--r-- 1 matlab matlab    524 2009-04-24 16:21 var2struct.m
+ 107110 -r--r--r-- 1 matlab matlab    363 2007-06-07 16:53 vartoer.m
+ 171274 -r--r--r-- 1 matlab matlab   8354 2007-12-05 16:38 VA_xml2mis.m
+ 107111 -r--r--r-- 1 matlab matlab   2397 2007-06-07 16:53 verbcycli.m
+ 107112 -r--r--r-- 1 matlab matlab   1080 2007-06-07 16:53 vergtijd.m
+ 107113 -r--r--r-- 1 matlab matlab    905 2007-06-07 16:53 verpmot.m
+ 107114 -r--r--r-- 1 matlab matlab   6837 2007-06-07 16:53 vervang.m
+ 107115 -r--r--r-- 1 matlab matlab    432 2009-02-09 13:13 verwpunt.m
+ 107137 drwxr-xr-x 2 matlab matlab   4656 2007-06-07 16:53 voicebox
+ 107116 -r--r--r-- 1 matlab matlab   7808 2009-12-04 09:11 volglijn.m
+ 107117 -r--r--r-- 1 matlab matlab  22018 2007-06-07 16:53 vrml.m
+ 107118 -r--r--r-- 1 matlab matlab   1105 2007-06-07 16:53 vt1fmodrep.m
+ 107119 -r--r--r-- 1 matlab matlab   4205 2007-06-07 16:53 vwmsgs.m
+  15591 -r--r--r-- 1 matlab matlab   1027 2008-11-04 11:22 wrenablfun.m
+ 107120 -r--r--r-- 1 matlab matlab   1525 2007-06-07 16:53 writedata.m
+ 107121 -r--r--r-- 1 matlab matlab   2730 2007-06-07 16:53 writedcm.m
+ 107122 -r--r--r-- 1 matlab matlab   4670 2007-06-07 16:53 xlswrite.m
+ 107123 -r--r--r-- 1 matlab matlab    409 2007-06-07 16:53 y2label.m
+ 107124 -rwxr-xr-x 1 matlab matlab   8388 2007-06-18 11:42 zcompr.mexglx
+ 107125 -r--r--r-- 1 matlab matlab   2357 2008-06-16 10:51 zetev.m
+ 107127 -r--r--r-- 1 matlab matlab   2243 2009-04-15 09:55 zoekcirc.m
+ 107129 -r--r--r-- 1 matlab matlab    571 2007-06-07 16:53 zoekdoorgg.m
+ 107128 -r--r--r-- 1 matlab matlab   1025 2007-06-07 16:53 zoekdoorg.m
+ 107130 -r--r--r-- 1 matlab matlab   2868 2007-06-07 16:53 zoekeven.m
+ 107131 -r--r--r-- 1 matlab matlab   2133 2007-06-07 16:53 zoekgel.m
+  15659 -r--r--r-- 1 matlab matlab   1801 2009-01-30 16:50 zoeklocmax.m
+ 107132 -r--r--r-- 1 matlab matlab   1266 2007-06-07 16:53 zoekmissings.m
+ 107133 -r--r--r-- 1 matlab matlab   1497 2007-06-07 16:53 zoekpiek.m
+ 107134 -r--r--r-- 1 matlab matlab   2149 2007-06-07 16:53 zoekpieks.m
+ 107135 -r--r--r-- 1 matlab matlab    367 2007-06-07 16:53 zoekstuk.m
+  36632 drwxr-xr-x 3 matlab matlab   1120 2010-01-06 14:02 zonnew
+ 107136 -rwxr-xr-x 1 matlab matlab   9198 2007-06-18 11:42 zuncompr.mexglx
+
+./@casap:
+total 80
+107784 -r--r--r-- 1 matlab matlab  2155 2007-06-07 16:53 calccreep.m
+107785 -r--r--r-- 1 matlab matlab  5140 2007-06-07 16:53 casap.m
+107786 -r--r--r-- 1 matlab matlab  4631 2007-06-07 16:53 cmppar.m
+107787 -r--r--r-- 1 matlab matlab   928 2007-06-07 16:53 compare.m
+107789 -r--r--r-- 1 matlab matlab  6313 2007-06-07 16:53 getpar1.m
+107788 -r--r--r-- 1 matlab matlab 11389 2007-06-07 16:53 getpar.m
+107790 -r--r--r-- 1 matlab matlab  1675 2007-06-07 16:53 getvar.m
+107791 -r--r--r-- 1 matlab matlab   263 2007-06-07 16:53 import.m
+107792 -r--r--r-- 1 matlab matlab  2710 2007-06-07 16:53 leestune.m
+107793 -r--r--r-- 1 matlab matlab   960 2007-06-07 16:53 maakxkal.m
+107794 -r--r--r-- 1 matlab matlab   340 2007-06-07 16:53 plow.m
+107795 -r--r--r-- 1 matlab matlab   577 2007-06-07 16:53 pneed.m
+107796 -r--r--r-- 1 matlab matlab   229 2007-06-07 16:53 printcalhtml.m
+107799 drwxr-xr-x 2 matlab matlab    80 2007-06-07 16:53 private
+107797 -r--r--r-- 1 matlab matlab  1762 2007-06-07 16:53 writedata.m
+107798 -r--r--r-- 1 matlab matlab  2549 2007-06-07 16:53 writedcm.m
+
+./@casap/private:
+total 4
+107800 -r--r--r-- 1 matlab matlab 300 2007-06-07 16:53 getelem.m
+
+./@ccvt:
+total 108
+107757 -r--r--r-- 1 matlab matlab  295 2007-06-07 16:53 calcdidt.m
+107758 -r--r--r-- 1 matlab matlab  265 2007-06-07 16:53 calci.m
+107759 -r--r--r-- 1 matlab matlab  113 2007-06-07 16:53 calcnsec.m
+107760 -r--r--r-- 1 matlab matlab  230 2007-06-07 16:53 calct.m
+107761 -r--r--r-- 1 matlab matlab  920 2007-06-07 16:53 calcxprimvent.m
+107762 -r--r--r-- 1 matlab matlab 5821 2007-06-07 16:53 ccvt.m
+107763 -r--r--r-- 1 matlab matlab   84 2007-06-07 16:53 fns2v.m
+107764 -r--r--r-- 1 matlab matlab  176 2007-06-07 16:53 fveersec.m
+107765 -r--r--r-- 1 matlab matlab   97 2007-06-07 16:53 fws2v.m
+107766 -r--r--r-- 1 matlab matlab   66 2007-06-07 16:53 ilow.m
+107767 -r--r--r-- 1 matlab matlab   62 2007-06-07 16:53 iod.m
+107768 -r--r--r-- 1 matlab matlab  123 2007-06-07 16:53 itoteind.m
+107769 -r--r--r-- 1 matlab matlab 1499 2007-06-07 16:53 presnosl.m
+107770 -r--r--r-- 1 matlab matlab  143 2007-06-07 16:53 pveersec.m
+107771 -r--r--r-- 1 matlab matlab  258 2007-06-07 16:53 raftaster.m
+107772 -r--r--r-- 1 matlab matlab  114 2007-06-07 16:53 rprim.m
+107773 -r--r--r-- 1 matlab matlab  114 2007-06-07 16:53 rsec.m
+107774 -r--r--r-- 1 matlab matlab  239 2007-06-07 16:53 schatnprim.m
+107775 -r--r--r-- 1 matlab matlab  144 2007-06-07 16:53 setpkop.m
+107776 -r--r--r-- 1 matlab matlab  146 2007-06-07 16:53 setpomp.m
+107777 -r--r--r-- 1 matlab matlab  139 2007-06-07 16:53 setpsec.m
+107778 -r--r--r-- 1 matlab matlab  119 2007-06-07 16:53 setwagen.m
+107779 -r--r--r-- 1 matlab matlab  168 2007-06-07 16:53 tkop.m
+107780 -r--r--r-- 1 matlab matlab 1356 2007-06-07 16:53 tloss.m
+107781 -r--r--r-- 1 matlab matlab 1196 2007-06-07 16:53 tranrend.m
+107782 -r--r--r-- 1 matlab matlab  182 2007-06-07 16:53 xaftaster.m
+
+./@ccvtcont:
+total 32
+107749 -r--r--r-- 1 matlab matlab  358 2007-06-07 16:53 actpos.m
+107750 -r--r--r-- 1 matlab matlab 4958 2007-06-07 16:53 ccvtcont.m
+107751 -r--r--r-- 1 matlab matlab  862 2007-06-07 16:53 dckop.m
+107752 -r--r--r-- 1 matlab matlab  449 2007-06-07 16:53 dcsec.m
+107753 -r--r--r-- 1 matlab matlab  143 2007-06-07 16:53 defoutput.m
+107754 -r--r--r-- 1 matlab matlab  155 2007-06-07 16:53 init.m
+107755 -r--r--r-- 1 matlab matlab  284 2007-06-07 16:53 setinputs.m
+
+./@cdriver:
+total 20
+107743 -r--r--r-- 1 matlab matlab 273 2007-06-07 16:53 cdriver.m
+107744 -r--r--r-- 1 matlab matlab  76 2007-06-07 16:53 getcyclus.m
+107745 -r--r--r-- 1 matlab matlab 526 2007-06-07 16:53 getgas.m
+107746 -r--r--r-- 1 matlab matlab 963 2007-06-07 16:53 getgasr.m
+107747 -r--r--r-- 1 matlab matlab 512 2007-06-07 16:53 init.m
+
+./@cell:
+total 8
+107741 -r--r--r-- 1 matlab matlab 758 2007-06-07 16:53 binzoek.m
+568378 -r--r--r-- 1 matlab matlab 295 2009-08-05 11:17 texlabel.m
+
+./@cjpeg:
+total 44
+107731 -r--r--r-- 1 matlab matlab  193 2007-06-07 16:53 cjpeg.m
+107732 -r--r--r-- 1 matlab matlab 1858 2007-06-07 16:53 disp.m
+107733 -r--r--r-- 1 matlab matlab  389 2007-06-07 16:53 gethufftables.m
+107735 -r--r--r-- 1 matlab matlab  109 2007-06-07 16:53 getmarkerdata.m
+107734 -r--r--r-- 1 matlab matlab   87 2007-06-07 16:53 getmarker.m
+107736 -r--r--r-- 1 matlab matlab  312 2007-06-07 16:53 getquanttables.m
+107737 -r--r--r-- 1 matlab matlab  296 2007-06-07 16:53 getscan.m
+107739 -r--r--r-- 1 matlab matlab 5385 2007-06-07 16:53 leesscanf.m
+107738 -r--r--r-- 1 matlab matlab 5084 2007-06-07 16:53 leesscan.m
+
+./@clens:
+total 48
+107723 -r--r--r-- 1 matlab matlab 4770 2007-12-14 09:06 clens.m
+107725 -r--r--r-- 1 matlab matlab 2687 2008-04-23 08:40 plot.m
+107726 -r--r--r-- 1 matlab matlab 8670 2008-04-23 08:45 straal.m
+107727 -r--r--r-- 1 matlab matlab 5685 2007-06-21 09:44 straals.m
+107728 -r--r--r-- 1 matlab matlab 4115 2007-06-21 09:44 straalss.m
+ 42522 -r--r--r-- 1 matlab matlab 4605 2007-12-17 11:07 surfaces.m
+
+./@cmotor:
+total 32
+107714 -r--r--r-- 1 matlab matlab 2640 2007-06-07 16:53 cmotor.m
+107715 -r--r--r-- 1 matlab matlab   80 2007-06-07 16:53 imassa.m
+107716 -r--r--r-- 1 matlab matlab  725 2007-06-07 16:53 plot.m
+107717 -r--r--r-- 1 matlab matlab  141 2007-06-07 16:53 tcan.m
+107718 -r--r--r-- 1 matlab matlab 1140 2007-06-07 16:53 tmotor.m
+107719 -r--r--r-- 1 matlab matlab  115 2007-06-07 16:53 verb_kwh.m
+107720 -r--r--r-- 1 matlab matlab  508 2007-06-07 16:53 verb_ng2nt.m
+107721 -r--r--r-- 1 matlab matlab  415 2007-06-07 16:53 verb_s.m
+
+./@cnavmsrs:
+total 28
+107711 -r--r--r-- 1 matlab matlab 4359 2009-08-05 08:41 cnavmsrs.m
+ 36118 -r-------- 1 matlab matlab  466 2007-11-13 11:27 del.m
+106416 -r--r--r-- 1 matlab matlab   87 2009-05-14 11:23 GetFig.m
+808013 -r--r--r-- 1 matlab matlab   89 2009-05-14 11:39 GetNr.m
+107712 -r--r--r-- 1 matlab matlab 7947 2009-09-28 16:24 navmsrs.m
+
+./@cpkop:
+total 12
+107707 -r--r--r-- 1 matlab matlab  730 2007-06-07 16:53 cpkop.m
+107708 -r--r--r-- 1 matlab matlab  516 2007-06-07 16:53 p.m
+107709 -r--r--r-- 1 matlab matlab 1962 2007-06-07 16:53 testpkop.m
+
+./@cpomp:
+total 12
+107703 -r--r--r-- 1 matlab matlab 854 2007-06-07 16:53 cpomp.m
+107704 -r--r--r-- 1 matlab matlab 237 2007-06-07 16:53 debiet.m
+107705 -r--r--r-- 1 matlab matlab 166 2007-06-07 16:53 tpomp.m
+
+./@cpsec:
+total 8
+107700 -r--r--r-- 1 matlab matlab 3272 2007-06-07 16:53 cpsec.m
+107701 -r--r--r-- 1 matlab matlab  619 2007-06-07 16:53 p.m
+
+./@crijcyclus:
+total 52
+107695 -r--r--r-- 1 matlab matlab 37963 2007-06-07 16:53 crijcyclus.m
+107696 -r--r--r-- 1 matlab matlab   150 2007-06-07 16:53 getcyclus.m
+107697 -r--r--r-- 1 matlab matlab   170 2007-06-07 16:53 getv.m
+107698 -r--r--r-- 1 matlab matlab   201 2007-06-07 16:53 plot.m
+
+./@cswf:
+total 60
+107679 -r--r--r-- 1 matlab matlab  351 2007-06-07 16:53 cswf.m
+107680 -r--r--r-- 1 matlab matlab 3068 2007-06-07 16:53 disp.m
+107681 -r--r--r-- 1 matlab matlab 2216 2007-06-07 16:53 getshape.m
+107683 -r--r--r-- 1 matlab matlab  141 2007-06-07 16:53 gettagdata.m
+107684 -r--r--r-- 1 matlab matlab  435 2007-06-07 16:53 gettaglist.m
+107682 -r--r--r-- 1 matlab matlab  128 2007-06-07 16:53 gettag.m
+107685 -r--r--r-- 1 matlab matlab  903 2007-06-07 16:53 jpegdata.m
+107686 -r--r--r-- 1 matlab matlab  621 2007-06-07 16:53 listtags.m
+107687 -r--r--r-- 1 matlab matlab  774 2007-06-07 16:53 maakjpeg.m
+107688 -r--r--r-- 1 matlab matlab  593 2007-06-07 16:53 pictdata.m
+107689 -r--r--r-- 1 matlab matlab  388 2007-06-07 16:53 plotshape.m
+107690 -r--r--r-- 1 matlab matlab   83 2007-06-07 16:53 unprotect.m
+107691 -r--r--r-- 1 matlab matlab  309 2007-06-07 16:53 zoekjpegs.m
+107692 -r--r--r-- 1 matlab matlab  454 2007-06-07 16:53 zoekpicts.m
+107693 -r--r--r-- 1 matlab matlab  710 2007-06-07 16:53 zoektags.m
+
+./@cwagen:
+total 68
+107662 -r--r--r-- 1 matlab matlab  352 2007-06-07 16:53 calcf.m
+107663 -r--r--r-- 1 matlab matlab  285 2007-06-07 16:53 calcfres.m
+107664 -r--r--r-- 1 matlab matlab  337 2007-06-07 16:53 calcoptn.m
+107665 -r--r--r-- 1 matlab matlab 2404 2007-06-07 16:53 calctout.m
+107667 -r--r--r-- 1 matlab matlab 1337 2007-06-07 16:53 calcveind.m
+107666 -r--r--r-- 1 matlab matlab  159 2007-06-07 16:53 calcv.m
+107668 -r--r--r-- 1 matlab matlab 1061 2007-06-07 16:53 cwagen.m
+107669 -r--r--r-- 1 matlab matlab  110 2007-06-07 16:53 getcont.m
+107670 -r--r--r-- 1 matlab matlab   80 2007-06-07 16:53 getcvt.m
+107671 -r--r--r-- 1 matlab matlab   70 2007-06-07 16:53 getm.m
+107672 -r--r--r-- 1 matlab matlab   84 2007-06-07 16:53 getmotor.m
+107673 -r--r--r-- 1 matlab matlab   91 2007-06-07 16:53 getowiel.m
+107674 -r--r--r-- 1 matlab matlab   74 2007-06-07 16:53 setcvt.m
+107675 -r--r--r-- 1 matlab matlab 4998 2007-06-07 16:53 sim.m
+107676 -r--r--r-- 1 matlab matlab   93 2007-06-07 16:53 tmotor.m
+107677 -r--r--r-- 1 matlab matlab  100 2007-06-07 16:53 tpomp.m
+
+./@dznach:
+total 12
+107658 -r--r--r-- 1 matlab matlab 1301 2007-06-07 16:53 dznach.m
+107659 -r--r--r-- 1 matlab matlab 1740 2007-06-07 16:53 getnset.m
+107660 -r--r--r-- 1 matlab matlab  289 2007-06-07 16:53 init.m
+
+./ecu:
+total 264
+107512 -r--r--r-- 1 matlab matlab  3715 2007-06-07 16:53 athcan.m
+107513 -r--r--r-- 1 matlab matlab   360 2007-06-07 16:53 avfilter.m
+107514 -r--r--r-- 1 matlab matlab  4410 2007-06-07 16:53 calcdrehzahln.m
+107515 -r--r--r-- 1 matlab matlab  1827 2007-06-07 16:53 calcff.m
+107516 -r--r--r-- 1 matlab matlab   950 2007-06-07 16:53 calctipr.m
+107517 -r--r--r-- 1 matlab matlab  2158 2007-06-07 16:53 canpr.m
+107518 -r--r--r-- 1 matlab matlab  1719 2007-06-07 16:53 combeven.m
+107519 -r--r--r-- 1 matlab matlab  1846 2007-06-07 16:53 correven.m
+107520 -r--r--r-- 1 matlab matlab  3590 2007-06-07 16:53 evlijst.m
+107521 -r--r--r-- 1 matlab matlab  1140 2007-06-07 16:53 ffcalcs.m
+107522 -r--r--r-- 1 matlab matlab 68111 2007-06-07 16:53 fffff.txt
+107523 -r--r--r-- 1 matlab matlab   657 2007-06-07 16:53 fl2d.m
+107524 -r--r--r-- 1 matlab matlab   809 2007-06-07 16:53 fl3d.m
+107525 -r--r--r-- 1 matlab matlab   400 2007-06-07 16:53 flpid.m
+107526 -r--r--r-- 1 matlab matlab   376 2007-06-07 16:53 getlastf.m
+107527 -r--r--r-- 1 matlab matlab  1252 2007-06-07 16:53 getparg.m
+107528 -r--r--r-- 1 matlab matlab   440 2007-06-07 16:53 kalidruk.m
+107529 -r--r--r-- 1 matlab matlab   367 2007-06-07 16:53 lasti.m
+107530 -r--r--r-- 1 matlab matlab   249 2007-06-07 16:53 lastnm.m
+107531 -r--r--r-- 1 matlab matlab   258 2007-06-07 16:53 lastns.m
+107532 -r--r--r-- 1 matlab matlab    89 2007-06-07 16:53 lastt.m
+107533 -r--r--r-- 1 matlab matlab   248 2007-06-07 16:53 lastv.m
+107534 -r--r--r-- 1 matlab matlab  5698 2007-06-07 16:53 leescan.m
+107535 -r--r--r-- 1 matlab matlab  1116 2007-06-07 16:53 leesdruk.m
+107536 -r--r--r-- 1 matlab matlab 29098 2007-06-07 16:53 leesecu.m
+107537 -r--r--r-- 1 matlab matlab  5524 2007-06-07 16:53 leeseven.m
+107538 -r--r--r-- 1 matlab matlab   648 2007-06-07 16:53 leesgeh.m
+107539 -r--r--r-- 1 matlab matlab  4571 2007-06-07 16:53 leeslu.m
+107540 -r--r--r-- 1 matlab matlab   530 2007-06-07 16:53 limfilt.m
+107541 -r--r--r-- 1 matlab matlab  2944 2007-06-07 16:53 oxfcan.m
+107542 -r--r--r-- 1 matlab matlab  1756 2007-06-07 16:53 ploteven.m
+107543 -r--r--r-- 1 matlab matlab   614 2007-06-07 16:53 plotff.m
+107544 -r--r--r-- 1 matlab matlab   537 2007-06-07 16:53 ploti.m
+107545 -r--r--r-- 1 matlab matlab  1342 2007-06-07 16:53 plotlu.m
+107546 -r--r--r-- 1 matlab matlab   368 2007-06-07 16:53 plotv.m
+107547 -r--r--r-- 1 matlab matlab    96 2007-06-07 16:53 prlast.m
+107548 -r--r--r-- 1 matlab matlab  8236 2007-06-07 16:53 schrlu.m
+
+./@FMTCfile:
+total 8
+46013 -r--r--r-- 1 matlab matlab 6509 2008-12-23 14:37 FMTCfile.m
+
+./@fstcalib:
+total 12
+107654 -r--r--r-- 1 matlab matlab  245 2007-06-07 16:53 fstcalib.m
+107655 -r--r--r-- 1 matlab matlab 2239 2007-06-07 16:53 getpar.m
+107656 -r--r--r-- 1 matlab matlab  204 2007-06-07 16:53 printhex.m
+
+./@HEATdata:
+total 4
+1177505 -r--r--r-- 1 matlab matlab 2450 2009-10-28 10:41 HEATdata.m
+
+./iges2matlab:
+total 96
+107505 -rwxr-xr-x 1 matlab matlab 57344 2007-06-07 16:53 bspeval.dll
+107506 -rw-rw-rw- 1 matlab matlab 15047 2007-06-07 16:53 iges2matlab.m
+107507 -rw-rw-rw- 1 matlab matlab  3504 2007-06-07 16:53 nrbeval.m
+107508 -rw-rw-rw- 1 matlab matlab  9065 2007-06-07 16:53 plotIGES.m
+107509 -rwxr-xr-x 1 matlab matlab  2070 2007-06-07 16:53 readme.txt
+107510 -rw-rw-rw- 1 matlab matlab  3138 2007-06-07 16:53 transformIGES.m
+
+./@long:
+total 144
+107625 -r--r--r-- 1 matlab matlab   249 2007-06-07 16:53 char.m
+107626 -r--r--r-- 1 matlab matlab    59 2007-06-07 16:53 ctranspose.m
+107627 -r--r--r-- 1 matlab matlab    39 2007-06-07 16:53 decimales.m
+107628 -r--r--r-- 1 matlab matlab   391 2007-06-07 16:53 display.m
+107629 -r--r--r-- 1 matlab matlab   258 2007-06-07 16:53 double.m
+107630 -r--r--r-- 1 matlab matlab   792 2007-06-07 16:53 eq.m
+107631 -r--r--r-- 1 matlab matlab   146 2007-06-07 16:53 exp.m
+107632 -r--r--r-- 1 matlab matlab   265 2007-06-07 16:53 horzcat.m
+107633 -r--r--r-- 1 matlab matlab    43 2007-06-07 16:53 length.m
+107635 -rwxr-xr-x 1 matlab matlab 32872 2007-06-07 16:53 long_foto.jpg
+107634 -r--r--r-- 1 matlab matlab  2122 2007-06-07 16:53 long.m
+107636 -r--r--r-- 1 matlab matlab  1713 2007-06-07 16:53 minus.m
+107637 -r--r--r-- 1 matlab matlab   553 2007-06-07 16:53 mtimes.m
+107638 -r--r--r-- 1 matlab matlab    34 2007-06-07 16:53 not.m
+107639 -r--r--r-- 1 matlab matlab  2483 2007-06-07 16:53 plus.m
+107640 -r--r--r-- 1 matlab matlab    39 2007-06-07 16:53 potencia.m
+107641 -r--r--r-- 1 matlab matlab   472 2007-06-07 16:53 power.m
+107642 -r--r--r-- 1 matlab matlab   167 2007-06-07 16:53 rdivide.m
+107643 -rwxr-xr-x 1 matlab matlab  1737 2007-06-07 16:53 readme.txt
+107644 -r--r--r-- 1 matlab matlab    39 2007-06-07 16:53 size.m
+107645 -r--r--r-- 1 matlab matlab   912 2007-06-07 16:53 subsasgn.m
+107646 -r--r--r-- 1 matlab matlab  1068 2007-06-07 16:53 subsref.m
+107647 -r--r--r-- 1 matlab matlab   177 2007-06-07 16:53 sum.m
+107648 -r--r--r-- 1 matlab matlab   159 2007-06-07 16:53 times.m
+107649 -r--r--r-- 1 matlab matlab    60 2007-06-07 16:53 transpose.m
+107650 -r--r--r-- 1 matlab matlab    70 2007-06-07 16:53 uminus.m
+107651 -r--r--r-- 1 matlab matlab    27 2007-06-07 16:53 uplus.m
+107652 -r--r--r-- 1 matlab matlab   310 2007-06-07 16:53 vertcat.m
+
+./lsge:
+total 132
+91677 -rw-rw-rw- 1 matlab matlab 1657 2008-04-07 14:30 csr.m
+92654 -rw-rw-rw- 1 matlab matlab 1794 2008-04-07 14:30 drrot3.m
+92662 -rw-rw-rw- 1 matlab matlab 1622 2008-04-07 14:30 fg2dcircle.m
+92670 -rw-rw-rw- 1 matlab matlab 2957 2008-04-07 14:30 fg3dcircle.m
+92676 -rw-rw-rw- 1 matlab matlab 2923 2008-04-07 14:30 fgbrrt3.m
+92682 -rw-rw-rw- 1 matlab matlab 2510 2008-04-07 14:30 fgcone.m
+92720 -rw-rw-rw- 1 matlab matlab 2308 2008-04-07 14:30 fgcylinder.m
+92726 -rw-rw-rw- 1 matlab matlab 1764 2008-04-07 14:30 fgrrot3.m
+93386 -rw-rw-rw- 1 matlab matlab 1673 2008-04-07 14:30 fgsphere.m
+93388 -rw-rw-rw- 1 matlab matlab 2051 2008-04-07 14:30 fgtorus.m
+93392 -rw-rw-rw- 1 matlab matlab 1627 2008-04-07 14:30 frrot3.m
+93396 -rw-rw-rw- 1 matlab matlab 2311 2008-04-07 14:30 gncc2.m
+93470 -rw-rw-rw- 1 matlab matlab 1178 2008-04-07 14:30 gr.m
+93476 -rwx------ 1 matlab matlab 7216 2008-04-07 14:30 licence.pdf
+93478 -rwx------ 1 matlab matlab 2521 2008-04-07 14:30 licence.txt
+93530 -rw-rw-rw- 1 matlab matlab 3736 2008-04-07 14:30 ls2dcircle.m
+93642 -rw-rw-rw- 1 matlab matlab 1660 2008-04-07 14:30 ls2dline.m
+93643 -rw-rw-rw- 1 matlab matlab 5364 2008-04-07 14:30 ls3dcircle.m
+94927 -rw-rw-rw- 1 matlab matlab 1817 2008-04-07 14:30 ls3dline.m
+95094 -rw-rw-rw- 1 matlab matlab 6168 2008-04-07 14:30 lscone.m
+95105 -rw-rw-rw- 1 matlab matlab 5408 2008-04-07 14:30 lscylinder.m
+95108 -rw-rw-rw- 1 matlab matlab 1749 2008-04-07 14:30 lsplane.m
+95117 -rw-rw-rw- 1 matlab matlab 4168 2008-04-07 14:30 lssphere.m
+95240 -rw-rw-rw- 1 matlab matlab 5584 2008-04-07 14:30 lstorus.m
+95286 -rw-rw-rw- 1 matlab matlab 4090 2008-04-07 14:30 nlss11.m
+95520 -rwx------ 1 matlab matlab  604 2008-04-07 14:30 readme.txt
+95528 -rw-rw-rw- 1 matlab matlab 1124 2008-04-07 14:30 rot3z.m
+
+./@lvtime:
+total 40
+412963 -r--r--r-- 1 matlab matlab  135 2008-08-13 09:43 char.m
+ 23400 -r--r--r-- 1 matlab matlab  216 2009-05-07 09:28 datenum.m
+ 59446 -r--r--r-- 1 matlab matlab  366 2008-11-19 09:29 diff.m
+412959 -r--r--r-- 1 matlab matlab  125 2008-08-13 09:43 disp.m
+410174 -r--r--r-- 1 matlab matlab  176 2008-11-19 13:32 double.m
+412942 -r--r--r-- 1 matlab matlab 2288 2009-07-15 08:30 lvtime.m
+412955 -r--r--r-- 1 matlab matlab  993 2009-05-06 10:42 minus.m
+412960 -r--r--r-- 1 matlab matlab  810 2009-05-06 10:39 plus.m
+412964 -r--r--r-- 1 matlab matlab   88 2008-08-13 10:00 uint32.m
+412965 -r--r--r-- 1 matlab matlab  207 2008-08-13 10:02 uint8.m
+
+./matlzlib:
+total 2628
+107467 -rwxr-xr-x  1 matlab matlab  100208 2007-06-07 16:53 matlzlib
+107494 drwxr-xr-x  6 matlab matlab     248 2007-06-07 16:53 matlzlib Data
+107469 -rwxr-xr-x  1 matlab matlab  125084 2007-06-07 16:53 matlzlibD.lib
+107468 -rwxr-xr-x  1 matlab matlab  115698 2007-06-07 16:53 matlzlib.lib
+107486 drwxr-xr-x  5 matlab matlab     200 2007-06-07 16:53 mexcreate Data
+107480 drwxr-xr-x  4 matlab matlab     168 2007-06-07 16:53 mexcreate.old Data
+107478 drwxr-xr-x  2 matlab matlab      80 2007-06-07 16:53 temp
+107470 -rwxr-xr-x  1 matlab matlab   81946 2007-06-07 16:53 winzlib1_1_3.lib
+107471 -rwxr-xr-x  1 matlab matlab    1907 2007-06-07 16:53 zcompr.c
+107472 -rwxr-xr-x  1 matlab matlab   32768 2007-06-07 16:53 zcompr.dll
+107473 -rwxr-xr-x  1 matlab matlab     110 2007-06-07 16:53 zcompr.h
+ 17248 -rwxr-xr-x  1 matlab matlab    8388 2007-06-13 15:23 zcompr.mexglx
+107474 -rwxr-xr-x  1 matlab matlab    7810 2007-06-07 16:53 zconf.h
+ 84740 drwxr-xr-x 11 matlab matlab    1872 2008-05-27 08:51 zlib-1.2.3
+ 32601 -rw-r--r--  1 matlab matlab 2109440 2008-05-27 08:39 zlib-1.2.3.tar
+107475 -rwxr-xr-x  1 matlab matlab   40898 2007-06-07 16:53 zlib.h
+107476 -rwxr-xr-x  1 matlab matlab    2312 2008-05-27 08:23 zuncompr.c
+107477 -rwxr-xr-x  1 matlab matlab   32768 2007-06-07 16:53 zuncompr.dll
+383876 -rw-r--r--  1 matlab matlab    3424 2008-05-27 09:03 zuncompr.o
+
+./matlzlib/matlzlib Data:
+total 4
+107502 drwxr-xr-x 2 matlab matlab   88 2007-06-07 16:53 Classic Toolbox Debug
+107500 drwxr-xr-x 2 matlab matlab   88 2007-06-07 16:53 Classic Toolbox Final
+107495 -rwxr-xr-x 1 matlab matlab 3538 2007-06-07 16:53 CWSettingsMacOS.stg
+107498 drwxr-xr-x 2 matlab matlab   88 2007-06-07 16:53 PPC Debug MacOS Toolbox
+107496 drwxr-xr-x 2 matlab matlab   88 2007-06-07 16:53 PPC Final MacOS Toolbox
+
+./matlzlib/matlzlib Data/Classic Toolbox Debug:
+total 208
+107503 -rwxr-xr-x 1 matlab matlab 209914 2007-06-07 16:53 TargetDataMacOS.tdt
+
+./matlzlib/matlzlib Data/Classic Toolbox Final:
+total 180
+107501 -rwxr-xr-x 1 matlab matlab 181306 2007-06-07 16:53 TargetDataMacOS.tdt
+
+./matlzlib/matlzlib Data/PPC Debug MacOS Toolbox:
+total 52
+107499 -rwxr-xr-x 1 matlab matlab 51915 2007-06-07 16:53 TargetDataMacOS.tdt
+
+./matlzlib/matlzlib Data/PPC Final MacOS Toolbox:
+total 52
+107497 -rwxr-xr-x 1 matlab matlab 51665 2007-06-07 16:53 TargetDataMacOS.tdt
+
+./matlzlib/mexcreate Data:
+total 8
+107487 -rwxr-xr-x 1 matlab matlab 4726 2007-06-07 16:53 CWSettingsMacOS.stg
+107492 drwxr-xr-x 2 matlab matlab   88 2007-06-07 16:53 mexUncomD
+107490 drwxr-xr-x 2 matlab matlab   88 2007-06-07 16:53 PPC Debug MacOS Toolbox
+107488 drwxr-xr-x 2 matlab matlab   88 2007-06-07 16:53 PPC Final MacOS Toolbox
+
+./matlzlib/mexcreate Data/mexUncomD:
+total 140
+107493 -rwxr-xr-x 1 matlab matlab 141869 2007-06-07 16:53 TargetDataMacOS.tdt
+
+./matlzlib/mexcreate Data/PPC Debug MacOS Toolbox:
+total 156
+107491 -rwxr-xr-x 1 matlab matlab 157312 2007-06-07 16:53 TargetDataMacOS.tdt
+
+./matlzlib/mexcreate Data/PPC Final MacOS Toolbox:
+total 128
+107489 -rwxr-xr-x 1 matlab matlab 130890 2007-06-07 16:53 TargetDataMacOS.tdt
+
+./matlzlib/mexcreate.old Data:
+total 4
+107481 -rwxr-xr-x 1 matlab matlab 3408 2007-06-07 16:53 CWSettingsMacOS.stg
+107484 drwxr-xr-x 2 matlab matlab   88 2007-06-07 16:53 PPC Debug MacOS Toolbox
+107482 drwxr-xr-x 2 matlab matlab   88 2007-06-07 16:53 PPC Final MacOS Toolbox
+
+./matlzlib/mexcreate.old Data/PPC Debug MacOS Toolbox:
+total 36
+107485 -rwxr-xr-x 1 matlab matlab 35641 2007-06-07 16:53 TargetDataMacOS.tdt
+
+./matlzlib/mexcreate.old Data/PPC Final MacOS Toolbox:
+total 36
+107483 -rwxr-xr-x 1 matlab matlab 35391 2007-06-07 16:53 TargetDataMacOS.tdt
+
+./matlzlib/temp:
+total 4
+107479 -rwxr-xr-x 1 matlab matlab 1863 2007-06-07 16:53 zuncompr.c
+
+./matlzlib/zlib-1.2.3:
+total 981
+137810 -rw-r--r--  1 matlab matlab  4559 2004-12-21 17:52 adler32.c
+383842 -rw-r--r--  1 matlab matlab  1707 2008-05-27 08:51 adler32.o
+137853 -rw-r--r--  1 matlab matlab  9336 2003-06-02 06:16 algorithm.txt
+383542 drwxr-xr-x  2 matlab matlab   112 2005-07-13 00:16 amiga
+383584 drwxr-xr-x  2 matlab matlab   160 2005-07-18 04:41 as400
+383614 -rw-r--r--  1 matlab matlab 42928 2005-07-18 15:26 ChangeLog
+383615 -rw-r--r--  1 matlab matlab  2489 2003-07-07 07:37 compress.c
+383843 -rw-r--r--  1 matlab matlab  1596 2008-05-27 08:51 compress.o
+383616 -rwxr-xr-x  1 matlab matlab 13167 2005-07-11 22:11 configure
+383617 drwxr-xr-x 22 matlab matlab   584 2005-07-18 15:22 contrib
+383765 -rw-r--r--  1 matlab matlab 13193 2005-06-13 01:56 crc32.c
+383766 -rw-r--r--  1 matlab matlab 30568 2003-01-05 17:53 crc32.h
+383844 -rw-r--r--  1 matlab matlab 11776 2008-05-27 08:51 crc32.o
+383767 -rw-r--r--  1 matlab matlab 64163 2005-07-18 04:27 deflate.c
+383768 -rw-r--r--  1 matlab matlab 12114 2005-05-29 17:55 deflate.h
+383847 -rw-r--r--  1 matlab matlab 14708 2008-05-27 08:51 deflate.o
+383858 -rwxr-xr-x  1 matlab matlab 16729 2008-05-27 08:51 example
+383769 -rw-r--r--  1 matlab matlab 16398 2004-10-24 02:11 example.c
+383841 -rw-r--r--  1 matlab matlab 11756 2008-05-27 08:51 example.o
+383770 drwxr-xr-x  2 matlab matlab   312 2005-06-13 02:24 examples
+383781 -rw-r--r--  1 matlab matlab 15080 2004-11-27 09:24 FAQ
+383854 -rw-r--r--  1 matlab matlab    31 2008-05-27 08:51 foo.gz
+383782 -rw-r--r--  1 matlab matlab 31103 2005-07-11 22:31 gzio.c
+383845 -rw-r--r--  1 matlab matlab 12716 2008-05-27 08:51 gzio.o
+383783 -rw-r--r--  1 matlab matlab  1318 2004-10-04 03:49 INDEX
+383784 -rw-r--r--  1 matlab matlab 22164 2005-05-31 00:58 infback.c
+383851 -rw-r--r--  1 matlab matlab  9928 2008-05-27 08:51 infback.o
+383785 -rw-r--r--  1 matlab matlab 12568 2004-11-13 07:05 inffast.c
+383786 -rw-r--r--  1 matlab matlab   407 2003-01-01 18:46 inffast.h
+383853 -rw-r--r--  1 matlab matlab  2588 2008-05-27 08:51 inffast.o
+383787 -rw-r--r--  1 matlab matlab  6343 2002-11-25 00:44 inffixed.h
+383788 -rw-r--r--  1 matlab matlab 48977 2005-06-14 23:50 inflate.c
+383789 -rw-r--r--  1 matlab matlab  5916 2004-11-13 06:38 inflate.h
+383850 -rw-r--r--  1 matlab matlab 16148 2008-05-27 08:51 inflate.o
+383790 -rw-r--r--  1 matlab matlab 13756 2005-07-18 04:27 inftrees.c
+383791 -rw-r--r--  1 matlab matlab  2373 2005-07-11 08:50 inftrees.h
+383852 -rw-r--r--  1 matlab matlab  4400 2008-05-27 08:51 inftrees.o
+378205 -rw-r--r--  1 matlab matlab 89092 2008-05-27 08:49 libz.a
+383540 lrwxrwxrwx  1 matlab matlab    13 2008-05-27 08:51 libz.so -> libz.so.1.2.3
+383857 lrwxrwxrwx  1 matlab matlab    13 2008-05-27 08:51 libz.so.1 -> libz.so.1.2.3
+383862 -rwxr-xr-x  1 matlab matlab 86614 2008-05-27 08:51 libz.so.1.2.3
+383793 -rw-r--r--  1 matlab matlab  4191 2008-05-27 08:50 Makefile
+383794 -rw-r--r--  1 matlab matlab  4133 2005-07-18 04:25 Makefile.in
+383792 -rw-------  1 matlab matlab 13234 2005-07-13 00:16 make_vms.com
+383860 -rwxr-xr-x  1 matlab matlab 11874 2008-05-27 08:51 minigzip
+383795 -rw-r--r--  1 matlab matlab  8018 2005-05-28 08:40 minigzip.c
+383855 -rw-r--r--  1 matlab matlab  5344 2008-05-27 08:51 minigzip.o
+383796 drwxr-xr-x  2 matlab matlab   208 2003-08-28 18:00 msdos
+383802 drwxr-xr-x  3 matlab matlab   224 2005-07-13 00:16 old
+383811 drwxr-xr-x  3 matlab matlab   104 2004-10-23 20:34 projects
+383819 drwxr-xr-x  2 matlab matlab    80 2005-07-18 04:35 qnx
+383821 -rw-r--r--  1 matlab matlab  5696 2005-07-18 04:25 README
+383822 -rw-r--r--  1 matlab matlab 44027 2005-06-13 02:34 trees.c
+383823 -rw-r--r--  1 matlab matlab  8444 1998-02-24 13:14 trees.h
+383848 -rw-r--r--  1 matlab matlab 15504 2008-05-27 08:51 trees.o
+383824 -rw-r--r--  1 matlab matlab  2087 2003-07-07 07:36 uncompr.c
+383846 -rw-r--r--  1 matlab matlab  1404 2008-05-27 08:51 uncompr.o
+383825 drwxr-xr-x  2 matlab matlab   288 2005-07-18 04:35 win32
+383834 -rw-r--r--  1 matlab matlab  9544 2008-05-27 08:50 zconf.h
+383835 -rw-r--r--  1 matlab matlab  9544 2005-05-28 08:40 zconf.in.h
+383836 -rw-r--r--  1 matlab matlab  4486 2005-07-18 04:34 zlib.3
+383837 -rw-r--r--  1 matlab matlab 66188 2005-07-18 04:26 zlib.h
+383838 -rw-r--r--  1 matlab matlab  7136 2005-06-13 02:37 zutil.c
+383839 -rw-r--r--  1 matlab matlab  6859 2005-07-11 22:35 zutil.h
+383849 -rw-r--r--  1 matlab matlab  2112 2008-05-27 08:51 zutil.o
+
+./matlzlib/zlib-1.2.3/amiga:
+total 8
+383548 -rw-r--r-- 1 matlab matlab 1845 2003-07-31 15:26 Makefile.pup
+383562 -rw------- 1 matlab matlab 1711 2005-07-13 00:16 Makefile.sas
+
+./matlzlib/zlib-1.2.3/as400:
+total 48
+383610 -rw-r--r-- 1 matlab matlab  5020 2003-11-12 07:47 bndsrc
+383611 -rw-r--r-- 1 matlab matlab  6933 2005-07-18 04:40 compile.clp
+383612 -rw-r--r-- 1 matlab matlab  4675 2005-07-18 04:41 readme.txt
+383613 -rw-r--r-- 1 matlab matlab 20846 2005-07-18 04:36 zlib.inc
+
+./matlzlib/zlib-1.2.3/contrib:
+total 4
+383618 drwxr-xr-x 2 matlab matlab  392 2004-10-04 03:58 ada
+383631 drwxr-xr-x 2 matlab matlab  104 2005-07-12 20:07 asm586
+383634 drwxr-xr-x 2 matlab matlab  104 2005-07-12 20:08 asm686
+383637 drwxr-xr-x 2 matlab matlab  192 2003-08-28 18:00 blast
+383644 drwxr-xr-x 2 matlab matlab  168 2004-12-01 18:05 delphi
+383649 drwxr-xr-x 3 matlab matlab  232 2004-09-19 01:32 dotzlib
+383666 drwxr-xr-x 2 matlab matlab  264 2005-07-18 04:46 infback9
+383674 drwxr-xr-x 2 matlab matlab  112 2004-10-23 20:30 inflate86
+383677 drwxr-xr-x 2 matlab matlab  136 2003-08-28 18:00 iostream
+383681 drwxr-xr-x 2 matlab matlab  112 2003-08-28 18:00 iostream2
+383684 drwxr-xr-x 2 matlab matlab  184 2003-08-28 18:00 iostream3
+383690 drwxr-xr-x 2 matlab matlab   80 2005-05-28 08:26 masm686
+383692 drwxr-xr-x 2 matlab matlab  272 2005-07-18 15:21 masmx64
+383700 drwxr-xr-x 2 matlab matlab  304 2005-07-18 15:21 masmx86
+383709 drwxr-xr-x 2 matlab matlab  464 2005-07-12 20:08 minizip
+383725 drwxr-xr-x 2 matlab matlab  176 2005-07-18 04:44 pascal
+383730 drwxr-xr-x 2 matlab matlab  176 2004-01-09 11:33 puff
+383736 -rw-r--r-- 1 matlab matlab 2700 2005-05-28 08:30 README.contrib
+383737 drwxr-xr-x 2 matlab matlab  112 2005-07-18 15:23 testzlib
+383740 drwxr-xr-x 2 matlab matlab  128 2004-10-04 04:16 untgz
+383744 drwxr-xr-x 4 matlab matlab  128 2005-07-18 15:22 vstudio
+
+./matlzlib/zlib-1.2.3/contrib/ada:
+total 116
+383619 -rw-r--r-- 1 matlab matlab  3717 2004-09-06 08:55 buffer_demo.adb
+383620 -rw-r--r-- 1 matlab matlab  4467 2004-07-23 09:49 mtest.adb
+383621 -rw-r--r-- 1 matlab matlab  4248 2004-05-31 12:53 read.adb
+383622 -rw-r--r-- 1 matlab matlab  2178 2004-10-04 03:54 readme.txt
+383623 -rw-r--r-- 1 matlab matlab 13180 2004-05-31 12:51 test.adb
+383628 -rw-r--r-- 1 matlab matlab 20400 2004-09-06 08:53 zlib.adb
+383629 -rw-r--r-- 1 matlab matlab 13594 2004-09-06 08:53 zlib.ads
+383630 -rw------- 1 matlab matlab   511 2004-10-04 03:58 zlib.gpr
+383624 -rw-r--r-- 1 matlab matlab  5996 2004-10-04 03:55 zlib-streams.adb
+383625 -rw-r--r-- 1 matlab matlab  4330 2004-10-04 03:55 zlib-streams.ads
+383626 -rw-r--r-- 1 matlab matlab  3329 2003-12-15 11:52 zlib-thin.adb
+383627 -rw-r--r-- 1 matlab matlab 15819 2004-07-23 08:33 zlib-thin.ads
+
+./matlzlib/zlib-1.2.3/contrib/asm586:
+total 16
+383632 -rw------- 1 matlab matlab 10817 2005-07-12 20:07 match.S
+383633 -rw-r--r-- 1 matlab matlab  1615 1998-06-19 16:46 README.586
+
+./matlzlib/zlib-1.2.3/contrib/asm686:
+total 16
+383635 -rw------- 1 matlab matlab 9238 2005-07-12 20:08 match.S
+383636 -rw-r--r-- 1 matlab matlab 1049 1998-06-19 16:47 README.686
+
+./matlzlib/zlib-1.2.3/contrib/blast:
+total 40
+383638 -rw-r--r-- 1 matlab matlab 17425 2003-02-16 18:37 blast.c
+383639 -rw-r--r-- 1 matlab matlab  3237 2003-02-16 18:37 blast.h
+383640 -rw-r--r-- 1 matlab matlab   127 2003-03-03 06:45 Makefile
+383641 -rw-r--r-- 1 matlab matlab    74 2003-03-04 07:42 README
+383642 -rw-r--r-- 1 matlab matlab     8 2003-02-13 06:37 test.pk
+383643 -rw-r--r-- 1 matlab matlab    13 2003-02-13 06:38 test.txt
+
+./matlzlib/zlib-1.2.3/contrib/delphi:
+total 32
+383645 -rw-r--r-- 1 matlab matlab  2500 2003-11-12 07:49 readme.txt
+383647 -rw-r--r-- 1 matlab matlab   186 2003-07-27 23:20 ZLibConst.pas
+383648 -rw-r--r-- 1 matlab matlab  2133 2003-07-27 23:01 zlibd32.mak
+383646 -rw-r--r-- 1 matlab matlab 16412 2005-07-18 04:42 ZLib.pas
+
+./matlzlib/zlib-1.2.3/contrib/dotzlib:
+total 88
+383650 drwxr-xr-x 2 matlab matlab   376 2005-07-18 04:44 DotZLib
+383661 -rw-r--r-- 1 matlab matlab  1178 2004-09-19 00:19 DotZLib.build
+383662 -rw-r--r-- 1 matlab matlab 72728 2004-09-19 00:43 DotZLib.chm
+383663 -rw-r--r-- 1 matlab matlab   907 2004-03-22 00:51 DotZLib.sln
+383664 -rw-r--r-- 1 matlab matlab  1359 2004-03-29 07:14 LICENSE_1_0.txt
+383665 -rw-r--r-- 1 matlab matlab  2369 2004-09-19 01:32 readme.txt
+
+./matlzlib/zlib-1.2.3/contrib/dotzlib/DotZLib:
+total 72
+383651 -rw-r--r-- 1 matlab matlab  2511 2004-09-15 00:41 AssemblyInfo.cs
+383652 -rw-r--r-- 1 matlab matlab  8051 2004-09-19 00:31 ChecksumImpl.cs
+383653 -rw-r--r-- 1 matlab matlab  2251 2004-03-29 16:57 CircularBuffer.cs
+383654 -rw-r--r-- 1 matlab matlab  6339 2004-09-19 00:38 CodecBase.cs
+383655 -rw-r--r-- 1 matlab matlab  4006 2004-03-30 14:59 Deflater.cs
+383656 -rw-r--r-- 1 matlab matlab  9944 2004-03-30 14:58 DotZLib.cs
+383657 -rw-r--r-- 1 matlab matlab  5396 2004-09-19 01:32 DotZLib.csproj
+383658 -rw-r--r-- 1 matlab matlab 11195 2004-03-30 15:13 GZipStream.cs
+383659 -rw-r--r-- 1 matlab matlab  3746 2004-09-19 00:37 Inflater.cs
+383660 -rw-r--r-- 1 matlab matlab  7683 2005-07-18 04:44 UnitTests.cs
+
+./matlzlib/zlib-1.2.3/contrib/infback9:
+total 64
+383667 -rw-r--r-- 1 matlab matlab 21242 2004-10-04 04:00 infback9.c
+383668 -rw-r--r-- 1 matlab matlab  1594 2005-04-08 17:20 infback9.h
+383669 -rw-r--r-- 1 matlab matlab  6599 2003-09-14 01:17 inffix9.h
+383670 -rw-r--r-- 1 matlab matlab  1991 2003-09-14 00:01 inflate9.h
+383671 -rw-r--r-- 1 matlab matlab 13401 2005-07-18 04:27 inftree9.c
+383672 -rw-r--r-- 1 matlab matlab  2374 2005-07-12 19:52 inftree9.h
+383673 -rw-r--r-- 1 matlab matlab    51 2003-09-09 06:45 README
+
+./matlzlib/zlib-1.2.3/contrib/inflate86:
+total 84
+383675 -rw-r--r-- 1 matlab matlab 40608 2004-10-21 04:05 inffas86.c
+383676 -rw-r--r-- 1 matlab matlab 42842 2004-10-21 04:05 inffast.S
+
+./matlzlib/zlib-1.2.3/contrib/iostream:
+total 16
+383678 -rw-r--r-- 1 matlab matlab  526 1997-04-30 16:34 test.cpp
+383679 -rw-r--r-- 1 matlab matlab 5112 2003-08-18 05:01 zfstream.cpp
+383680 -rw-r--r-- 1 matlab matlab 2467 2003-08-18 05:01 zfstream.h
+
+./matlzlib/zlib-1.2.3/contrib/iostream2:
+total 16
+383682 -rw-r--r-- 1 matlab matlab 9283 1998-01-19 21:27 zstream.h
+383683 -rw-r--r-- 1 matlab matlab  711 1998-01-19 21:28 zstream_test.cpp
+
+./matlzlib/zlib-1.2.3/contrib/iostream3:
+total 40
+383685 -rw-r--r-- 1 matlab matlab  1490 2003-06-11 14:09 README
+383686 -rw-r--r-- 1 matlab matlab  1490 2003-06-11 17:24 test.cc
+383687 -rw-r--r-- 1 matlab matlab   491 2003-06-11 14:02 TODO
+383688 -rw-r--r-- 1 matlab matlab 13447 2003-06-11 13:15 zfstream.cc
+383689 -rw-r--r-- 1 matlab matlab 12240 2003-06-10 14:08 zfstream.h
+
+./matlzlib/zlib-1.2.3/contrib/masm686:
+total 12
+383691 -rw-r--r-- 1 matlab matlab 11328 2005-02-06 13:25 match.asm
+
+./matlzlib/zlib-1.2.3/contrib/masmx64:
+total 60
+383693 -rw-r--r-- 1 matlab matlab    86 2005-02-06 13:30 bld_ml64.bat
+383694 -rw-r--r-- 1 matlab matlab 15043 2005-07-12 05:17 gvmat64.asm
+383695 -rw-r--r-- 1 matlab matlab  4119 2005-07-15 10:16 gvmat64.obj
+383696 -rw-r--r-- 1 matlab matlab  7585 2005-02-06 12:49 inffas8664.c
+383697 -rw-r--r-- 1 matlab matlab 10532 2005-02-06 13:05 inffasx64.asm
+383698 -rw-r--r-- 1 matlab matlab  5913 2005-02-06 13:28 inffasx64.obj
+383699 -rw-r--r-- 1 matlab matlab  1096 2005-02-06 13:39 readme.txt
+
+./matlzlib/zlib-1.2.3/contrib/masmx86:
+total 88
+383701 -rw-r--r-- 1 matlab matlab    93 2005-02-07 00:45 bld_ml32.bat
+383702 -rw-r--r-- 1 matlab matlab 27178 2005-02-07 00:49 gvmat32.asm
+383704 -rw-r--r-- 1 matlab matlab  1815 2005-02-06 10:56 gvmat32c.c
+383703 -rw-r--r-- 1 matlab matlab 10241 2005-02-06 15:49 gvmat32.obj
+383705 -rw-r--r-- 1 matlab matlab 16378 2005-02-06 12:45 inffas32.asm
+383706 -rw-r--r-- 1 matlab matlab 14893 2005-02-06 04:26 inffas32.obj
+383707 -rwxr-xr-x 1 matlab matlab   127 2004-04-12 22:08 mkasm.bat
+383708 -rw-r--r-- 1 matlab matlab   595 2003-08-28 07:44 readme.txt
+
+./matlzlib/zlib-1.2.3/contrib/minizip:
+total 196
+383710 -rw------- 1 matlab matlab  2055 2005-07-12 20:08 ChangeLogUnzip
+383711 -rw------- 1 matlab matlab  4712 2005-07-12 20:08 crypt.h
+383712 -rw------- 1 matlab matlab  3694 2005-07-12 20:08 ioapi.c
+383713 -rw------- 1 matlab matlab  2535 2005-07-12 20:08 ioapi.h
+383714 -rw------- 1 matlab matlab  6411 2005-07-12 20:08 iowin32.c
+383715 -rw------- 1 matlab matlab   422 2005-07-12 20:08 iowin32.h
+383716 -rw------- 1 matlab matlab   457 2005-07-12 20:08 Makefile
+383717 -rw------- 1 matlab matlab 15381 2005-07-12 20:08 miniunz.c
+383718 -rw------- 1 matlab matlab 11662 2005-07-12 20:08 minizip.c
+383719 -rw------- 1 matlab matlab  7985 2005-07-12 20:08 mztools.c
+383720 -rw------- 1 matlab matlab   681 2005-07-12 20:08 mztools.h
+383721 -rw------- 1 matlab matlab 49292 2005-07-12 20:08 unzip.c
+383722 -rw------- 1 matlab matlab 12968 2005-07-12 20:08 unzip.h
+383723 -rw------- 1 matlab matlab 37353 2005-07-12 20:08 zip.c
+383724 -rw------- 1 matlab matlab  8847 2005-07-12 20:08 zip.h
+
+./matlzlib/zlib-1.2.3/contrib/pascal:
+total 32
+383726 -rw-r--r-- 1 matlab matlab 15687 2003-08-20 23:00 example.pas
+383727 -rw-r--r-- 1 matlab matlab  3004 2003-08-17 23:01 readme.txt
+383728 -rw-r--r-- 1 matlab matlab  2133 2003-07-27 23:01 zlibd32.mak
+383729 -rw-r--r-- 1 matlab matlab  8033 2005-07-18 04:44 zlibpas.pas
+
+./matlzlib/zlib-1.2.3/contrib/puff:
+total 56
+383731 -rw-r--r-- 1 matlab matlab   101 2003-03-04 07:37 Makefile
+383732 -rw-r--r-- 1 matlab matlab 37036 2004-01-09 11:33 puff.c
+383733 -rw-r--r-- 1 matlab matlab  1328 2003-03-04 06:57 puff.h
+383734 -rw-r--r-- 1 matlab matlab  3076 2003-03-04 07:26 README
+383735 -rw-r--r-- 1 matlab matlab  1213 2003-03-04 07:29 zeros.raw
+
+./matlzlib/zlib-1.2.3/contrib/testzlib:
+total 12
+383738 -rw-r--r-- 1 matlab matlab 7638 2005-07-15 11:37 testzlib.c
+383739 -rw-r--r-- 1 matlab matlab  205 2005-02-06 13:55 testzlib.txt
+
+./matlzlib/zlib-1.2.3/contrib/untgz:
+total 28
+383741 -rw-r--r-- 1 matlab matlab   234 2003-07-27 20:43 Makefile
+383742 -rw-r--r-- 1 matlab matlab   281 2003-07-27 20:23 Makefile.msc
+383743 -rw-r--r-- 1 matlab matlab 16542 2004-03-07 07:00 untgz.c
+
+./matlzlib/zlib-1.2.3/contrib/vstudio:
+total 4
+383745 -rw-r--r-- 1 matlab matlab 3040 2005-07-15 13:07 readme.txt
+383746 drwxr-xr-x 2 matlab matlab  296 2005-07-18 15:23 vc7
+383755 drwxr-xr-x 2 matlab matlab  336 2005-07-15 10:48 vc8
+
+./matlzlib/zlib-1.2.3/contrib/vstudio/vc7:
+total 56
+383747 -rw-r--r-- 1 matlab matlab  3221 2005-07-14 10:57 miniunz.vcproj
+383748 -rw-r--r-- 1 matlab matlab  3221 2005-07-14 10:57 minizip.vcproj
+383749 -rw-r--r-- 1 matlab matlab  3202 2005-07-15 11:43 testzlib.vcproj
+383750 -rw-r--r-- 1 matlab matlab   929 2005-07-15 10:20 zlib.rc
+383751 -rw-r--r-- 1 matlab matlab  6572 2005-07-15 10:27 zlibstat.vcproj
+383752 -rw-r--r-- 1 matlab matlab  4483 2005-07-15 10:20 zlibvc.def
+383753 -rw-r--r-- 1 matlab matlab  5325 2005-07-15 11:44 zlibvc.sln
+383754 -rw-r--r-- 1 matlab matlab 12792 2005-07-15 10:28 zlibvc.vcproj
+
+./matlzlib/zlib-1.2.3/contrib/vstudio/vc8:
+total 148
+383756 -rw-r--r-- 1 matlab matlab 12875 2005-07-15 12:44 miniunz.vcproj
+383757 -rw-r--r-- 1 matlab matlab 12689 2005-07-15 12:44 minizip.vcproj
+383759 -rw-r--r-- 1 matlab matlab 12937 2005-07-15 12:44 testzlibdll.vcproj
+383758 -rw-r--r-- 1 matlab matlab 20566 2005-07-15 12:44 testzlib.vcproj
+383760 -rw-r--r-- 1 matlab matlab   929 2005-07-15 10:20 zlib.rc
+383761 -rw-r--r-- 1 matlab matlab 20099 2005-07-15 13:12 zlibstat.vcproj
+383762 -rw-r--r-- 1 matlab matlab  4483 2005-07-15 10:20 zlibvc.def
+383763 -rw-r--r-- 1 matlab matlab 10649 2005-07-15 12:27 zlibvc.sln
+383764 -rw-r--r-- 1 matlab matlab 28762 2005-07-15 12:44 zlibvc.vcproj
+
+./matlzlib/zlib-1.2.3/examples:
+total 148
+383771 -rw-r--r-- 1 matlab matlab  8594 2005-06-13 02:31 fitblk.c
+383772 -rw-r--r-- 1 matlab matlab 25499 2005-06-13 02:15 gun.c
+383773 -rw-r--r-- 1 matlab matlab 16838 2004-09-15 16:40 gzappend.c
+383774 -rw-r--r-- 1 matlab matlab 14014 2005-06-13 02:23 gzjoin.c
+383775 -rw-r--r-- 1 matlab matlab 11532 2004-12-31 07:16 gzlog.c
+383776 -rw-r--r-- 1 matlab matlab  2899 2004-11-27 08:52 gzlog.h
+383777 -rw-r--r-- 1 matlab matlab  1515 2005-05-30 03:39 README.examples
+383778 -rw-r--r-- 1 matlab matlab 28639 2005-04-07 05:26 zlib_how.html
+383779 -rw-r--r-- 1 matlab matlab  5815 2005-04-07 05:17 zpipe.c
+383780 -rw-r--r-- 1 matlab matlab 15306 2005-05-30 03:35 zran.c
+
+./matlzlib/zlib-1.2.3/msdos:
+total 20
+383797 -rw-r--r-- 1 matlab matlab 2871 2003-03-16 03:36 Makefile.bor
+383798 -rw-r--r-- 1 matlab matlab 2585 2003-03-19 03:31 Makefile.dj2
+383799 -rw-r--r-- 1 matlab matlab 1412 2003-03-20 03:35 Makefile.emx
+383800 -rw-r--r-- 1 matlab matlab 2733 2003-03-20 03:40 Makefile.msc
+383801 -rw-r--r-- 1 matlab matlab 2430 2003-03-16 03:36 Makefile.tc
+
+./matlzlib/zlib-1.2.3/old:
+total 80
+383803 -rw-r--r-- 1 matlab matlab  1545 1996-01-30 22:31 descrip.mms
+383804 -rw------- 1 matlab matlab  3767 2005-07-13 00:16 Makefile.riscos
+383805 drwxr-xr-x 2 matlab matlab   104 2003-08-28 18:00 os2
+383808 -rw-r--r-- 1 matlab matlab   133 2004-09-15 16:40 README
+383809 -rw-r--r-- 1 matlab matlab  6060 2003-10-27 04:13 visual-basic.txt
+383810 -rw-r--r-- 1 matlab matlab 57933 2002-03-11 14:55 zlib.html
+
+./matlzlib/zlib-1.2.3/old/os2:
+total 12
+383806 -rw-r--r-- 1 matlab matlab 4104 1998-03-01 10:00 Makefile.os2
+383807 -rw-r--r-- 1 matlab matlab  778 1998-03-01 09:59 zlib.def
+
+./matlzlib/zlib-1.2.3/projects:
+total 4
+383812 -rw-r--r-- 1 matlab matlab 1786 2004-10-21 06:00 README.projects
+383813 drwxr-xr-x 2 matlab matlab  192 2004-10-23 20:36 visualc6
+
+./matlzlib/zlib-1.2.3/projects/visualc6:
+total 52
+383814 -rw-r--r-- 1 matlab matlab 10750 2004-10-04 06:00 example.dsp
+383815 -rw-r--r-- 1 matlab matlab 10796 2004-10-04 06:00 minigzip.dsp
+383816 -rw-r--r-- 1 matlab matlab  2504 2004-10-21 06:00 README.txt
+383817 -rw-r--r-- 1 matlab matlab 17360 2004-10-04 06:00 zlib.dsp
+383818 -rw-r--r-- 1 matlab matlab  1081 2004-05-31 06:00 zlib.dsw
+
+./matlzlib/zlib-1.2.3/qnx:
+total 8
+383820 -rw------- 1 matlab matlab 6427 2005-07-18 04:35 package.qpg
+
+./matlzlib/zlib-1.2.3/win32:
+total 48
+383826 -rw-r--r-- 1 matlab matlab 17928 2004-10-11 04:15 DLL_FAQ.txt
+383827 -rw-r--r-- 1 matlab matlab  2440 2003-08-28 07:59 Makefile.bor
+383828 -rw-r--r-- 1 matlab matlab  1421 2003-07-24 08:38 Makefile.emx
+383829 -rw-r--r-- 1 matlab matlab  3529 2003-08-02 05:49 Makefile.gcc
+383830 -rw-r--r-- 1 matlab matlab  2781 2003-08-27 06:42 Makefile.msc
+383831 -rw-r--r-- 1 matlab matlab   117 2004-05-31 06:00 VisualC.txt
+383833 -rw-r--r-- 1 matlab matlab  1024 2005-07-18 04:35 zlib1.rc
+383832 -rw-r--r-- 1 matlab matlab   921 2003-11-08 21:47 zlib.def
+
+./@model3d:
+total 377
+107572 -r--r--r-- 1 matlab matlab   1295 2007-06-07 16:53 center_of_mass.m
+107573 -r--r--r-- 1 matlab matlab    682 2007-06-07 16:53 greyscale.m
+107619 drwxr-xr-x 2 matlab matlab    176 2007-06-07 16:53 info
+107574 -r--r--r-- 1 matlab matlab    446 2007-06-07 16:53 layer_names.m
+107575 -r--r--r-- 1 matlab matlab    583 2007-06-07 16:53 magnify.m
+107576 -r--r--r-- 1 matlab matlab    514 2007-06-07 16:53 minus.m
+107580 -r--r--r-- 1 matlab matlab    241 2007-06-07 16:53 model3d_ambient.m
+107581 -r--r--r-- 1 matlab matlab    220 2007-06-07 16:53 model3d_diffuse.m
+107577 -rwxr-xr-x 1 matlab matlab 122880 2007-06-07 16:53 model3d.dll
+107582 -r--r--r-- 1 matlab matlab    364 2007-06-07 16:53 model3d_filename.m
+107583 -r--r--r-- 1 matlab matlab    719 2007-06-07 16:53 model3d_light.m
+107578 -r--r--r-- 1 matlab matlab    726 2007-06-07 16:53 model3d.m
+107579 -rwxr-xr-x 1 matlab matlab  45804 2007-06-07 16:53 model3d.mexglx
+107584 -r--r--r-- 1 matlab matlab    180 2007-06-07 16:53 model3d_set_layers.m
+107585 -r--r--r-- 1 matlab matlab    941 2007-06-07 16:53 model3d_viewport.m
+107586 -r--r--r-- 1 matlab matlab    450 2007-06-07 16:53 model_type.m
+107587 -r--r--r-- 1 matlab matlab    157 2007-06-07 16:53 mrdivide.m
+107588 -r--r--r-- 1 matlab matlab   1233 2007-06-07 16:53 mtimes.m
+107590 -r--r--r-- 1 matlab matlab   3614 2007-06-07 16:53 plot.m
+107591 -r--r--r-- 1 matlab matlab   1999 2007-06-07 16:53 plus.m
+107592 -r--r--r-- 1 matlab matlab   2066 2007-06-07 16:53 qrot.m
+107593 -r--r--r-- 1 matlab matlab    671 2007-06-07 16:53 remove_layer.m
+107594 -rwxr-xr-x 1 matlab matlab 106496 2007-06-07 16:53 serialize.dll
+107595 -r--r--r-- 1 matlab matlab    448 2007-06-07 16:53 serialize.m
+107596 -rwxr-xr-x 1 matlab matlab  15666 2007-06-07 16:53 serialize.mexglx
+107597 -r--r--r-- 1 matlab matlab   3449 2007-06-07 16:53 slice.m
+107599 drwxr-xr-x 3 matlab matlab    544 2007-06-07 16:53 src
+107598 -r--r--r-- 1 matlab matlab    498 2007-06-07 16:53 times.m
+
+./@model3d/info:
+total 104
+107620 -rwxr-xr-x 1 matlab matlab    62 2007-06-07 16:53 AUTHORS.txt
+107621 -rwxr-xr-x 1 matlab matlab   710 2007-06-07 16:53 INSTALL.txt
+107622 -rwxr-xr-x 1 matlab matlab   835 2007-06-07 16:53 README.txt
+107623 -rwxr-xr-x 1 matlab matlab 92985 2007-06-07 16:53 sample.png
+
+./@model3d/src:
+total 292
+107600 -rwxr-xr-x 1 matlab matlab  23305 2007-06-07 16:53 c3ds
+107601 -rwxr-xr-x 1 matlab matlab  15411 2007-06-07 16:53 c3ds.cpp
+107602 -rwxr-xr-x 1 matlab matlab   2102 2007-06-07 16:53 c3ds.h
+107603 -rwxr-xr-x 1 matlab matlab  10394 2007-06-07 16:53 dxf.cpp
+107605 -rwxr-xr-x 1 matlab matlab   7211 2007-06-07 16:53 dxfctable.h
+107604 -rwxr-xr-x 1 matlab matlab   1469 2007-06-07 16:53 dxf.h
+107606 -rwxr-xr-x 1 matlab matlab    778 2007-06-07 16:53 Makefile
+107607 -rwxr-xr-x 1 matlab matlab   7900 2007-06-07 16:53 mexfunction.cpp
+107608 -rwxr-xr-x 1 matlab matlab   4499 2007-06-07 16:53 model3d.cpp
+107609 -rwxr-xr-x 1 matlab matlab     38 2007-06-07 16:53 model3d.def
+107610 -rwxr-xr-x 1 matlab matlab   1175 2007-06-07 16:53 model3d.h
+107611 -rwxr-xr-x 1 matlab matlab 166912 2007-06-07 16:53 model3d.ncb
+107612 -rwxr-xr-x 1 matlab matlab   1416 2007-06-07 16:53 model3d.sln
+107613 -rwxr-xr-x 1 matlab matlab  11264 2007-06-07 16:53 model3d.suo
+107614 -rwxr-xr-x 1 matlab matlab   4285 2007-06-07 16:53 model3d.vcproj
+107616 drwxr-xr-x 2 matlab matlab    112 2007-06-07 16:53 serialize
+107615 -rwxr-xr-x 1 matlab matlab   4384 2007-06-07 16:53 serialize.cpp
+
+./@model3d/src/serialize:
+total 12
+107617 -rwxr-xr-x 1 matlab matlab   40 2007-06-07 16:53 serialize.def
+107618 -rwxr-xr-x 1 matlab matlab 4254 2007-06-07 16:53 serialize.vcproj
+
+./nurbs_R2006b:
+total 672
+107379 -rwxr-xr-x 1 matlab matlab   878 2007-06-07 16:53 basisfun.c
+107380 -rwxr-xr-x 1 matlab matlab  8144 2007-06-07 16:53 bspdegelev.c
+107381 -rwxr-xr-x 1 matlab matlab 12288 2007-06-07 16:53 bspdegelev.dll
+107382 -rwxr-xr-x 1 matlab matlab 61440 2007-06-07 16:53 bspdegelev.dll.old
+107383 -rwxr-xr-x 1 matlab matlab   607 2007-06-07 16:53 bspdegelev.m
+107384 -rwxr-xr-x 1 matlab matlab 12058 2007-06-07 16:53 bspdegelev.mexglx
+107385 -rwxr-xr-x 1 matlab matlab 12288 2007-06-07 16:53 bspdegelev.mexw32
+107386 -rwxr-xr-x 1 matlab matlab  2062 2007-06-07 16:53 bspderiv.c
+107387 -rwxr-xr-x 1 matlab matlab  2056 2007-06-07 16:53 bspderiv.c~
+107388 -rwxr-xr-x 1 matlab matlab  8192 2007-06-07 16:53 bspderiv.dll
+107389 -rwxr-xr-x 1 matlab matlab 57344 2007-06-07 16:53 bspderiv.dll.old
+107390 -rwxr-xr-x 1 matlab matlab   653 2007-06-07 16:53 bspderiv.m
+107391 -rwxr-xr-x 1 matlab matlab  8934 2007-06-07 16:53 bspderiv.mexglx
+107392 -rwxr-xr-x 1 matlab matlab  8192 2007-06-07 16:53 bspderiv.mexw32
+107393 -rwxr-xr-x 1 matlab matlab  2238 2007-06-07 16:53 bspeval.c
+107394 -rwxr-xr-x 1 matlab matlab  8704 2007-06-07 16:53 bspeval.dll
+107395 -rwxr-xr-x 1 matlab matlab 57344 2007-06-07 16:53 bspeval.dll.old
+107396 -rwxr-xr-x 1 matlab matlab   556 2007-06-07 16:53 bspeval.m
+107397 -rwxr-xr-x 1 matlab matlab  9852 2007-06-07 16:53 bspeval.mexglx
+107398 -rwxr-xr-x 1 matlab matlab  8704 2007-06-07 16:53 bspeval.mexw32
+107399 -rwxr-xr-x 1 matlab matlab  3005 2007-06-07 16:53 bspkntins.c
+107400 -rwxr-xr-x 1 matlab matlab  9216 2007-06-07 16:53 bspkntins.dll
+107401 -rwxr-xr-x 1 matlab matlab 57344 2007-06-07 16:53 bspkntins.dll.old
+107402 -rwxr-xr-x 1 matlab matlab   655 2007-06-07 16:53 bspkntins.m
+107403 -rwxr-xr-x 1 matlab matlab 10092 2007-06-07 16:53 bspkntins.mexglx
+107404 -rwxr-xr-x 1 matlab matlab  9216 2007-06-07 16:53 bspkntins.mexw32
+107405 -rwxr-xr-x 1 matlab matlab  1975 2007-06-07 16:53 Contents.m
+107406 -rwxr-xr-x 1 matlab matlab   565 2007-06-07 16:53 deg2rad.m
+107407 -rwxr-xr-x 1 matlab matlab   251 2007-06-07 16:53 demo4surf.m
+107408 -rwxr-xr-x 1 matlab matlab   297 2007-06-07 16:53 democirc.m
+107409 -rwxr-xr-x 1 matlab matlab   931 2007-06-07 16:53 democoons.m
+107410 -rwxr-xr-x 1 matlab matlab   574 2007-06-07 16:53 democurve.m
+107411 -rwxr-xr-x 1 matlab matlab   270 2007-06-07 16:53 democylind.m
+107412 -rwxr-xr-x 1 matlab matlab   504 2007-06-07 16:53 demodegelev.m
+107413 -rwxr-xr-x 1 matlab matlab   551 2007-06-07 16:53 demodercrv.m
+107414 -rwxr-xr-x 1 matlab matlab   823 2007-06-07 16:53 demodersrf.m
+107415 -rwxr-xr-x 1 matlab matlab   393 2007-06-07 16:53 demoellip.m
+107416 -rwxr-xr-x 1 matlab matlab   176 2007-06-07 16:53 demoextrude.m
+107417 -rwxr-xr-x 1 matlab matlab   734 2007-06-07 16:53 demogeom.m
+107418 -rwxr-xr-x 1 matlab matlab   611 2007-06-07 16:53 demohelix.m
+107419 -rwxr-xr-x 1 matlab matlab   553 2007-06-07 16:53 demokntins.m
+107420 -rwxr-xr-x 1 matlab matlab   205 2007-06-07 16:53 demoline.m
+107421 -rwxr-xr-x 1 matlab matlab   234 2007-06-07 16:53 demorect.m
+107422 -rwxr-xr-x 1 matlab matlab   889 2007-06-07 16:53 demorevolve.m
+107423 -rwxr-xr-x 1 matlab matlab   413 2007-06-07 16:53 demoruled.m
+107424 -rwxr-xr-x 1 matlab matlab  1310 2007-06-07 16:53 demos.m
+107425 -rwxr-xr-x 1 matlab matlab   160 2007-06-07 16:53 demosurf.m
+107426 -rwxr-xr-x 1 matlab matlab   504 2007-06-07 16:53 demotorus.m
+107427 -rwxr-xr-x 1 matlab matlab   679 2007-06-07 16:53 findspan.c
+107428 -rwxr-xr-x 1 matlab matlab 18321 2007-06-07 16:53 LICENSE
+107429 -rwxr-xr-x 1 matlab matlab   478 2007-06-07 16:53 makefile
+107430 -rwxr-xr-x 1 matlab matlab   913 2007-06-07 16:53 mexmat.c
+107431 -rwxr-xr-x 1 matlab matlab   424 2007-06-07 16:53 mexmat.h
+107432 -rwxr-xr-x 1 matlab matlab  1319 2007-06-07 16:53 nrb4surf.m
+107433 -rwxr-xr-x 1 matlab matlab  2251 2007-06-07 16:53 nrbcirc.m
+107434 -rwxr-xr-x 1 matlab matlab  3934 2007-06-07 16:53 nrbcoons.m
+107435 -rwxr-xr-x 1 matlab matlab  1078 2007-06-07 16:53 nrbcylind.m
+107436 -rwxr-xr-x 1 matlab matlab  2355 2007-06-07 16:53 nrbdegelev.m
+107437 -rwxr-xr-x 1 matlab matlab  2423 2007-06-07 16:53 nrbderiv.m
+107438 -rwxr-xr-x 1 matlab matlab  1658 2007-06-07 16:53 nrbdeval.m
+107439 -rwxr-xr-x 1 matlab matlab  3504 2007-06-07 16:53 nrbeval.m
+107440 -rwxr-xr-x 1 matlab matlab  1105 2007-06-07 16:53 nrbextrude.m
+107441 -rwxr-xr-x 1 matlab matlab  3021 2007-06-07 16:53 nrbkntins.m
+107442 -rwxr-xr-x 1 matlab matlab   804 2007-06-07 16:53 nrbline.m
+107443 -rwxr-xr-x 1 matlab matlab  4538 2007-06-07 16:53 nrbmak.m
+107444 -rwxr-xr-x 1 matlab matlab  2853 2007-06-07 16:53 nrbplot.m
+107445 -rwxr-xr-x 1 matlab matlab   975 2007-06-07 16:53 nrbrect.m
+107446 -rwxr-xr-x 1 matlab matlab   846 2007-06-07 16:53 nrbreverse.m
+107447 -rwxr-xr-x 1 matlab matlab  2698 2007-06-07 16:53 nrbrevolve.m
+107448 -rwxr-xr-x 1 matlab matlab  1508 2007-06-07 16:53 nrbruled.m
+107449 -rwxr-xr-x 1 matlab matlab   277 2007-06-07 16:53 nrbtestcrv.m
+107450 -rwxr-xr-x 1 matlab matlab  1130 2007-06-07 16:53 nrbtestsrf.m
+107451 -rwxr-xr-x 1 matlab matlab  1411 2007-06-07 16:53 nrbtform.m
+107452 -rwxr-xr-x 1 matlab matlab   656 2007-06-07 16:53 nrbtransp.m
+107453 -rwxr-xr-x 1 matlab matlab   566 2007-06-07 16:53 rad2deg.m
+107454 -rwxr-xr-x 1 matlab matlab  3350 2007-06-07 16:53 README.txt
+107455 -rwxr-xr-x 1 matlab matlab   858 2007-06-07 16:53 vecangle.m
+107456 -rwxr-xr-x 1 matlab matlab  1152 2007-06-07 16:53 veccross.m
+107457 -rwxr-xr-x 1 matlab matlab   833 2007-06-07 16:53 vecdot.m
+107459 -rwxr-xr-x 1 matlab matlab   716 2007-06-07 16:53 vecmag2.m
+107458 -rwxr-xr-x 1 matlab matlab   683 2007-06-07 16:53 vecmag.m
+107460 -rwxr-xr-x 1 matlab matlab   743 2007-06-07 16:53 vecnorm.m
+107461 -rwxr-xr-x 1 matlab matlab  1058 2007-06-07 16:53 vecrotx.m
+107462 -rwxr-xr-x 1 matlab matlab  1098 2007-06-07 16:53 vecroty.m
+107463 -rwxr-xr-x 1 matlab matlab  1085 2007-06-07 16:53 vecrotz.m
+107464 -rwxr-xr-x 1 matlab matlab  1057 2007-06-07 16:53 vecscale.m
+107465 -rwxr-xr-x 1 matlab matlab  1082 2007-06-07 16:53 vectrans.m
+
+./peta:
+total 328
+107367 -r--r--r-- 1 matlab matlab    101 2007-06-07 16:53 defpdir.m
+107368 -rwxr-xr-x 1 matlab matlab 158342 2007-06-07 16:53 fffff.txt
+107370 -r--r--r-- 1 matlab matlab   2647 2007-06-07 16:53 leescsv2.m
+107371 -r--r--r-- 1 matlab matlab   3048 2007-06-07 16:53 leescsv3.m
+107369 -r--r--r-- 1 matlab matlab   8150 2007-06-07 16:53 leescsv.m
+107372 -r--r--r-- 1 matlab matlab  21018 2007-06-07 16:53 leespap2.m
+107373 -r--r--r-- 1 matlab matlab  32059 2007-06-07 16:53 leespap3.m
+107374 -r--r--r-- 1 matlab matlab  39891 2007-06-07 16:53 leespap4.m
+107375 -r--r--r-- 1 matlab matlab  47111 2007-06-07 16:53 leespapp.m
+107376 -r--r--r-- 1 matlab matlab   1313 2007-06-07 16:53 lutcorr.m
+107377 -r--r--r-- 1 matlab matlab   3240 2007-06-07 16:53 plotfb.m
+
+./sam2000:
+total 280
+107355 -rw-rw-rw- 1 matlab matlab  1110 2007-06-07 16:53 calctfac.m
+107356 -rwxr-xr-x 1 matlab matlab 89866 2007-06-07 16:53 fffff.txt
+107358 -rw-rw-rw- 1 matlab matlab 17735 2007-06-07 16:53 leessam2.m
+107359 -rwxr-xr-x 1 matlab matlab 35565 2007-06-07 16:53 leessamf.c
+107360 -rwxr-xr-x 1 matlab matlab 65536 2007-06-07 16:53 leessamf.dll
+107361 -rw-rw-rw- 1 matlab matlab   850 2007-06-07 16:53 leessamf.m
+107357 -rw-rw-rw- 1 matlab matlab 16353 2007-06-07 16:53 leessam.m
+107362 -rw-rw-rw- 1 matlab matlab 30389 2007-06-07 16:53 leessamp.m
+107363 -rw-rw-rw- 1 matlab matlab  4770 2007-06-07 16:53 sam2xf3.m
+107364 -rw-rw-rw- 1 matlab matlab  1847 2007-06-07 16:53 samlijst.m
+107365 -rwxr-xr-x 1 matlab matlab    30 2007-06-07 16:53 samproj.ini
+
+./simulink:
+total 340
+107334 -rwxr-xr-x 1 matlab matlab 49152 2007-06-07 16:53 bumpstop.dll
+107335 -r--r--r-- 1 matlab matlab   540 2007-06-07 16:53 bumpstop.m
+107336 -rwxr-xr-x 1 matlab matlab 29493 2007-06-07 16:53 fffff.txt
+107337 -r--r--r-- 1 matlab matlab  5020 2007-06-07 16:53 getblcks.m
+107338 -r--r--r-- 1 matlab matlab  1934 2007-06-07 16:53 leesmdl.m
+107339 -rwxr-xr-x 1 matlab matlab 49152 2007-06-07 16:53 pwmc.dll
+107340 -r--r--r-- 1 matlab matlab   254 2007-06-07 16:53 pwmc.m
+107341 -rwxr-xr-x 1 matlab matlab 49152 2007-06-07 16:53 safelim.dll
+107342 -r--r--r-- 1 matlab matlab   336 2007-06-07 16:53 safelim.m
+107343 -r--r--r-- 1 matlab matlab  3105 2007-06-07 16:53 simmax.m
+107344 -r--r--r-- 1 matlab matlab  3140 2007-06-07 16:53 simmin.m
+107345 -rwxr-xr-x 1 matlab matlab 49152 2007-06-07 16:53 simstat.dll
+107346 -r--r--r-- 1 matlab matlab   298 2007-06-07 16:53 simstat.m
+107347 -r--r--r-- 1 matlab matlab   729 2007-06-07 16:53 tests.m
+107348 -r--r--r-- 1 matlab matlab   944 2007-06-07 16:53 testss.m
+107349 -r--r--r-- 1 matlab matlab  2972 2007-06-07 16:53 toonmod.m
+107350 -rwxr-xr-x 1 matlab matlab 10042 2007-06-07 16:53 twowpwm.c
+107351 -rwxr-xr-x 1 matlab matlab 53248 2007-06-07 16:53 twowpwm.dll
+107352 -r--r--r-- 1 matlab matlab   529 2007-06-07 16:53 twowpwm.m
+
+./src:
+total 52
+ 15804 -rw-r--r-- 1 matlab matlab 2844 2007-06-13 15:20 todouble1.c
+ 17247 -rwxr-xr-x 1 matlab matlab 9341 2007-06-13 15:20 todouble1.mexglx
+107331 -rwxr-xr-x 1 matlab matlab 2353 2007-06-13 15:20 todouble.c
+ 17230 -rwxr-xr-x 1 matlab matlab 9166 2007-06-13 15:22 todouble.mexglx
+107332 -rwxr-xr-x 1 matlab matlab 1736 2007-06-07 16:53 tosinglebe.c
+ 17243 -rwxr-xr-x 1 matlab matlab 8459 2007-06-13 15:09 tosinglebe.mexglx
+ 32309 -rw-r--r-- 1 matlab matlab 1246 2008-05-15 10:09 touint8.c
+
+./@struct:
+total 48
+107557 -r--r--r-- 1 matlab matlab 2623 2007-06-07 16:53 compare2.m
+107555 -r--r--r-- 1 matlab matlab 2730 2007-06-07 16:53 compare.m
+107558 -r--r--r-- 1 matlab matlab  357 2007-06-07 16:53 dispstr.m
+107559 -r--r--r-- 1 matlab matlab 1379 2007-06-07 16:53 findDoubles.m
+107561 -r--r--r-- 1 matlab matlab  795 2009-10-02 12:12 flattenDir.m
+107563 -r--r--r-- 1 matlab matlab  677 2007-06-07 16:53 getkan.m
+107564 -r--r--r-- 1 matlab matlab  622 2007-06-07 16:53 getkanx.m
+107565 -r--r--r-- 1 matlab matlab 1148 2007-06-07 16:53 getpar.m
+107566 -r--r--r-- 1 matlab matlab  588 2007-06-07 16:53 metingvelden.m
+107567 -r--r--r-- 1 matlab matlab 5458 2007-06-07 16:53 plotmat.m
+107569 -r--r--r-- 1 matlab matlab 1670 2007-06-07 16:53 sort.m
+
+./@uint8:
+total 16
+107550 -r--r--r-- 1 matlab matlab 153 2007-06-07 16:53 minus.m
+107551 -r--r--r-- 1 matlab matlab 151 2007-06-07 16:53 mtimes.m
+107552 -r--r--r-- 1 matlab matlab 147 2007-06-07 16:53 plus.m
+107553 -r--r--r-- 1 matlab matlab 151 2007-06-07 16:53 times.m
+
+./voicebox:
+total 804
+107138 -rw-rw-rw- 1 matlab matlab  6241 2007-06-07 16:53 activlev.m
+107139 -rw-rw-rw- 1 matlab matlab  1684 2007-06-07 16:53 bark2frq.m
+107140 -rw-rw-rw- 1 matlab matlab  3315 2007-06-07 16:53 bitsprec.m
+107141 -rw-rw-rw- 1 matlab matlab  2023 2007-06-07 16:53 ccwarpf.m
+107142 -rw-rw-rw- 1 matlab matlab  2141 2007-06-07 16:53 cep2pow.m
+107143 -rw-rw-rw- 1 matlab matlab  2249 2007-06-07 16:53 choosenk.m
+107144 -rw-rw-rw- 1 matlab matlab  1613 2007-06-07 16:53 choosrnk.m
+107145 -rw-rw-rw- 1 matlab matlab  7071 2007-06-07 16:53 Contents.m
+107146 -rw-rw-rw- 1 matlab matlab  3829 2007-06-07 16:53 distchar.m
+107147 -rw-rw-rw- 1 matlab matlab  3432 2007-06-07 16:53 distchpf.m
+107148 -rw-rw-rw- 1 matlab matlab  3634 2007-06-07 16:53 disteusq.m
+107149 -rw-rw-rw- 1 matlab matlab  4651 2007-06-07 16:53 distisar.m
+107150 -rw-rw-rw- 1 matlab matlab  3746 2007-06-07 16:53 distispf.m
+107151 -rw-rw-rw- 1 matlab matlab  4180 2007-06-07 16:53 distitar.m
+107152 -rw-rw-rw- 1 matlab matlab  3611 2007-06-07 16:53 distitpf.m
+107153 -rw-rw-rw- 1 matlab matlab  1992 2007-06-07 16:53 ditherq.m
+107154 -rw-rw-rw- 1 matlab matlab  2756 2007-06-07 16:53 dlyapsq.m
+107155 -rw-rw-rw- 1 matlab matlab  2488 2007-06-07 16:53 dualdiag.m
+107157 -rw-rw-rw- 1 matlab matlab 20352 2007-06-07 16:53 dypsa_206.m
+107158 -rw-rw-rw- 1 matlab matlab 26343 2007-06-07 16:53 dypsa_301.m
+107156 -rw-rw-rw- 1 matlab matlab 26343 2007-06-07 16:53 dypsa.m
+107159 -rw-rw-rw- 1 matlab matlab  2147 2007-06-07 16:53 enframe.m
+107160 -rw-rw-rw- 1 matlab matlab  2447 2007-06-07 16:53 erb2frq.m
+107161 -rw-rw-rw- 1 matlab matlab  2471 2007-06-07 16:53 ewgrpdel.m
+107162 -rw-rw-rw- 1 matlab matlab  2663 2007-06-07 16:53 figbolden.m
+107163 -rw-rw-rw- 1 matlab matlab  4212 2007-06-07 16:53 findpeaks.m
+107164 -rw-rw-rw- 1 matlab matlab  2493 2007-06-07 16:53 frac2bin.m
+107165 -rw-rw-rw- 1 matlab matlab  5269 2007-06-07 16:53 fram2wav.m
+107166 -rw-rw-rw- 1 matlab matlab  1719 2007-06-07 16:53 frq2bark.m
+107167 -rw-rw-rw- 1 matlab matlab  2489 2007-06-07 16:53 frq2erb.m
+107168 -rw-rw-rw- 1 matlab matlab  2262 2007-06-07 16:53 frq2mel.m
+107169 -rw-rw-rw- 1 matlab matlab  2092 2007-06-07 16:53 frq2midi.m
+107170 -rw-rw-rw- 1 matlab matlab 16841 2007-06-07 16:53 fxrapt.m
+107171 -rw-rw-rw- 1 matlab matlab  6700 2007-06-07 16:53 gausprod.m
+107172 -rw-rw-rw- 1 matlab matlab 10735 2007-06-07 16:53 gaussmix.m
+107173 -rw-rw-rw- 1 matlab matlab  3360 2007-06-07 16:53 glotlf.m
+107174 -rw-rw-rw- 1 matlab matlab  1909 2007-06-07 16:53 glotros.m
+107175 -rw-rw-rw- 1 matlab matlab  4685 2007-06-07 16:53 gmmlpdf.m
+107176 -rw-rw-rw- 1 matlab matlab  4664 2007-06-07 16:53 histndim.m
+107177 -rw-rw-rw- 1 matlab matlab  2483 2007-06-07 16:53 irdct.m
+107178 -rw-rw-rw- 1 matlab matlab  2044 2007-06-07 16:53 irfft.m
+107179 -rw-rw-rw- 1 matlab matlab  7422 2007-06-07 16:53 kmeanhar.m
+107180 -rw-rw-rw- 1 matlab matlab  1888 2007-06-07 16:53 kmeanlbg.m
+107181 -rw-rw-rw- 1 matlab matlab  5509 2007-06-07 16:53 kmeans.m
+107182 -rw-rw-rw- 1 matlab matlab  3314 2007-06-07 16:53 ldatrace.m
+107183 -rw-rw-rw- 1 matlab matlab  2204 2007-06-07 16:53 lin2pcma.m
+107184 -rw-rw-rw- 1 matlab matlab  2085 2007-06-07 16:53 lin2pcmu.m
+107185 -rw-rw-rw- 1 matlab matlab  2090 2007-06-07 16:53 lognmpdf.m
+107186 -rw-rw-rw- 1 matlab matlab  1711 2007-06-07 16:53 logsum.m
+107187 -rw-rw-rw- 1 matlab matlab  1278 2007-06-07 16:53 lpcaa2ao.m
+107188 -rw-rw-rw- 1 matlab matlab  1455 2007-06-07 16:53 lpcaa2dl.m
+107189 -rw-rw-rw- 1 matlab matlab  1323 2007-06-07 16:53 lpcaa2rf.m
+107190 -rw-rw-rw- 1 matlab matlab  1266 2007-06-07 16:53 lpcao2rf.m
+107191 -rw-rw-rw- 1 matlab matlab  2811 2007-06-07 16:53 lpcar2am.m
+107192 -rw-rw-rw- 1 matlab matlab  1764 2007-06-07 16:53 lpcar2cc.m
+107193 -rw-rw-rw- 1 matlab matlab  1420 2007-06-07 16:53 lpcar2db.m
+107194 -rw-rw-rw- 1 matlab matlab  1320 2007-06-07 16:53 lpcar2ff.m
+107195 -rw-rw-rw- 1 matlab matlab  2796 2007-06-07 16:53 lpcar2fm.m
+107196 -rw-rw-rw- 1 matlab matlab  1367 2007-06-07 16:53 lpcar2im.m
+107197 -rw-rw-rw- 1 matlab matlab  2020 2007-06-07 16:53 lpcar2ls.m
+107198 -rw-rw-rw- 1 matlab matlab  1446 2007-06-07 16:53 lpcar2pf.m
+107199 -rw-rw-rw- 1 matlab matlab  1779 2007-06-07 16:53 lpcar2pp.m
+107200 -rw-rw-rw- 1 matlab matlab  1352 2007-06-07 16:53 lpcar2ra.m
+107201 -rw-rw-rw- 1 matlab matlab  1691 2007-06-07 16:53 lpcar2rf.m
+107202 -rw-rw-rw- 1 matlab matlab  1833 2007-06-07 16:53 lpcar2rr.m
+107203 -rw-rw-rw- 1 matlab matlab  1312 2007-06-07 16:53 lpcar2zz.m
+107204 -rw-rw-rw- 1 matlab matlab  4344 2007-06-07 16:53 lpcauto.m
+107205 -rw-rw-rw- 1 matlab matlab  1499 2007-06-07 16:53 lpcbwexp.m
+107206 -rw-rw-rw- 1 matlab matlab  1531 2007-06-07 16:53 lpccc2ar.m
+107207 -rw-rw-rw- 1 matlab matlab  1332 2007-06-07 16:53 lpccc2cc.m
+107208 -rw-rw-rw- 1 matlab matlab  1757 2007-06-07 16:53 lpccc2db.m
+107209 -rw-rw-rw- 1 matlab matlab  1670 2007-06-07 16:53 lpccc2pf.m
+107210 -rw-rw-rw- 1 matlab matlab  4364 2007-06-07 16:53 lpcconv.m
+107211 -rw-rw-rw- 1 matlab matlab  5097 2007-06-07 16:53 lpccovar.m
+107212 -rw-rw-rw- 1 matlab matlab  1347 2007-06-07 16:53 lpccw2zz.m
+107213 -rw-rw-rw- 1 matlab matlab  1265 2007-06-07 16:53 lpcdb2pf.m
+107214 -rw-rw-rw- 1 matlab matlab  1335 2007-06-07 16:53 lpcdl2aa.m
+107215 -rw-rw-rw- 1 matlab matlab  1249 2007-06-07 16:53 lpcff2pf.m
+107216 -rw-rw-rw- 1 matlab matlab  1665 2007-06-07 16:53 lpcfq2zz.m
+107217 -rw-rw-rw- 1 matlab matlab  3108 2007-06-07 16:53 lpcifilt.m
+107218 -rw-rw-rw- 1 matlab matlab  1348 2007-06-07 16:53 lpcim2ar.m
+107219 -rw-rw-rw- 1 matlab matlab  1257 2007-06-07 16:53 lpcis2rf.m
+107220 -rw-rw-rw- 1 matlab matlab  1296 2007-06-07 16:53 lpcla2rf.m
+107221 -rw-rw-rw- 1 matlab matlab  1260 2007-06-07 16:53 lpclo2rf.m
+107222 -rw-rw-rw- 1 matlab matlab  1527 2007-06-07 16:53 lpcls2ar.m
+107223 -rw-rw-rw- 1 matlab matlab  1474 2007-06-07 16:53 lpcpf2cc.m
+107224 -rw-rw-rw- 1 matlab matlab  1471 2007-06-07 16:53 lpcpf2rr.m
+107225 -rw-rw-rw- 1 matlab matlab  1421 2007-06-07 16:53 lpcpp2cw.m
+107226 -rw-rw-rw- 1 matlab matlab  1348 2007-06-07 16:53 lpcpp2pz.m
+107227 -rw-rw-rw- 1 matlab matlab  1347 2007-06-07 16:53 lpcpz2zz.m
+107228 -rw-rw-rw- 1 matlab matlab  1568 2007-06-07 16:53 lpcra2pf.m
+107229 -rw-rw-rw- 1 matlab matlab  1707 2007-06-07 16:53 lpcra2pp.m
+107230 -rw-rw-rw- 1 matlab matlab  1767 2007-06-07 16:53 lpcrand.m
+107231 -rw-rw-rw- 1 matlab matlab  1481 2007-06-07 16:53 lpcrf2aa.m
+107232 -rw-rw-rw- 1 matlab matlab  1324 2007-06-07 16:53 lpcrf2ao.m
+107233 -rw-rw-rw- 1 matlab matlab  3358 2007-06-07 16:53 lpcrf2ar.m
+107234 -rw-rw-rw- 1 matlab matlab  1258 2007-06-07 16:53 lpcrf2is.m
+107235 -rw-rw-rw- 1 matlab matlab  1450 2007-06-07 16:53 lpcrf2la.m
+107236 -rw-rw-rw- 1 matlab matlab  1345 2007-06-07 16:53 lpcrf2lo.m
+107237 -rw-rw-rw- 1 matlab matlab  2146 2007-06-07 16:53 lpcrf2rr.m
+107238 -rw-rw-rw- 1 matlab matlab  2388 2007-06-07 16:53 lpcrr2am.m
+107239 -rw-rw-rw- 1 matlab matlab  1616 2007-06-07 16:53 lpcrr2ar.m
+107240 -rw-rw-rw- 1 matlab matlab  1519 2007-06-07 16:53 lpcss2zz.m
+107241 -rw-rw-rw- 1 matlab matlab  1411 2007-06-07 16:53 lpczz2ar.m
+107242 -rw-rw-rw- 1 matlab matlab  1547 2007-06-07 16:53 lpczz2cc.m
+107243 -rw-rw-rw- 1 matlab matlab  1531 2007-06-07 16:53 lpczz2ss.m
+107244 -rw-rw-rw- 1 matlab matlab  2787 2007-06-07 16:53 maxfilt.m
+107245 -rw-rw-rw- 1 matlab matlab  2171 2007-06-07 16:53 meansqtf.m
+107246 -rw-rw-rw- 1 matlab matlab  2260 2007-06-07 16:53 mel2frq.m
+107247 -rw-rw-rw- 1 matlab matlab  3549 2007-06-07 16:53 melbankm.m
+107248 -rw-rw-rw- 1 matlab matlab  5042 2007-06-07 16:53 melcepst.m
+107249 -rw-rw-rw- 1 matlab matlab  2392 2007-06-07 16:53 midi2frq.m
+107250 -rw-rw-rw- 1 matlab matlab  2163 2007-06-07 16:53 pcma2lin.m
+107251 -rw-rw-rw- 1 matlab matlab  1991 2007-06-07 16:53 pcmu2lin.m
+107252 -rw-rw-rw- 1 matlab matlab  1877 2007-06-07 16:53 permutes.m
+107253 -rw-rw-rw- 1 matlab matlab  1939 2007-06-07 16:53 potsband.m
+107254 -rw-rw-rw- 1 matlab matlab  2078 2007-06-07 16:53 pow2cep.m
+107255 -rw-rw-rw- 1 matlab matlab  2597 2007-06-07 16:53 randfilt.m
+107256 -rw-rw-rw- 1 matlab matlab  2556 2007-06-07 16:53 randiscr.m
+107257 -rw-rw-rw- 1 matlab matlab  5128 2007-06-07 16:53 randvec.m
+107258 -rw-rw-rw- 1 matlab matlab  2121 2007-06-07 16:53 rdct.m
+107259 -rw-rw-rw- 1 matlab matlab  8093 2007-06-07 16:53 readaif.m
+107260 -rw-rw-rw- 1 matlab matlab  3467 2007-06-07 16:53 readcnx.m
+107261 -rw-rw-rw- 1 matlab matlab  5308 2007-06-07 16:53 readhtk.m
+107262 -rw-rw-rw- 1 matlab matlab 15507 2007-06-07 16:53 readsfs.m
+107263 -rw-rw-rw- 1 matlab matlab 11038 2007-06-07 16:53 readsph.m
+107264 -rw-rw-rw- 1 matlab matlab  8567 2007-06-07 16:53 readwav.m
+107265 -rw-rw-rw- 1 matlab matlab  1815 2007-06-07 16:53 rfft.m
+107266 -rw-rw-rw- 1 matlab matlab  1409 2007-06-07 16:53 rhartley.m
+107267 -rw-rw-rw- 1 matlab matlab  1810 2007-06-07 16:53 rnsubset.m
+107268 -rw-rw-rw- 1 matlab matlab  2414 2007-06-07 16:53 rotation.m
+107269 -rw-rw-rw- 1 matlab matlab  1792 2007-06-07 16:53 rsfft.m
+107270 -rw-rw-rw- 1 matlab matlab  2965 2007-06-07 16:53 schmitt.m
+107271 -rw-rw-rw- 1 matlab matlab  1709 2007-06-07 16:53 skew3d.m
+107272 -rw-rw-rw- 1 matlab matlab  3625 2007-06-07 16:53 specsubm.m
+107273 -rw-rw-rw- 1 matlab matlab  2090 2007-06-07 16:53 spgrambw.m
+107274 -rw-rw-rw- 1 matlab matlab  1827 2007-06-07 16:53 sprintsi.m
+107275 -rw-rw-rw- 1 matlab matlab  4728 2007-06-07 16:53 txalign.m
+107276 -rw-rw-rw- 1 matlab matlab  3094 2007-06-07 16:53 unixwhich.m
+107277 -rw-rw-rw- 1 matlab matlab  1682 2007-06-07 16:53 usasi.m
+107278 -rw-rw-rw- 1 matlab matlab  8443 2007-06-07 16:53 voicebox.m
+107279 -rw-rw-rw- 1 matlab matlab  6111 2007-06-07 16:53 windows.m
+107280 -rw-rw-rw- 1 matlab matlab  1744 2007-06-07 16:53 winenvar.m
+107281 -rw-rw-rw- 1 matlab matlab  4777 2007-06-07 16:53 writehtk.m
+107282 -rw-rw-rw- 1 matlab matlab  8790 2007-06-07 16:53 writewav.m
+107283 -rw-rw-rw- 1 matlab matlab  2235 2007-06-07 16:53 zerocros.m
+107284 -rw-rw-rw- 1 matlab matlab  1326 2007-06-07 16:53 zerotrim.m
+
+./zonnew:
+total 1361
+ 36633 -r--r--r-- 1 matlab matlab    1345 2007-08-23 14:04 calccaldate.m
+181702 -r--r--r-- 1 matlab matlab     781 2009-12-01 10:50 calcDang.m
+ 36634 -r--r--r-- 1 matlab matlab    1897 2007-08-23 14:04 calcdoorg.m
+ 36635 -r--r--r-- 1 matlab matlab     423 2007-08-23 14:04 calcjc.m
+ 36636 -r--r--r-- 1 matlab matlab     935 2009-12-01 08:53 calcjd.m
+ 36637 -r--r--r-- 1 matlab matlab    3929 2007-08-23 14:04 calcobl.m
+ 36638 -r--r--r-- 1 matlab matlab     393 2007-08-23 14:04 calcphra.m
+ 36639 -r--r--r-- 1 matlab matlab    5535 2007-08-23 14:04 calcposhemel.m
+ 36640 -r--r--r-- 1 matlab matlab     964 2007-08-23 14:04 calcschemering.m
+ 36641 -r--r--r-- 1 matlab matlab    1275 2007-08-23 14:04 calcsc.m
+182216 -r--r--r-- 1 matlab matlab     965 2009-12-01 10:48 calcStartSeiz.m
+ 36642 -r--r--r-- 1 matlab matlab     811 2007-08-23 14:04 calctsidereal.m
+ 36643 -r--r--r-- 1 matlab matlab    1486 2007-08-23 14:04 calcvsop87.m
+ 36644 -r--r--r-- 1 matlab matlab     332 2007-08-23 14:04 deg2rad.m
+ 36645 -r--r--r-- 1 matlab matlab     586 2007-08-23 14:04 ecli2equcoor.m
+ 36646 -r--r--r-- 1 matlab matlab    2860 2007-08-23 14:04 efemeride.m
+ 36647 -r--r--r-- 1 matlab matlab    1557 2009-10-13 08:16 geogcoor.m
+ 36648 -r--r--r-- 1 matlab matlab     686 2007-08-23 14:04 getutctime.m
+ 36649 -r--r--r-- 1 matlab matlab     889 2007-08-23 14:04 lagrptn.m
+ 36650 -r--r--r-- 1 matlab matlab     714 2007-08-23 14:04 leesvsopcompleet.m
+ 36651 -r--r--r-- 1 matlab matlab    1745 2007-08-23 14:04 leesvsopdata.m
+ 36652 -r--r--r-- 1 matlab matlab    7749 2007-08-23 14:04 leeszwdata.m
+ 36653 -r--r--r-- 1 matlab matlab     401 2007-08-23 14:04 magnnoord.m
+ 36654 -r--r--r-- 1 matlab matlab    2168 2007-08-23 14:04 plotplan.m
+ 36655 -r--r--r-- 1 matlab matlab    1064 2007-08-23 14:04 plotzwdata.m
+ 36656 -r--r--r-- 1 matlab matlab     729 2007-08-23 14:04 rad2deg.m
+ 36657 -r--r--r-- 1 matlab matlab    3587 2009-01-26 13:09 realtimesun.m
+ 36658 -r--r--r-- 1 matlab matlab    6767 2007-08-23 14:04 savetxtres.m
+ 36659 -r--r--r-- 1 matlab matlab    1352 2007-08-23 14:04 tolocalhorizcoor.m
+ 36660 drwx------ 2 matlab matlab     304 2007-08-23 14:04 vsop87data
+ 36669 -rwx------ 1 matlab matlab 1199544 2007-08-23 14:04 VSOP87data.mat
+ 36670 -rwx------ 1 matlab matlab    1651 2007-08-23 14:04 zonnewHelsen.txt
+ 36671 -r--r--r-- 1 matlab matlab   35151 2007-08-23 14:04 zonnewijzer.m
+ 36672 -r--r--r-- 1 matlab matlab   17374 2007-08-23 14:04 zonnew.m
+
+./zonnew/vsop87data:
+total 4142
+36665 -r--r--r-- 1 matlab matlab 324804 2007-08-23 14:04 EARTHD.DAT
+36662 -r--r--r-- 1 matlab matlab 465652 2007-08-23 14:04 JUPITERD.DAT
+36663 -r--r--r-- 1 matlab matlab 731652 2007-08-23 14:04 MARSD.DAT
+36666 -r--r--r-- 1 matlab matlab 910404 2007-08-23 14:04 MERCURYD.DAT
+36661 -r--r--r-- 1 matlab matlab 258836 2007-08-23 14:04 NEPTUNED.DAT
+36664 -r--r--r-- 1 matlab matlab 768360 2007-08-23 14:04 SATURND.DAT
+36667 -r--r--r-- 1 matlab matlab 532682 2007-08-23 14:04 URANUSD.DAT
+36668 -r--r--r-- 1 matlab matlab 226119 2007-08-23 14:04 VENUSD.DAT
