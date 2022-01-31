@@ -128,6 +128,7 @@ if ~bOverwrite&&exist(fname,'file')
 end
 orient(fig,'tall')
 set(fig,'paperunits','centimeter','papersize',siz,'paperposition',pos)
+%set(fig,'paperunits','centimeter','papersize',siz)
 if strcmpi(fext,'.emf')
 	if ~isempty(opt)
 		warning('Saving to emf is not done via print but via saveas, some options are not used!')

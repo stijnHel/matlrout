@@ -24,6 +24,8 @@ function SpecUtils(varargin)
 %       an option (check in context menu) can be added to give the
 %          possibility for "linear means based on logaritmic data)
 %       sum rather than mean can also be useful.
+%   SpecUtils legend & list in case of categories (not numeric axes)
+%       --> display category, not number!
 
 if nargin==0
 	h=[findobj(gcf,'type','image');findobj(gcf,'type','surface')];
@@ -32,7 +34,7 @@ if nargin==0
 	end
 	if length(h)>1
 		tags=get(h,'Tag');
-		B=strncmp('TMW_',tags,4);
+		B=startsWith(tags,'TMW_');	% still usefull?
 		if any(B)
 			h(B)=[];
 		end

@@ -79,6 +79,9 @@ ax=ancestor(l,'axes');
 x=get(l,'XData');
 y=get(l,'YData');
 dx=get(l,'UserData');
+if isempty(dx)
+	dx = 0.01;	%!!!!!
+end
 xl=get(ax,'XLim');
 yl=get(ax,'YLim');
 p=get(ax,'CurrentPoint');

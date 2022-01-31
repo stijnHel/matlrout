@@ -25,9 +25,10 @@ fcnOpen = [];
 fcnAlt = [];
 mnContext = [];
 [bAdd] = false;
+[bWarnLinethickness] = true;
 
 if ~isempty(options)
-	setoptions({'fcnOpen','fcnAlt','mnContext','bAdd'},options{:})
+	setoptions({'fcnOpen','fcnAlt','mnContext','bAdd','bWarnLinethickness'},options{:})
 end
 
 if ~isempty(fcnOpen)
@@ -54,7 +55,9 @@ if all(W==W(1))
 	Wnormal = W(1);
 	Wsel = max(1,Wnormal)*2;
 else
-	warning('Not all lines with the same width to start?!')
+	if bWarnLinethickness
+		warning('Not all lines with the same width to start?!')
+	end
 	Wnormal = min(W);
 	Wsel = max(W);
 end

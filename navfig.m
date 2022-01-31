@@ -1410,7 +1410,18 @@ if ~reedsverwerkt
 				'"y" : print coordinates (screen coordinates)',newline,	...
 				'"a"/"A" : show line marker points or hide them',newline,	...
 				'"ESC" : back to autoscaling',newline,	...
-				'"n" : go to next linked figure'	...
+				'"n" : go to next linked figure',newline	...
+				'"ctrl-B" : add contextmenu to lines',newline	...
+				'"ctrl-C" : plot XCORR',newline		...
+				'"ctrl-D" : install axtick2date',newline	...
+				'"ctrl-E" : Zoom to make last point as max scale',newline	...
+				'"ctrl-G" : Start axis with clicked point',newline	...
+				'"ctrl-M" : Maximize figure (and linked figures)',newline	...
+				'"ctrl-S" : Zoom to make first point as min scale',newline	...
+				'"ctrl-T" : Tile linked figures (all if not linked!)',newline	...
+				'"ctrl-X" : Manual zoom',newline	...
+				'"ctrl-Y" : Manual zoom in Y-direction',newline		...
+				'"ctrl-Z" : Undo last zoom-action'	...
 				];
 			K = navfig('keylist');
 			if ~isempty(K)
@@ -1429,6 +1440,8 @@ if ~reedsverwerkt
 			helpdlg(helpS,'NAVFIG-help')
 		case 'w'	% delete lines from fitSine
 			delete(findobj(f,'Tag','sineFitPlot'))
+		case 2	% add uicontext-capability to lines
+			AddLineUIcontexts(f)
 		case 3	% ctrl-c - plot xcorr
 			fXCORR=nfigure;
 			for i=1:length(as)
@@ -1637,7 +1650,9 @@ if doebepfig
 		if isdatetime(get(gca,'xlim'))&&isnumeric(x)
 			x = datetime(x,'convertFrom','datenum');
 		end
-		set(as,'XLim',x);
+		if ~isequal(x,x0)
+			set(as,'XLim',x);
+		end
 		assen=as;
 	elseif isequal(rlink,1)
 		dx1=x(1)-x0(1);
@@ -1651,7 +1666,9 @@ if doebepfig
 	else
 		andere=RemoveNoLink(andere);
 		try
-			bepfigs(x,andere)
+			if ~isequal(x,x0)
+				bepfigs(x,andere)
+			end
 		catch
 			warning('NAVFIG:Relinked','figuren "herlinkt"')
 			navfig relink
@@ -1777,3 +1794,13 @@ while i<=length(assen)
 		i=i+1;
 	end
 end
+
+function AddLineUIcontexts(f)
+l = findobj(f,'Type','line');
+hMn = uicontextmenu(f);
+uimenu(hMn,'Label','gradient','Callback','berhell')
+uimenu(hMn,'Label','t-constant','Callback','bertconst')
+
+
+set(l,'UIcontextmenu',hMn)
+fprintf('Contextmenu-capabilities added to lines in figure %d.\n',double(f))

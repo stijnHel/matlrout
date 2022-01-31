@@ -265,7 +265,7 @@ classdef cnavmsrs < handle
 			fNr=get(hAx(1),'Parent');
 			if isscalar(opties.kanx)&&(opties.kanx<0||opties.kanx>floor(opties.kanx))
 				kanx=-abs(opties.kanx);
-			elseif length(opties.kanx)==size(e,1)	% (kanx is converted to 1 by plotmat)
+			elseif length(opties.kanx)==size(e,1) && size(e,1)>1	% (kanx is converted to 1 by plotmat)
 				kanx=[];	% don't redraw
 			end
 			c.fnaam = fnaam;

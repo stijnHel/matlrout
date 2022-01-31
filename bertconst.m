@@ -24,12 +24,12 @@ if nargin
 		end
 	else
 		% setup
-		if (nargin==1)|isempty(dx)
+		if (nargin==1)||isempty(dx)
 			dx=-1;
 		end
 		if length(l)==1
 			t=get(l,'Type');
-			if strcmp(t,'figure')|strcmp(t,'axes')
+			if strcmp(t,'figure')||strcmp(t,'axes')
 				l=findobj(l,'Type','line');
 			end
 		end
@@ -58,6 +58,8 @@ if length(dx)>1
 	[Bf,Af]=butter(nFilt,fFilt*dxMean*2);
 	y=y(1)+filter(Bf,Af,y-y(1));
 	y=y(end)+filter(Bf,Af,y(end:-1:1)-y(end));y=y(end:-1:1);
+elseif isempty(dx)
+	dx = -1;
 end
 if dx<0
 	dx=10*mean(diff(x));
