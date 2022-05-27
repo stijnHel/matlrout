@@ -35,8 +35,8 @@ for i=1:numel(graphs)
 	end
 	X{i}=cell(1,length(l));
 	for j=1:length(l)
-		Xdata=get(l(j),'XData');
-		Ydata=get(l(j),'YData');
+		Xdata=double(get(l(j),'XData'));	% double - to prevent problems with combining X and Y with integer data
+		Ydata=double(get(l(j),'YData'));
 		if bClipData
 			B=Xdata>=xl(1)&Xdata<=xl(2);Ydata>=yl(1)&Ydata<=yl(2);
 			X{i}{j}=[Xdata(B)' Ydata(B)'];

@@ -19,6 +19,7 @@ function varargout=navfig(c,x2,varargin)
 %   [X,I]=navfig('getLog') - returns the log of points
 %   navfig off   : switches navigation functionallity off
 %   navfig('updateAxes',fcn)  - runs "fcn" after updating axes
+%           (extra fcn-arguments are possible via updateAxesArgs axes appdata)
 %   navfig updateAxesT switches "X-time-display" on
 %
 % Press "H" (from "navfig-enabled window") to get a list of key-codes.
@@ -291,6 +292,10 @@ if ischar(c)&&length(c)>1
 			ll=FindLines(gca);
 			setappdata(f,'navfigX',get(ll(1),'XData'))
 		case 'keys'
+			if nargin==1
+				varargout = {getappdata(f,'NAVFIGkey')};
+				return
+			end
 			figs=getlinked(f,1);
 			figs=[f;figs(:)];
 			for f1=figs(:)'
@@ -383,6 +388,8 @@ if ischar(c)&&length(c)>1
 					c=K{i};
 					if length(c)>1 || (c>='0'&&upper(c)<='Z')
 						K{i,4} = c;
+					elseif c==' '
+						K{i,4} = ['''',c,''''];
 					else
 						K{i,4} = sprintf('<%d|0x%02x>',abs([c c]));
 						if c>1&&c<=26
@@ -543,7 +550,7 @@ if isempty(X)
 		if ~isvector(X)
 			X=X(1,:);	%!!!!!!
 		end
-		if min(X)>pt(1)||max(X)<pt(1)
+		if isempty(X) || min(X)>pt(1) || max(X)<pt(1)
 			lNOK(i)=1;
 		else
 			Y=get(ll(i),'YData');

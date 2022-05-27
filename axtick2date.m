@@ -6,23 +6,7 @@ function [varargout]=axtick2date(ax,axType,varargin)
 %    axtick2date(hAxes/hFigure,'X'/'Y'/'Z')
 %            Z added, but only really practical for normal (XY)2Dplots
 %    axtick2date([<figure/ax>,]'timeformat',<timeformat>) forces a specific timeformat
-%            possible values:
-%                     'auto' - automatically determined
-%                     'excel' (days after -1/1/1900)
-%                     'matlab'
-%                     'matlabSeconds'
-%                     'winSeconds'
-%                     'winMicrosec'
-%                     'winNanosec'
-%                     'lvSeconds' (LabVIEW seconds)
-%                     'julianday'
-%                     'beckhoff'
-%                     'beckhoffSec'
-%                     'base<time>' with <time> (days)
-%                              yyyymmdd
-%                              yyyymmddHHMMSS.FFF
-%                                only HH, HHMM, HHMMSS are also possible
-%                     'sec<time>' same as base.. but with seconds
+%            possible values: see Tim2MLtime
 %    axtick2date([<figure/ax>,]'stop') removes "time-ticks"
 %    axtick2date([<figure/ax>,]'changeTformat',<timeformat>)
 %           changes axes (including X)
@@ -100,7 +84,7 @@ elseif strncmpi(axType,'changeTformat',nStringTest)
 	% (!)Works only for X-axis
 	if isempty(opts)||(ischar(opts{1})&&strcmpi(opts{1},'auto'))
 		xl=get(ax(1),'Xlim');
-		[tScale,tOffset]=GetScaleOffset(getappdata(ax(1),'TIMEFORMAT'),xl(1));
+		[tScale,tOffset]=Tim2MLtime(getappdata(ax(1),'TIMEFORMAT'),xl(1));
 		if tScale==1
 			newTform='base';
 		else
@@ -116,9 +100,9 @@ elseif strncmpi(axType,'changeTformat',nStringTest)
 		tForm=getappdata(ax(i),'TIMEFORMAT');
 		if ~isequal(tForm,newTform)
 			xl=get(ax(i),'xlim');
-			[tScaleNew,tOffsetNew]=GetScaleOffset(newTform,xl(1));
+			[tScaleNew,tOffsetNew]=Tim2MLtime(newTform,xl(1));
 				% in loop because xl can change(!)
-			[tScale,tOffset]=GetScaleOffset(tForm,xl(1));
+			[tScale,tOffset]=Tim2MLtime(tForm,xl(1));
 			l=get(ax(i),'Children');
 			for j=1:length(l)
 				if any(strcmp(get(l(j),'Type'),{'line','patch','text'}))
@@ -233,7 +217,7 @@ f=1/tStep;
 if diff(xl)>370
 	yr=yr-1;	% force start with year
 end
-for i=1:length(xd);
+for i=1:length(xd)
 	dd=datevec(xd(i));
 	if dd(1)<0||dd(1)>2600
 		warning('AXTICK2DATE:BadDate'	...
@@ -260,117 +244,14 @@ for i=1:length(xd);
 end
 set(ax,sXtick,(xd-tOffset)*tScale,sXtickL,xtl)
 
-function [tScale,tOffset]=GetScaleOffset(timeFormat,t)
-tScale=1;
-tOffset=0;
-if isempty(timeFormat)
-	timeFormat=GetDefaultTF(t);
-end
-switch lower(timeFormat)
-	case 'excel'
-		tOffset=datenum(1900,1,-1);
-	case 'winseconds'
-		tScale=86400;
-		tOffset=datenum(1970,1,0,1,0,0);
-		if isDST(t/tScale+tOffset)
-			tOffset=tOffset+1/24;
-		end
-	case 'winmicrosec'
-		tScale=86400e6;
-		tOffset=datenum(1970,1,1,1,0,0);
-		if isDST(t/tScale+tOffset)
-			tOffset=tOffset+1/24;
-		end
-	case 'winnanosec'
-		tScale=86400e9;
-		tOffset=datenum(1970,1,1,1,0,0);
-		if isDST(t/tScale+tOffset)
-			tOffset=tOffset+1/24;
-		end
-	case 'lvseconds'
-		tScale=86400;
-		tOffset=datenum(1904,1,1);
-		if isDST(t/tScale+tOffset)
-			tOffset=tOffset+1/24;
-		end
-	case 'matlabseconds'
-		tScale=86400;
-		tOffset=0;
-	case 'julianday'
-		%tOffset=datenum(2000,1,1)-calcjd(1,1,2000);	% julian day ---> matlab-datenum
-		tOffset=-1721058.5;
-	case 'matlab'
-		%no "correction"
-	case 'beckhoff'
-		tScale=86400e7;
-		tOffset=datenum(1601,1,1,1,0,0);
-	case 'beckhofsec'
-		tScale=86400;
-		tOffset=datenum(1601,1,1,1,0,0);
-	otherwise
-		bBase=strncmpi(timeFormat,'base',4);
-		bSec=strncmpi(timeFormat,'sec',3);
-		if bSec
-			sTime=timeFormat(4:end);
-			tScale=86400;
-		elseif bBase
-			sTime=timeFormat(5:end);
-		else
-			error('Unknown time format!')
-		end
-		lTime=length(sTime);
-		if lTime<8||~all((sTime>='0'&sTime<='9')|sTime=='.')
-				% not fool proof!
-			error('Wrong base time format')
-		end
-		tBase=sscanf(sTime,'%04d%02d%02d',[1 3]);
-		if lTime>8
-			tB=sscanf(sTime(9:end),'%02d%02d%02d%f');
-			if length(tB)<3
-				tB(1,3)=0;
-			elseif length(tB)>3
-				tB(3)=tB(3)+tB(4);
-			end
-			tBase(4:6)=tB(1:3);
-		end
-		tOffset=datenum(tBase);
-end
-
-function timeFormat=GetDefaultTF(t)
-if t<1e5
-	if t>10000	% Excel-date?
-		timeFormat='excel';
-	else
-		timeFormat='base20101101';
-	end
-elseif t>1e18
-	timeFormat='winNanosec';
-elseif t>1e17
-	timeFormat='beckhoff';
-elseif t>1e15
-	timeFormat='winMicrosec';
-elseif t>6e10	% supposed to be "Matlab-seconds" (matlabtime*86400)
-	timeFormat='matlabSeconds';
-elseif t>1e10
-	timeFormat='beckhofSec';
-elseif t>3e9
-	timeFormat='lvSeconds';
-elseif t>1e7	% supposed to be "windows-seconds" (sec after 1/1/1970)
-	timeFormat='winSeconds';
-elseif t>1e6	% supposed to be jd
-	timeFormat='julianday';
-else
-	timeFormat='matlab';
-end
-
 function [tScale,tOffset]=GetTimeScale(ax,xl)
 timeFormat=getappdata(ax(1),'TIMEFORMAT');
 if isempty(timeFormat)
-	timeFormat=GetDefaultTF(xl(1));
+	[~,timeFormat]=Tim2MLtime(xl(1));
 	for i=1:length(ax)
 		setappdata(ax(i),'TIMEFORMAT',timeFormat)
 	end
 elseif ~ischar(timeFormat)
 	error('Unknown fixed time-format!')
 end
-[tScale,tOffset]=GetScaleOffset(timeFormat,xl(1));
+[tScale,tOffset]=Tim2MLtime(timeFormat,xl(1));

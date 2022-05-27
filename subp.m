@@ -86,6 +86,8 @@ elseif narg >= 3
 	kill_siblings = 1;
 end
 
+f = gcf;
+
 % if we recovered an identifier earlier, use it:
 if exist('handle1','var')
 	set(get(0,'CurrentFigure'),'CurrentAxes',handle1);
@@ -119,6 +121,14 @@ elseif ~exist('position','var')
 		width = (totalwidth - (ncols-1)*(PERC_OFFSET_L+PERC_OFFSET_R))/ncols;
 		height = (totalheight - (nrows-1)*(PERC_OFFSET_T+PERC_OFFSET_B))/nrows;
 		if thisPlot==0
+			h = getappdata(f,'hFigureTitle');
+			if ~isempty(h) && ishandle(h)
+				if ~exist('titel','var')
+					titel='';
+				end
+				set(h,'String',titel)
+				return
+			end
 			position=[def_pos(1) def_pos(2)+totalheight/0.95 totalwidth totalheight/18];
 		else
 			position = [def_pos(1)+col*(width+PERC_OFFSET_L+PERC_OFFSET_R) ...
@@ -137,11 +147,11 @@ elseif ~exist('position','var')
 end
 
 % kill overlapping siblings if mnp specifier was used:
-nextstate = get(gcf,'nextplot');
+nextstate = get(f,'nextplot');
 if strcmp(nextstate,'replace'), nextstate = 'add'; end
 if(kill_siblings)
-	if delay_destroy, set(gcf,'NextPlot','replace'); return, end
-	sibs = get(gcf, 'Children');
+	if delay_destroy, set(f,'NextPlot','replace'); return, end
+	sibs = get(f, 'Children');
 	for i = 1:length(sibs)
 		if(strcmp(get(sibs(i),'Type'),'axes'))
 			sibpos = get(sibs(i),'Position');
@@ -156,7 +166,7 @@ if(kill_siblings)
 				if any(sibpos ~= position)
 					delete(sibs(i));
 				else
-					set(gcf,'CurrentAxes',sibs(i));
+					set(f,'CurrentAxes',sibs(i));
 					if thisPlot==0
 						c=get(sibs(i),'Children');
 						for l=1:length(c)
@@ -172,20 +182,21 @@ if(kill_siblings)
 			end
 		end
 	end
-	set(gcf,'NextPlot',nextstate);
+	set(f,'NextPlot',nextstate);
 end
 
 % create the axis:
 if create_axis
 	if strcmp(nextstate,'new'), figure, end
-	ax = axes('Position', position,'box','on', 'ytick',-100, 'xtick',-100);
+	ax = axes('Position', position,'box','on');
 	if thisPlot==0
-		set(ax,'Units','normalized','Tag','title')
+		set(ax,'Units','normalized','Tag','title', 'ytick',-100, 'xtick',-100)
 		if ~exist('titel','var')
 			titel='';
 		end
-		text(0.5,0.5,titel,'HorizontalAlignment', 'center','FontSize',18,...
-			'Units','normalized',varargin{:})
+		h = text(0.5,0.5,titel,'HorizontalAlignment', 'center','FontSize',18,...
+			'Units','normalized',varargin{:});
+		setappdata(f,'hFigureTitle',h)
 	end
 else
 	ax = gca;

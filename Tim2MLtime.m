@@ -6,6 +6,7 @@ function [tML,timeFormat]=Tim2MLtime(t,timeFormat)
 %                     'matlab'
 %                     'matlabSeconds'
 %                     'winSeconds'
+%                     'winMillisec'
 %                     'winMicrosec'
 %                     'winNanosec'
 %                     'lvSeconds' (LabVIEW seconds)
@@ -17,6 +18,7 @@ function [tML,timeFormat]=Tim2MLtime(t,timeFormat)
 %                              yyyymmddHHMMSS.FFF
 %                                only HH, HHMM, HHMMSS are also possible
 %                     'sec<time>' same as base.. but with seconds
+%          [tScale,tOffset] = Tim2MLtime(timeFormat,t)
 %    extracted data from axtick2date
 
 if ~isnumeric(t)
@@ -24,46 +26,82 @@ if ~isnumeric(t)
 		tML = double(t);
 		timeFormat = 'lvtime';
 		return
+	elseif ischar(t)
+		if nargin<2
+			timeFormat = [];
+		end
+		[tML,timeFormat]=GetScaleOffset(t,timeFormat);
+		return
 	else
 		error('Wrong input!')
 	end
 end
 
-tScale=1;
-tOffset=0;
 if nargin<2||isempty(timeFormat)
 	timeFormat=GetDefaultTF(t(1));
 end
 if isnumeric(t)&&~isfloat(t)
 	t=double(t);
 end
+[tScale,tOffset] = GetScaleOffset(timeFormat,t(1));
+tML=double(t)/tScale+tOffset;
+
+function timeFormat=GetDefaultTF(t)
+if t<1e5
+	if t>10000	% Excel-date?
+		timeFormat='excel';
+	else
+		timeFormat='base20101101';
+	end
+elseif t>1e18
+	timeFormat='winNanosec';
+elseif t>1e17
+	timeFormat='beckhoff';
+elseif t>1e15
+	timeFormat='winMicrosec';
+elseif t>1e12
+	timeFormat='winMillisec';
+elseif t>6e10	% supposed to be "Matlab-seconds" (matlabtime*86400)
+	timeFormat='matlabSeconds';
+elseif t>1e10
+	timeFormat='beckhofSec';
+elseif t>3e9
+	timeFormat='lvSeconds';
+elseif t>1e7	% supposed to be "windows-seconds" (sec after 1/1/1970)
+	timeFormat='winSeconds';
+elseif t>1e6	% supposed to be jd
+	timeFormat='julianday';
+else
+	timeFormat='matlab';
+end
+
+function [tScale,tOffset] = GetScaleOffset(timeFormat,t)
+tScale=1;
+tOffset=0;
+bDSTcorr = false;
 switch lower(timeFormat)
 	case 'excel'
 		tOffset=datenum(1900,1,-1);
 	case 'winseconds'
 		tScale=86400;
 		tOffset=datenum(1970,1,1,1,0,0);
-		if isDST(t(1)/tScale+tOffset)
-			tOffset=tOffset+1/24;
-		end
+		bDSTcorr = true;
 	case 'winmicrosec'
 		tScale=86400e6;
 		tOffset=datenum(1970,1,1,1,0,0);
-		if isDST(t(1)/tScale+tOffset)
-			tOffset=tOffset+1/24;
-		end
+		bDSTcorr = true;
+	case 'winmillisec'
+		tScale=86400e3;
+		tOffset=datenum(1970,1,1,1,0,0);
+		bDSTcorr = true;
 	case 'winnanosec'
 		tScale=86400e9;
 		tOffset=datenum(1970,1,1,1,0,0);
-		if isDST(t(1)/tScale+tOffset)
-			tOffset=tOffset+1/24;
-		end
+		bDSTcorr = true;
 	case 'lvseconds'
 		tScale=86400;
 		tOffset=datenum(1904,1,1);
-		if isDST(t(1)/tScale+tOffset)
-			tOffset=tOffset+1/24;
-		end
+		bDSTcorr = true;
 	case 'matlabseconds'
 		tScale=86400;
 		tOffset=0;
@@ -81,9 +119,7 @@ switch lower(timeFormat)
 	case 'ntp64'
 		tScale=86400;
 		tOffset=datenum(1900,1,1);
-		if isDST(t(1)/tScale+tOffset)
-			tOffset=tOffset+1/24;
-		end
+		bDSTcorr = true;
 	otherwise
 		bBase=strncmpi(timeFormat,'base',4);
 		bSec=strncmpi(timeFormat,'sec',3);
@@ -112,31 +148,6 @@ switch lower(timeFormat)
 		end
 		tOffset=datenum(tBase);
 end
-tML=double(t)/tScale+tOffset;
-
-function timeFormat=GetDefaultTF(t)
-if t<1e5
-	if t>10000	% Excel-date?
-		timeFormat='excel';
-	else
-		timeFormat='base20101101';
-	end
-elseif t>1e18
-	timeFormat='winNanosec';
-elseif t>1e17
-	timeFormat='beckhoff';
-elseif t>1e15
-	timeFormat='winMicrosec';
-elseif t>6e10	% supposed to be "Matlab-seconds" (matlabtime*86400)
-	timeFormat='matlabSeconds';
-elseif t>1e10
-	timeFormat='beckhofSec';
-elseif t>3e9
-	timeFormat='lvSeconds';
-elseif t>1e7	% supposed to be "windows-seconds" (sec after 1/1/1970)
-	timeFormat='winSeconds';
-elseif t>1e6	% supposed to be jd
-	timeFormat='julianday';
-else
-	timeFormat='matlab';
+if bDSTcorr && ~isempty(t) && isDST(t/tScale+tOffset)
+	tOffset=tOffset+1/24;
 end

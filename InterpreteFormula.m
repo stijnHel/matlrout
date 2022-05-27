@@ -258,7 +258,7 @@ while iS<=nS
 		bAllowString = true;
 	elseif si=='^'
 		if bMatlabForm
-			typLast=26; %#ok<UNRCH>
+			typLast=26;
 		else
 			typLast=42;
 		end
@@ -335,7 +335,7 @@ while iS<=nS
 	elseif si=='.'
 		typLast=40;
 		if bMatlabForm
-			if s(jS)=='*' %#ok<UNRCH>
+			if s(jS)=='*'
 				typLast=44;
 			elseif s(jS)=='/'
 				typLast=45;
@@ -1169,6 +1169,9 @@ for iOrd=1:size(order,1)
 					case 60	% ==
 						if bNumeric
 							v=v1==v2;
+						elseif (ischar(v1) || iscell(v1)&&ischar(v1{1}))	...
+								&& (ischar(v2) || iscell(v2)&&ischar(v2{1}))
+							v = strcmp(v1,v2);
 						else
 							bVal=false;
 						end

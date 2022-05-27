@@ -186,8 +186,9 @@ if bProcess
 	else
 		Xrecord(:,1) = Xrecord(:,1)/86400+t0Data;
 	end
+	
+	G = var2struct(Dtot,Z1,t0);
 end		% if bProcess
-G = var2struct(Dtot,Z1,t0);
 
 	function crc=CalcCRC(x)
 		crc=uint16(0);

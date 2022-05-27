@@ -20,7 +20,7 @@ if nargin==0
 	return
 end
 
-if isnumeric(n)&&length(n)==1
+if isnumeric(n) && length(n)==1 && ~isa(f,'matlab.ui.Figure')
 	for I=1:n
 		bepfig(x,I)
 	end

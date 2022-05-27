@@ -3,6 +3,35 @@ function [fout,bNew,Stitles]=getmakefig(t,activate,create,titl,varargin)
 %     [f,bNew]=getmakefig(tag[,activate[,create[,titl[,options]]]])
 %     [f,tags,titles]=getmakefig
 
+persistent bForceNormalFigure
+
+if isempty(bForceNormalFigure)
+	bForceNormalFigure = false;
+end
+
+if nargin>1 && ischar(activate)
+	if nargin==2
+		options = [{activate},varargin];
+	elseif nargin==3
+		options = [{activate,create},varargin];
+	else
+		options = [{activate,create,titl},varargin];
+	end
+else
+	options = varargin;
+end
+if strcmpi(t,'bForceNormalFigure')
+	if nargin==1
+		if nargout
+			fout = bForceNormalFigure;
+		else
+			fprintf('normal figure options: %d\n',bForceNormalFigure)
+		end
+	else
+		bForceNormalFigure = activate;
+	end
+	return
+end
 if ~exist('activate','var')||isempty(activate)
 	activate=true;
 end
@@ -12,6 +41,7 @@ end
 if ~exist('titl','var')
 	titl=[];
 end
+
 % make sure all figures are found, even the hidden handles (non-integer
 % handles)
 shH = get(0,'ShowHiddenHandles'); % store state to restore to original
@@ -51,10 +81,10 @@ elseif isempty(f)
 		end
 		return
 	end
-	if exist('nfigure.m','file')
-		f=nfigure('Tag',t,varargin{:});
+	if ~bForceNormalFigure && exist('nfigure.m','file')
+		f=nfigure('Tag',t,options{:});
 	else
-		f=figure('Tag',t,varargin{:});
+		f=figure('Tag',t,options{:});
 	end
 	bNew=true;
 else
@@ -74,9 +104,9 @@ else
 		end
 	end
 	bNew=false;
-	if ~isempty(varargin)
+	if ~isempty(options)
 		try
-			set(f,varargin{:})
+			set(f,options{:})
 		catch err
 			DispErr(err)
 			warning('Problem with settings - maybe a special (n)figure-setting?')

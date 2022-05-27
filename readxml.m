@@ -1,4 +1,4 @@
-function S=readxml(fname,bFlat,bSimplify,bStruct)
+function S=readxml(fname,bFlat,bSimplify,bStruct,varargin)
 %readxml  - Reads an xml-like format
 %    S=readxml(fname[,bFlat[,bSimplify]])
 %    S=readxml({<text>}[,bFlat])
@@ -19,15 +19,37 @@ for i=1:2
 end
 bBrackCharsOpen=brackChars{2,1};
 shortTags={};
+bWarning = true;
 
-if nargin<4
-	bStruct=false;
+if nargin>1 && ischar(bFlat)	% (better to work with all varargin's!)
+	if nargin==2
+		options = {bFlat};
+	elseif nargin==3
+		options = {bFlat,bSimplify};
+	elseif nargin>=4
+		options = [{bFlat,bSimplify,bStruct},varargin];
+	end
+	bFlat = [];
+	bSimplify = [];
+	bStruct = [];
+	setoptions({'bFlat','bSimplify','bStruct','bWarning'},options{:})
+elseif nargin<4
+	bStruct=[];
 	if nargin<3
-		bSimplify=true;
+		bSimplify=[];
 		if nargin<2
-			bFlat=true;
+			bFlat=[];
 		end
 	end
+end
+if isempty(bStruct)
+	bStruct = false;
+end
+if isempty(bSimplify)
+	bSimplify = true;
+end
+if isempty(bFlat)
+	bFlat = true;
 end
 if iscell(fname)
 	if length(fname)>1
@@ -81,7 +103,9 @@ while i<length(x)	% ('<' - at least two characters have to be read)
 		if x(i+1)=='?'
 			[tag,fields,I,i]=readtag(x,i+1);
 			if isempty(I.last)||I.last~='?'
-				warning('READXML:badClose','!no good closing of ''<?''-tag')
+				if bWarning
+					warning('READXML:badClose','!no good closing of ''<?''-tag')
+				end
 			end
 			nS=nS+1;
 			S(nS).type=1;
@@ -118,7 +142,9 @@ while i<length(x)	% ('<' - at least two characters have to be read)
 					S(nS).fields={'text',x(i+4:j-1)};
 					i=j+2;
 				else
-					warning('READXML:nonClosedComment','Comment block not closed! - reading stopped')
+					if bWarning
+						warning('READXML:nonClosedComment','Comment block not closed! - reading stopped')
+					end
 					break;
 				end
 			else
@@ -133,18 +159,24 @@ while i<length(x)	% ('<' - at least two characters have to be read)
 		elseif x(i+1)=='/'	% end tag
 			[tag,fields,~,i]=readtag(x,i+2);
 			if ~isempty(fields)
-				warning('READXML:ClosingTagField','no fields expected in a closing tag')
+				if bWarning
+					warning('READXML:ClosingTagField','no fields expected in a closing tag')
+				end
 			end
 			b=true;
 			bOK=true;
 			nHierLast=nHier;
 			while ~strcmpi(tag,S(currentS).tag)
 				b=false;
-				warning('READXML:NoCloseTag','(#%4d-%2d)?no closing tag (%s)?',nS,nHier,S(currentS).tag)
+				if bWarning
+					warning('READXML:NoCloseTag','(#%4d-%2d)?no closing tag (%s)?',nS,nHier,S(currentS).tag)
+				end
 				nHier=nHier-1;
 				currentS=Shier(nHier);
 				if currentS<2
-					warning('READXML:NoClosingTag','??couldn''t find closing tag (%s) - stopped reading file!! - or tried to continue....',tag)
+					if bWarning
+						warning('READXML:NoClosingTag','??couldn''t find closing tag (%s) - stopped reading file!! - or tried to continue....',tag)
+					end
 					nHier=nHierLast;
 					currentS=Shier(nHier);
 					bOK=false;
@@ -239,8 +271,14 @@ end
 						[~,i]=ReadBracket(x,i);
 					end
 					i=i+1;
+					if i>length(x)
+						break	%!!!!
+					end
 				end
 				i2=i-1;
+				if i>length(x)
+					break	%!!!!!
+				end
 				if isempty(tag)
 					tag=x(i1:i2);
 					if endChar=='?'
@@ -338,6 +376,11 @@ end
 			else
 				xLast=x(i);
 				i=i+1;
+			end
+			if i>length(x)
+				warning('Reading bracketted data out of range?!')
+				i = i-1;
+				break
 			end
 		end
 		s=x(iStart:i);

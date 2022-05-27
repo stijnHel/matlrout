@@ -45,11 +45,69 @@ if ischar(fName)&&strcmpi(fName,'web')
 	end
 	fwrite(fid,H5);
 	fclose(fid);
-elseif ischar(fName)&&strcmpi(fName,'last')
-	pth = DefaultPath();
-	d = dir(fullfile(pth,'*.hdf5'));
-	[~,iLast] = max([d.datenum]);
-	fName = fullfile(pth,d(iLast).name);
+elseif ischar(fName)
+	if startsWith(fName,'last','IgnoreCase',true)
+		if length(fName)>4
+			if any(fName=='_')
+				nLast = sscanf(fName(6:end),'%d',1);
+			else
+				nLast = sscanf(fName(5:end),'%d',1);
+			end
+			if isempty(nLast)
+				nLast = 1;
+			end
+		else
+			nLast = 1;
+		end
+		pth = DefaultPath();
+		d = dir(fullfile(pth,'*.hdf5'));
+		[~,ii] = sort([d.datenum]);
+		fName = {d(ii(end-nLast+1:end)).name};
+	elseif strcmpi(fName,'list')
+		pth = DefaultPath();
+		d = dir(fullfile(pth,'*.hdf5'));
+		[~,ii] = sort([d.datenum]);
+		IMGs = d(ii);
+		return
+	end
+end
+if iscell(fName)
+	if isscalar(fName)
+		fName = fName{1};
+	end
+elseif isstruct(fName) && isfield(fName,'datenum')
+	if isscalar(fName)
+		fName = fName.name;
+	else
+		fName = {fName.name};
+	end
+end
+if ~ischar(fName) && length(fName)>1
+	X = cell(length(fName),2);
+	t = 0;
+	for i=1:length(fName)
+		[X{i,:}] = ReadWaterinfoRadarHDF5(fName{i});
+		if X{i,2}.t(1)<t
+			B = X{i,2}.t>t;
+			X{i,2}.t = X{i,2}.t(B);
+			X{i} = X{i}(:,:,B);
+		end
+		if ~isempty(X{i,2}.t)
+			t = X{i,2}.t(end);
+		end
+	end
+	IMGs = cat(3,X{:,1});
+	I = X{1,2};
+	X = [X{:,2}];
+	I.t = [X.t];
+	if bPlot
+		handles = Plot(IMGs,I);
+		I.handles = handles;
+	end		% if bPlot
+	if nargout==0
+		clear IMGs
+	end
+	return
 end
 fFull = fFullPath(fName,false,'.hdf5',false);
 if isempty(fFull)
@@ -81,6 +139,10 @@ for i=1:length(sL)
 	for j = 1:length(sC)
 		Pborder(i,j) = h5readatt(fFull,'/where',[sL{i},'_',sC{j}]);
 	end
+end
+Z0 = mean(Pborder);
+if Z0(1)<Z0(2)
+	Pborder = Pborder(:,[2 1]);	% definition was corrected (between 2022-02 and 2022-04)
 end
 sProjDef = h5readatt(fFull,'/where','projdef');
 sProjDef = sProjDef{1};
@@ -142,7 +204,8 @@ while i<length(sProjDef)
 end
 xScale = h5readatt(fFull,'/where','xscale');
 yScale = h5readatt(fFull,'/where','yscale');
-PborderXY = ProjGPS2XY(Pborder,'Z1',[projDef.lat_0,projDef.lon_0],'Req',projDef.a,'Rpol',projDef.b);
+Z1 = [projDef.lat_0,projDef.lon_0];
+PborderXY = ProjGPS2XY(Pborder,'Z1',Z1,'Req',projDef.a,'Rpol',projDef.b);
 [Pbel,Pother] = ReadRegion(Pborder);
 PbelXY = ProjGPS2XY(Pbel(:,[2 1]),'Z1',[projDef.lat_0,projDef.lon_0],'Req',projDef.a,'Rpol',projDef.b);
 PotherXY = ProjGPS2XY(Pother(:,[2 1]),'Z1',[projDef.lat_0,projDef.lon_0],'Req',projDef.a,'Rpol',projDef.b);
@@ -196,11 +259,13 @@ function [Pbel,Pother] = ReadRegion(Pborder)
 persistent Xworld Xbel
 
 if isempty(Xworld)
-	Xworld = ReadESRI('C:\Users\stijn.helsen\Documents\temp\gps\borders\ne_10m_admin_0_countries\ne_10m_admin_0_countries');
+	%Xworld = ReadESRI('C:\Users\stijn.helsen\Documents\temp\gps\borders\ne_10m_admin_0_countries\ne_10m_admin_0_countries');
+	Xworld = ReadWorld();
 end
 
 if isempty(Xbel)
-	Xbel = ReadESRI('C:\Users\stijn.helsen\Documents\temp\gps\borders\BEL_adm\BEL_adm2');
+	pth = FindFolder('borders',0,'-bAppend');
+	Xbel = ReadESRI(fullfile(pth,'BEL_adm\BEL_adm2'));
 end
 Pbel = ReadESRI(Xbel,'getCoor','all','-bFlatten');
 Prange = [min(Pborder(:,[2 1]));max(Pborder(:,[2 1]))];
@@ -271,7 +336,7 @@ else
 end
 handles = var2struct(hI,hCountry);
 I.handles = handles;
-D = var2struct(hI,hCountry,Xs,I);
+D = var2struct(hI,hCountry,Xs,X,I);
 setappdata(f,'D',D)
 Update(hI,Xs,1,I)
 
@@ -285,6 +350,12 @@ switch ev.Character
 	case {'N','p'}
 		nr = nr-1;
 		bUpdate = nr>=1;
+	case '0'
+		nr = 1;
+		bUpdate = true;
+	case '9'
+		nr = size(D.Xs,3);
+		bUpdate = true;
 	otherwise
 		switch ev.Key
 			case 'leftarrow'
@@ -307,7 +378,37 @@ switch ev.Character
 				else
 					bUpdate = false;
 				end
+			case 'home'
+				nr = 1;
+				bUpdate = true;
+			case 'end'
+				nr = size(D.Xs,3);
+				bUpdate = true;
 			otherwise
+				if ~isempty(ev.Character)
+					switch ev.Character
+						case 'P'
+							pt = get(gca,'CurrentPoint');
+							x = pt(1);
+							y = pt(1,2);
+							ix = round((x-D.hI.XData(1))/diff(D.hI.XData)*size(D.Xs,2)+1);
+							iy = round((y-D.hI.YData(1))/diff(D.hI.YData)*size(D.Xs,1)+1);
+							if ix<1 || iy<1 || ix>size(D.Xs,2) || iy>size(D.Xs,1)
+								warning('Point out of range! (%.0f,%.0f)',pt(1),pt(1,2))
+								return
+							end
+							R = squeeze(D.Xs(iy,ix,:))';
+							R(isnan(R)) = 0;
+							[~,bN] = getmakefig('RRate');
+							plot(D.I.t,R);grid
+							title 'rain rate'
+							if bN
+								navfig
+								navfig(char(4))
+							end
+							navfig X
+					end
+				end
 				bUpdate = false;
 		end
 end

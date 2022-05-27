@@ -574,6 +574,30 @@ else
 				REFidx(end+1) = struct('label',s,'sref',Sref0);
 				localprint(f,'%s\n',s);
 			end
+		case 'string'
+			if isscalar(d)
+				if strlength(d)>options.maxstrlen
+					localprint(f,'long string %d',strlength(d));
+				else
+					localprint(f,'%s\n',d);
+				end
+			elseif min(sz)>1 || length(sz)>options.maxrowarray
+				localprint(f,'%s string array',stringsize(sz));
+			else
+				for i=1:max(sz)-1
+					if options.bDirectString
+						localprint(f,d(i))
+					else
+						printstring(f,d(i));
+					end
+					localprint(f,'<br>\n');
+				end
+				if options.bDirectString
+					localprint(f,d(end))
+				else
+					printstring(f,d(end));
+				end
+			end
 		case 'char'
 			if isempty(d)
 				localprint(f,'&nbsp;');
@@ -749,6 +773,9 @@ s=strrep(s,'�','&eacute;');
 s=strrep(s,[char(13) newline],'<br>');
 s=strrep(s,newline,'<br>');
 s=strrep(s,char(13),'<br>');
+if isstring(s)
+	s = char(s);
+end
 B=s<32|(s>=127&s<160);
 while any(B)
 	i=find(B,1);

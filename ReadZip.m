@@ -285,14 +285,18 @@ while ix<length(x)
 	switch E(nE).cID
 		case 'UT'
 			if iHeader==1
-				if l~=13
-					error('Wrong assumption about UT-local header')
+				if l==13
+					flg=E(nE).data(1);
+					modTime=Tim2MLtime(ToInt(E(nE).data(2:5)),'winSeconds');
+					acTime=Tim2MLtime(ToInt(E(nE).data(6:9)),'winSeconds');
+					crTime=Tim2MLtime(ToInt(E(nE).data(10:13)),'winSeconds');
+					E(nE).data=var2struct(flg,modTime,acTime,crTime);
+				elseif l==9	% unknown format?!!!
+					E(nE).data=E(nE).data;
+				else
+					warning('Wrong assumption about UT-local header')
+					E(nE).data=E(nE).data;
 				end
-				flg=E(nE).data(1);
-				modTime=Tim2MLtime(ToInt(E(nE).data(2:5)),'winSeconds');
-				acTime=Tim2MLtime(ToInt(E(nE).data(6:9)),'winSeconds');
-				crTime=Tim2MLtime(ToInt(E(nE).data(10:13)),'winSeconds');
-				E(nE).data=var2struct(flg,modTime,acTime,crTime);
 			else
 				if l~=5
 					error('Wrong assumption about UT-central header')

@@ -14,26 +14,113 @@ function [D,varargout]=ReadESRI(fName,varargin)
 %              bFlatten
 %              bAddNaN
 %    A = ReadESRI(D,'calcArea',country)
+%
+%      D = ReadESRI('country',<country>) % finds (or tries to find) country data
+%      L = ReadESRI('countrylist')	% returns a list of available countries (locally)
+%      L = ReadESRI('list') % returns of available countries (externally)
+%      ReadESRI('download',<country>) % downloads data for a new country
+
 
 % Data locally available on:
-%        C:\Users\stijn.helsen\Documents\temp\gps\borders\BEL_adm
-% Not clear where the date came from, but at least similar data can be
-% found on:
+%        borders\BEL_adm
+%    origin: https://gadm.org/download_country.html
+% other locations:
 %         https://github.com/wmgeolab/geoBoundaries
-% also useful:
 %         https://www.geoboundaries.org/index.html#getdata
-% probably data came from:
-%         https://gadm.org/
+
+% - Add the possibility to "unrwap"?
+%    if part close to -180 and other close to +180 ==> try link
+%       simple case: keep parts, but just add/subtract 360 to some of them
+%       nicer: merge
+
+if ischar(fName)
+	if strcmpi(fName,'country')
+		country = varargin{1};
+		varargout = cell(1,nargout-1);
+		[D,varargout{:}] = ReadCountry(country);
+		return
+	elseif strcmpi(fName,'countrylist')
+		T = ReadTransTable();
+		for i=1:size(T,1)
+			if iscell(T{i,2})
+				if length(T{i,2})>1
+					T{i,2} = T{i,2}{2};
+				else
+					T{i,2} = T{i,2}{1};
+				end
+			end
+		end
+		if nargout==0
+			printstr(T(:,2));
+		else
+			D = T(:,2);
+		end
+		return
+	elseif strcmpi(fName,'list')
+		W = webread('https://gadm.org/download_country.html');
+		X = readxml({W},'--bWarning');
+		D = [X(strcmp({X.tag},'option')).data];
+		D(1) = [];
+		return
+	elseif strcmpi(fName,'download')
+		country = varargin{1};
+		[~,pth] = ReadTransTable();
+		W = webread('https://gadm.org/download_country.html');
+		X = readxml({W},'--bWarning');
+		for i=1:length(X)
+			if strcmp(X(i).tag,'option') && ~isempty(X(i).data)	...
+					&& any(startsWith(X(i).data,country,'IgnoreCase',true))
+				tri = X(i).fields{2}(1:3);
+				urlBase = 'https://geodata.ucdavis.edu/gadm/gadm4.0/shp/gadm40_%s_shp.zip';
+				% this link can be extracted from W(/X)!
+				%          ---> script function changeCountry
+				url = sprintf(urlBase,tri);
+				[~,fPth] = fileparts(url);
+				filePath = fullfile(pth,fPth);
+				if exist(filePath,'dir')
+					error('This path already exists!')
+				end
+				B = urlbinread(url);
+				Z = ReadZip(B);
+				mkdir(filePath)
+				levelMax = -1;
+				fShape = '';
+				for j=1:length(Z)
+					fid = fopen(fullfile(filePath,Z(j).fName),'wb');
+					fwrite(fid,Z(j).fUncomp);
+					fclose(fid);
+					[~,f,fExt] = fileparts(Z(j).fName);
+					if strcmpi(fExt,'.shx')
+						w = regexp(f,'_','split');
+						level = str2double(w{end});
+						if level>levelMax
+							levelMax = level;
+							fShape = fullfile(fPth,f);
+						end
+					end
+				end
+				fid = fopen(fullfile(pth,'countries.txt'),'at');
+				fprintf(fid,'%s\t%s\t%s\n',fShape,tri,X(i).data{1});
+				fclose(fid);
+				if nargout
+					D = ReadESRI('country',tri);
+				end
+				return
+			end
+		end		% for i
+		error('Country not found!')
+	end		% if command
+end		% char input
 
 if isstruct(fName)
 	W=fName;
+	if nargin<3
+		country = 'all';
+	else
+		country = varargin{2};
+	end
 	switch varargin{1}
 		case 'plot'
-			if nargin<3
-				country='all';
-			else
-				country=varargin{2};
-			end
 			varargout = cell(1,max(0,nargout-1));
 			[L,varargout{:}]=Plot(W,country,varargin{3:end});
 			if nargout
@@ -41,9 +128,8 @@ if isstruct(fName)
 			end
 		case 'getCoor'
 			varargout=cell(1,nargout-1);
-			[D,varargout{:}]=GetCoor(W,varargin{2:end});
+			[D,varargout{:}]=GetCoor(W,country,varargin{3:end});
 		case 'calcArea'
-			country=varargin{2};
 			C=GetCoor(W,country,true,false);
 			A=0;
 			if isnumeric(C)
@@ -67,11 +153,6 @@ if isstruct(fName)
 			end		% for i
 			D=A/2e6;	% /2 (because double A is calcuated, 1e6 for sq km)
 		case 'middle'
-			if nargin<3
-				country = 'all';
-			else
-				country = varargin{2};
-			end
 			P = GetCoor(W,country,false,false,'-bFlatten');
 			D = (min(P)+max(P))/2;
 		otherwise
@@ -86,8 +167,11 @@ if nargin>1
 end
 
 % Read all files
-fName=fFullPath(fName,true);
-[fpth,fnme,fext]=fileparts(fName);
+fPath = fFullPath(fName,true,[],false);
+if isempty(fPath)
+	error('Sorry, I can''t find this country data')
+end
+[fpth,fnme,fext]=fileparts(fPath);
 if ~any(strcmp(fext,{'.dbc','.shp','.prj','.shx'}))	% hold extension
 	fnme=[fnme fext];
 end
@@ -257,9 +341,11 @@ end
 [CountryField] = [];
 [CfieldOut] = [];
 [bToggleXY] = false;
+[bPosLong] = false;
+[bNegLong] = false;
 if ~isempty(options)
 	setoptions({'bXYproject','bCommonZ0','Z0','bFlatten','bAddNaN'	...
-		,'Plimit','CountryField','CfieldOut','bToggleXY'	...
+		,'Plimit','CountryField','CfieldOut','bToggleXY','bPosLong','bNegLong'	...
 		},options{:})
 	if ~isempty(Z0)&&isempty(bCommonZ0)
 		bCommonZ0 = true;
@@ -384,6 +470,23 @@ for iC=1:length(country)
 	Z{iC}=cell(1,length(I)-1);
 	for j=1:length(I)-1
 		Pi=P(I(j)+1:I(j+1),:);
+		if bPosLong
+			if any(Pi(:,1)<0)
+				if any(Pi(:,1)>0)
+					warning('Sorry, but parts Long>0 and other Long<0!')
+				else
+					Pi(:,1) = Pi(:,1)+360;
+				end
+			end
+		elseif bNegLong
+			if any(Pi(:,1)>0)
+				if any(Pi(:,1)<0)
+					warning('Sorry, but parts Long>0 and other Long<0!')
+				else
+					Pi(:,1) = Pi(:,1)-360;
+				end
+			end
+		end
 		if bXYproject
 			if ~bCommonZ0 || isempty(Z0)
 				[Pi,~,~,Z0]=ProjGPS2XY(Pi(:,[2 1]));
@@ -493,3 +596,38 @@ elseif P(idxOut,2)>Plimit(4)
 	r = (Plimit(4)-P(idxOut,2))/(P(idxIn,2)-P(idxOut,2));
 	P(idxOut,:) = P(idxOut,:) + r*(P(idxIn,:)-P(idxOut,:));
 end
+
+function [X,varargout] = ReadCountry(country)
+pth = FindFolder('borders',0,'-bAppend');
+CountryData = ReadTransTable();
+if any(country=='#')
+	P = regexp(country,'#','split');
+	country = P{1};
+	level = str2double(P{2});
+	if isnan(level)
+		error('bad detail level number?! (%s)',P{2})
+	end
+else
+	level = -1;
+end
+X = [];
+for iC = 1:size(CountryData,1)
+	if any(startsWith(CountryData{iC,2},country,'IgnoreCase',true))
+		countryPath = CountryData{iC};
+		countryName = CountryData{iC,2};
+		if iscell(countryName)
+			countryName = countryName{1};
+		end
+		country = countryName;
+		if level>=0
+			iNr = find(countryPath=='_',1,'last');
+			countryPath = [countryPath(1:iNr),num2str(level)];
+		end
+		X = ReadESRI(fullfile(pth,countryPath));
+		break
+	end
+end
+if isempty(X)
+	error('Sorry, country not found!')
+end
+varargout = {country};

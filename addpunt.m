@@ -1,4 +1,4 @@
-function addpunt(f, p, bDifMarkCols, bSameMarkerColor)
+function [varargout] = addpunt(f, p, bDifMarkCols, bSameMarkerColor)
 % ADDPUNT - Voegt punten toe aan lijnen
 %     addpunt(f, p, bDifMarkCols)
 %         f           : figure
@@ -7,12 +7,14 @@ function addpunt(f, p, bDifMarkCols, bSameMarkerColor)
 %             colour and axes ----- this is in development
 %         bSameMarkerColor: Same marker for the different colours
 %
-%  other functionality: (not ready!!!!!!!!)
+%  other functionality:
 %    default settings (only for current figure!)
 %        addpunt('setDifCol'[,<true/false>]) (if no true/false ==> toggle)
 %                to set default behaviour for bDifMarkCols
 %        addpunt('setSameCol'[,<true/false>])
 %                to set default behaviour for bSameMarkerColor
+%    b = addpunt('getState'[,f])
+%        returns "addpunt-state": true ==> points are drawn
 
 if ~exist('f','var');f=[];end
 if ~exist('p','var');p=[];end
@@ -23,7 +25,7 @@ if ischar(f)
 	if nargin<2||isempty(p)
 		p = -1;
 	end
-	if startsWith('setdifcol',lower(f))
+	if startsWith(f,'setdifcol','IgnoreCase',true)
 		if p<0
 			p = getappdata(gcf,'ADDP_difMarkCols');
 			if isempty(p)
@@ -40,7 +42,7 @@ if ischar(f)
 			end
 		end
 		setappdata(gcf,'ADDP_difMarkCols',p);
-	elseif startsWith('detsamecol',lower(f))
+	elseif startsWith(f,'setSameCol','IgnoreCase',true)
 		if p<0
 			p = getappdata(gcf,'ADDP_sameMarkerCol');
 			if isempty(p)
@@ -57,6 +59,14 @@ if ischar(f)
 			end
 		end
 		setappdata(gcf,'ADDP_sameMarkerCol',p);
+	elseif startsWith(f,'getState','IgnoreCase',true)
+		if nargin<2 || isempty(p)
+			f = p;
+		else
+			f = gcf;
+		end
+		[l,Bmarker] = GetLines(f);
+		varargout = {all(Bmarker),Bmarker,l};
 	else
 		error('What did you mean?')
 	end
@@ -118,10 +128,9 @@ if bDifMarkCols
 end
 
 collijst=get(ancestor(f(1),'figure'),'DefaultAxesColorOrder');
-l=[findobj(f,'Type','line');findobj(f,'Type','Stair')];
+[l,Bmarker] = GetLines(f);
 for i=1:length(l)
-	m=get(l(i),'Marker');
-	if strcmp(m,'none')
+	if ~Bmarker(i)
 		pt=[];
 		c=get(l(i),'Color');
 		if ~isempty(collijst)
@@ -134,6 +143,13 @@ for i=1:length(l)
 		pt=rem(pt-1,size(p,1))+1;
 		set(l(i),'Marker',deblank(p(pt,:)));
 	end
+end
+
+function [l,BhasMarker] = GetLines(f)
+l = [findobj(f,'Type','line');findobj(f,'Type','Stair')]';
+BhasMarker = false(size(l));
+for i=1:length(l)
+	BhasMarker(i) = ~strcmp(get(l(i),'Marker'),'none');
 end
 
 function [L,M] = SetMarkers(ax,p,L,bSameMarkerColor)

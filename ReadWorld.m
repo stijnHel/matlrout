@@ -1,6 +1,11 @@
 function [Xworld,varargout] = ReadWorld(X,varargin)
 %ReadWorld - Read world borders
 %       Xworld = ReadWorld()
+%
+%   extra's:
+%      [Pbox,CountryNames,Coordinates,SegmentList] = ReadWorld(Xworld,'pos');
+%      [Coordinates,CountryNames,SegmentList] = ReadWorld(Xworld,'border');
+%      [Populations,CountryNames,Coordinates,SegmentList] = ReadWorld(Xworld,'pop');
 
 if nargin
 	if isstruct(X)
@@ -62,8 +67,8 @@ if nargin
 	return
 end
 
-Xworld=ReadESRI('C:\Users\stijn.helsen\Documents\temp\gps\borders\ne_10m_admin_0_countries\ne_10m_admin_0_countries');
-	% !!!!! remove absolute link!!!!!
+fBorders = FindFolder('borders',0,'-bAppend');
+Xworld=ReadESRI(fullfile(fBorders,'ne_10m_admin_0_countries\ne_10m_admin_0_countries'));
 iCname=find(strcmpi('sovereignt',{Xworld.Xattr.recordDef.name}));
 Xworld.iCpopest=find(strcmpi('POP_EST',{Xworld.Xattr.recordDef.name}));
 Xworld.iCcontinent=find(strcmpi('CONTINENT',{Xworld.Xattr.recordDef.name}));
@@ -81,4 +86,3 @@ for i=1:size(Xworld.Xattr.X,1)
 		end
 	end
 end
-

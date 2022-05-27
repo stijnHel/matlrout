@@ -9,7 +9,9 @@ classdef cTSlist < handle
 	
 	methods
 		function c=cTSlist(X)
-			if isstruct(X)
+			if nargin==0	% expected to be called by a subclass
+				% do nothing
+			elseif isstruct(X)
 				if length(X)>1&&isfield(X,'t')&&isfield(X,'data')&&isfield(X,'signal')
 					c.DATAtype=1;
 				else

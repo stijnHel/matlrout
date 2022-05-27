@@ -8,7 +8,7 @@ bPlot=nargout==0||iscell(fName);
 iiPlot=[];
 [bForceBin]=[];
 [bWireframe]=false;
-[bSomeAnalysis]=true;
+[bSomeAnalysis]=[];
 [tol]=[0 3e-7];	% relatief
 if nargin>1
 	setoptions({'bPlot','bForceBin','iiPlot','bWireframe','bSomeAnalysis'	...
@@ -130,6 +130,10 @@ else
 	if isscalar(D)
 		D=D{1};
 	end
+end
+
+if isempty(bSomeAnalysis)
+	bSomeAnalysis = ~isstruct(D) || ~isfield(D,'uX');
 end
 
 if bSomeAnalysis	% !!!!! temporarily !!!!!??

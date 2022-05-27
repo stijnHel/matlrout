@@ -23,9 +23,14 @@ function [fOut,out2]=status(sArg,prcin,varargin)
 
 persistent STATUSTIME FIGwin
 persistent BLOG NLOG LOG
+persistent TSTART
 
-tNow=now;
-if nargin==1&&isnumeric(sArg)&&tNow-STATUSTIME<1e-5
+if isempty(TSTART)
+	TSTART = tic;
+end
+
+tNow=toc(TSTART);
+if nargin==1&&isnumeric(sArg)&&tNow-STATUSTIME<0.5
 	return
 end
 
@@ -180,6 +185,13 @@ if isempty(f)||~isempty(varargin)
 	end
 	if isempty(f)||~isequal(nMaxHier,nMaxHierOld)	% draw/redraw
 		if ~isempty(f)
+			l=get(f,'UserData');
+			if length(l)>2
+				s=get(l(2),'UserData');
+				if ~isempty(s)
+					warning('Recreating status window while in use?!!! This might lead to errors!')
+				end
+			end
 			delete(f)	% recreate
 		end
 		if isempty(nMaxHier)||nMaxHier==0
@@ -284,15 +296,15 @@ if isempty(f)||~isempty(varargin)
 		set(f,'UserData',l	...
 			,'HandleVisibility','off'	...
 			);
-		if nargin>2&&isempty(sArg)
-			set(f,'Visible','off')
-			return
-		end
 		s='';
 		prc=[];
 	else
 		bUseFig=true;
 	end		% draw/redraw
+	if nargin>2&&isempty(sArg)	% function call was done to change settings
+		set(f,'Visible','off')
+		return
+	end
 end
 if bUseFig
 	close(f(2:end));	% this shouldn't be useful...
@@ -409,7 +421,7 @@ elseif isempty(prc)
 else
 	STATUSTIME=tNow;
 	t1=(cpuNow-prc(1,2))/60/max(0.01,sArg);
-	t2=(tNow-prc(1,3))*(60*24)/max(0.01,sArg);
+	t2=(tNow-prc(1,3))/60/max(0.01,sArg);
 	if IsHandle(l(1))
 		if t2>1
 			if t2>=100
