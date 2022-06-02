@@ -129,7 +129,7 @@ elseif ~exist('position','var')
 				set(h,'String',titel)
 				return
 			end
-			position=[def_pos(1) def_pos(2)+totalheight/0.95 totalwidth totalheight/18];
+			position=[def_pos(1) def_pos(2)+totalheight/0.90 totalwidth totalheight/18];
 		else
 			position = [def_pos(1)+col*(width+PERC_OFFSET_L+PERC_OFFSET_R) ...
 				def_pos(2)+row*(height+PERC_OFFSET_T+PERC_OFFSET_B) ...
