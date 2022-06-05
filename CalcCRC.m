@@ -5,6 +5,7 @@ function crc=CalcCRC(x,varargin)
 %        crc=CalcCRC(x,crc_previous)
 %
 % Based on code in RFC1952 (https://tools.ietf.org/html/rfc1952)
+%   MEX-version is avilable (working about 800 x faster)
 
 persistent CRC_TABLE
 
@@ -21,9 +22,10 @@ end
 C0=2^32-1;
 crc=bitxor(crc,C0);
 for i=1:length(x)
-	crc=bitxor(CRC_TABLE(rem(bitxor(crc,x(i)),256)+1),floor(crc/256));
+	crc=bitxor(CRC_TABLE(rem(bitxor(crc,double(x(i))),256)+1),floor(crc/256));
 end
 crc=bitxor(crc,C0);
+crc = uint32(crc);
 
 function crc_table=CalcCRCtable()
 
