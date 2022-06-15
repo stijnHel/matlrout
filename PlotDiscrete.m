@@ -47,12 +47,13 @@ if min(size(y))>1
 end
 
 maxValues=20;
-bPlotYdirect=[];	% directly plot y-values, otherwise index values
+[bPlotYdirect] = [];	% directly plot y-values, otherwise index values
 	% default: if small variation true, otherwise false
 sTickSpec='%g';
+[bUseStairs] = true;
 
 if ~isempty(options)
-	setoptions({'maxValues','bPlotYdirect','sTickSpec'},options{:})
+	setoptions({'maxValues','bPlotYdirect','sTickSpec','bUseStairs'},options{:})
 end
 
 if isempty(spec)
@@ -100,7 +101,12 @@ else
 	end
 	yLabels=1:length(uy);
 end
-l=plot(x,yPlot);grid
+if bUseStairs
+	l = stairs(x,yPlot);
+else
+	l = plot(x,yPlot);
+end
+grid
 if ~bPlotYdirect
 	yMin=min(yPlot);
 	yMax=max(yPlot);
