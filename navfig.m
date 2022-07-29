@@ -1293,6 +1293,7 @@ if ~reedsverwerkt
 			end
 		case 27		% escape - automatic scaling
 			set(as,'XLimMode','auto')	% only on current axes!
+			CheckUpdateFcn(as)
 		case 'Q'	% specgram
 			if isempty(NAVFIGsets)||~isfield(NAVFIGsets,'SG_nFFT')
 				NAVFIGsets.SG_nFFT=256;
@@ -1687,25 +1688,7 @@ if doebepfig
 	if lp
 		plotlong(x,assen)
 	end
-	for i=1:length(assen)
-		fcn=getappdata(assen(i),'updateAxes');
-		fcnArgs=getappdata(assen(i),'updateAxesArgs');
-		if isempty(fcnArgs)
-			fcnArgs={};
-		elseif ~iscell(fcnArgs)
-			fcnArgs={fcnArgs};
-		end
-		if ~isempty(fcn)
-			if isempty(fcnArgs)&&ischar(fcn)
-				eval(fcn)
-			else
-				if ischar(fcn)
-					fcn=str2func(fcn);
-				end
-				fcn(assen(i),fcnArgs{:})
-			end
-		end
-	end
+	CheckUpdateFcn(assen)
 	if isempty(NAVFIGsets)||~isfield(NAVFIGsets,'bTEXTcorrection')
 		NAVFIGsets.bTEXTcorrection=true;
 	end
@@ -1811,3 +1794,24 @@ uimenu(hMn,'Label','t-constant','Callback','bertconst')
 
 set(l,'UIcontextmenu',hMn)
 fprintf('Contextmenu-capabilities added to lines in figure %d.\n',double(f))
+
+function CheckUpdateFcn(assen)
+for i=1:length(assen)
+	fcn=getappdata(assen(i),'updateAxes');
+	fcnArgs=getappdata(assen(i),'updateAxesArgs');
+	if isempty(fcnArgs)
+		fcnArgs={};
+	elseif ~iscell(fcnArgs)
+		fcnArgs={fcnArgs};
+	end
+	if ~isempty(fcn)
+		if isempty(fcnArgs)&&ischar(fcn)
+			eval(fcn)
+		else
+			if ischar(fcn)
+				fcn=str2func(fcn);
+			end
+			fcn(assen(i),fcnArgs{:})
+		end
+	end
+end

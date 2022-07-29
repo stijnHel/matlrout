@@ -64,6 +64,10 @@ function HTMLout=print2html(s,nrecurs,f,varargin)
 %      Other options (related to the display of data) are possible but these are too
 %         long to list here.  Look to the comments further in the code to find a more
 %         complete list.
+%
+% "Hidden possibility" for cell arrays
+%     if a cell is a single char, with value char(3), then the rest of the
+%         row is "spanned"
 
 
 % Originally this function was made for structures.  By some simple
@@ -538,18 +542,33 @@ else
 				iSrefArr = length(Sref);
 				for i=1:sz(1)
 					localprint(f,'<tr>');
+					bSpan = false;
+					for j = 2:sz(2)
+						if ischar(d{i,j}) && isscalar(d{i,j}) && d{i,j}==3
+							% (special format!!) - the rest is "spanned"
+							bSpan = true;
+							jSpan = j;
+							break
+						end
+					end
 					for j=1:sz(2)
-						localprint(f,'<td>');
-						if i*j==1
-							localprint(f,'{');
+						if ~bSpan || j<jSpan		% else discard
+							if bSpan && j==jSpan-1
+								localprint(f,sprintf('<td colspan="%d">',sz(2)-j+1));
+							else
+								localprint(f,'<td>');
+							end
+							if i*j==1
+								localprint(f,'{');
+							end
+							Sref(iSrefArr).subs = {[i,j]};
+							f=printdata(f,d{i+(j-1)*sz(1)},nrecurs-1,options,Sref);
+								% no d{i,j} to allow data types allowing only one index
+							if i*j==sz(1)*sz(2)
+								localprint(f,'}');
+							end
+							localprint(f,'</td>');
 						end
-						Sref(iSrefArr).subs = {[i,j]};
-						f=printdata(f,d{i+(j-1)*sz(1)},nrecurs-1,options,Sref);
-							% no d{i,j} to allow data types allowing only one index
-						if i*j==sz(1)*sz(2)
-							localprint(f,'}');
-						end
-						localprint(f,'</td>');
 					end
 					localprint(f,'</tr>\n');
 				end	% rows

@@ -1,6 +1,7 @@
 function ax=GetNormalAxes(in,varargin)
 %GetNormalAxes - Find "normal axes" (no legend, ...)
-%     ax=GetNormalAxes(in)
+%     ax=GetNormalAxes(<handle>)
+%             <handle> - any graphical object, typically a figure
 % additionally
 %    GetNormalAxes('AddDiscard',<tag-to-discard>)
 %    GetNormalAxes('RemDiscard',<tag-to-discard>)
@@ -13,6 +14,10 @@ function ax=GetNormalAxes(in,varargin)
 
 
 persistent TagsToDiscard
+
+if nargin==0
+	in = gcf;
+end
 
 if isempty(TagsToDiscard)
 	TagsToDiscard={'legend','Colorbar','title'};

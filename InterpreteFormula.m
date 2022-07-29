@@ -803,6 +803,9 @@ end
 end		% function FindVar
 
 function [v,bOK,VALs,V]=GetFormValue(D,V,order,varargin)
+if ~isempty(V) && size(V,1)==2	% assume all elements are values
+	[V{3,:}] = deal(true);
+end
 bOK=true;
 if ~isempty(V)
 	V=FillV(V,5,0,'bUpdated');
