@@ -60,6 +60,8 @@ function HTMLout=print2html(s,nrecurs,f,varargin)
 %                         ---> display in MATLAB web browser in new tab
 %        'bLinks'        : create links ==> struct's with fields 'link' and
 %                          'text' are replaced by links
+%        'bCellChar'     : add starting/closing bracket ('{'/'}') for cells
+%                          (default true)
 %      .................................
 %      Other options (related to the display of data) are possible but these are too
 %         long to list here.  Look to the comments further in the code to find a more
@@ -171,6 +173,7 @@ stroptions=struct('maxcolarray',6,'maxrowarray',10,'maxel',20	...
 	,'bExpandComplexS',true		... expand complex structures (like Simulink.Signal)
 	,'bDirectString',false	... no "safe text"
 	,'bLinks',false	... replace "links" by HTML-anchors
+	,'bCellChar',true	... add starting/closing bracket ('{'/'}') for cells
 	,'bExpandLink',false	... create a link for "collapsed data"
 	,'webArguments',{{}}	... arguments "forwarded" to web-call
 	,'figure',[]	... figure if matlab figure brwowser is requested
@@ -558,13 +561,13 @@ else
 							else
 								localprint(f,'<td>');
 							end
-							if i*j==1
+							if i*j==1 && options.bCellChar
 								localprint(f,'{');
 							end
 							Sref(iSrefArr).subs = {[i,j]};
 							f=printdata(f,d{i+(j-1)*sz(1)},nrecurs-1,options,Sref);
 								% no d{i,j} to allow data types allowing only one index
-							if i*j==sz(1)*sz(2)
+							if i*j==sz(1)*sz(2) && options.bCellChar
 								localprint(f,'}');
 							end
 							localprint(f,'</td>');
