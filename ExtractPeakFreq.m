@@ -60,7 +60,7 @@ for i=1:length(l)
 	[S(i).f,S(i).A,S(i).iMax,S(i).di]=CalcFreqPeak(x,y,nPeaks);
 	S(i).per=1./S(i).f;
 	S(i).dx=dx;
-	if bDisp
+	if bDisp && ~isempty(S(i).A)
 		if bCalcPeriods
 			fprintf('#%2d: per=%10g (%9g-%9g), A=%10g\n',i,S(i).per(1),1./x(S(i).iMax+S(i).di+[1 0]),S(i).A(1))
 			%fprintf('#%2d: per=%10g, A=%10g\n',i,S(i).per(1),S(i).A(1))

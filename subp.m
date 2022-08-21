@@ -151,33 +151,27 @@ nextstate = get(f,'nextplot');
 if strcmp(nextstate,'replace'), nextstate = 'add'; end
 if(kill_siblings)
 	if delay_destroy, set(f,'NextPlot','replace'); return, end
-	sibs = get(f, 'Children');
+	sibs = findobj(f, 'Type','axes');
 	for i = 1:length(sibs)
-		if(strcmp(get(sibs(i),'Type'),'axes'))
-			sibpos = get(sibs(i),'Position');
-			intersect = 1;
-			if (position(1) >= sibpos(1) + sibpos(3)) || ...
-					(sibpos(1) >= position(1) + position(3)) || ...
-					(position(2) >= sibpos(2) + sibpos(4)) || ...
-					(sibpos(2) >= position(2) + position(4))
-				intersect = 0;
-			end
-			if intersect
-				if any(sibpos ~= position)
-					delete(sibs(i));
+		sibpos = get(sibs(i),'Position');
+		if ~((position(1) >= sibpos(1) + sibpos(3)) || ...
+				(sibpos(1) >= position(1) + position(3)) || ...
+				(position(2) >= sibpos(2) + sibpos(4)) || ...
+				(sibpos(2) >= position(2) + position(4)))
+			if any(abs(sibpos-position)>1e-6)
+				delete(sibs(i));
+			else
+				set(f,'CurrentAxes',sibs(i));
+				if thisPlot==0
+					c=get(sibs(i),'Children');
+					for l=1:length(c)
+						delete(c(l))
+					end
+				end
+				if strcmp(nextstate,'new')
+					create_axis = 1;
 				else
-					set(f,'CurrentAxes',sibs(i));
-					if thisPlot==0
-						c=get(sibs(i),'Children');
-						for l=1:length(c)
-							delete(c(l))
-						end
-					end
-					if strcmp(nextstate,'new')
-						create_axis = 1;
-					else
-						create_axis = 0;
-					end
+					create_axis = 0;
 				end
 			end
 		end

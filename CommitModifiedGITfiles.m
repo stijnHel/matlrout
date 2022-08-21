@@ -73,6 +73,9 @@ end
 if nargout<3
 	fprintf('Current branch: %s\n',sBranch)
 end
+if any(sComment=='"') && ~contains(sComment,'\"')
+	sComment = strrep(sComment,'"','\"');
+end
 if isempty(fList)&&isempty(filesToAdd)
 	warning('Up to date - nothing done to the repository!')
 elseif nargin&&~isempty(sComment)

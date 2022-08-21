@@ -1175,6 +1175,8 @@ for iOrd=1:size(order,1)
 						elseif (ischar(v1) || iscell(v1)&&ischar(v1{1}))	...
 								&& (ischar(v2) || iscell(v2)&&ischar(v2{1}))
 							v = strcmp(v1,v2);
+						elseif isstring(v1) && isstring(v2)
+							v = v1==v2;
 						else
 							bVal=false;
 						end
@@ -1182,6 +1184,11 @@ for iOrd=1:size(order,1)
 					case 61	% !=
 						if bNumeric
 							v=v1~=v2;
+						elseif (ischar(v1) || iscell(v1)&&ischar(v1{1}))	...
+								&& (ischar(v2) || iscell(v2)&&ischar(v2{1}))
+							v = ~strcmp(v1,v2);
+						elseif isstring(v1) && isstring(v2)
+							v = v1~=v2;
 						else
 							bVal=false;
 						end
@@ -1189,6 +1196,11 @@ for iOrd=1:size(order,1)
 					case 62	% ~=
 						if bNumeric
 							v=v1~=v2;
+						elseif (ischar(v1) || iscell(v1)&&ischar(v1{1}))	...
+								&& (ischar(v2) || iscell(v2)&&ischar(v2{1}))
+							v = ~strcmp(v1,v2);
+						elseif isstring(v1) && isstring(v2)
+							v = v1~=v2;
 						else
 							bVal=false;
 						end
@@ -1196,6 +1208,11 @@ for iOrd=1:size(order,1)
 					case 63	% <
 						if bNumeric
 							v=v1<v2;
+						elseif (ischar(v1) || iscell(v1)&&ischar(v1{1}))	...
+								&& (ischar(v2) || iscell(v2)&&ischar(v2{1}))
+							v = string(v1)<string(v2);
+						elseif isstring(v1) && isstring(v2)
+							v = v1<v2;
 						else
 							bVal=false;
 						end
@@ -1203,6 +1220,11 @@ for iOrd=1:size(order,1)
 					case 64	% <=
 						if bNumeric
 							v=v1<=v2;
+						elseif (ischar(v1) || iscell(v1)&&ischar(v1{1}))	...
+								&& (ischar(v2) || iscell(v2)&&ischar(v2{1}))
+							v = string(v1)<=string(v2);
+						elseif isstring(v1) && isstring(v2)
+							v = v1<=v2;
 						else
 							bVal=false;
 						end
@@ -1210,6 +1232,11 @@ for iOrd=1:size(order,1)
 					case 65	% >
 						if bNumeric
 							v=v1>v2;
+						elseif (ischar(v1) || iscell(v1)&&ischar(v1{1}))	...
+								&& (ischar(v2) || iscell(v2)&&ischar(v2{1}))
+							v = string(v1)>string(v2);
+						elseif isstring(v1) && isstring(v2)
+							v = v1>v2;
 						else
 							bVal=false;
 						end
@@ -1217,6 +1244,11 @@ for iOrd=1:size(order,1)
 					case 66	% >=
 						if bNumeric
 							v=v1>=v2;
+						elseif (ischar(v1) || iscell(v1)&&ischar(v1{1}))	...
+								&& (ischar(v2) || iscell(v2)&&ischar(v2{1}))
+							v = string(v1)>=string(v2);
+						elseif isstring(v1) && isstring(v2)
+							v = v1>=v2;
 						else
 							bVal=false;
 						end

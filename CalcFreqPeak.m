@@ -57,6 +57,7 @@ end
 
 f=zeros(1,nPeaks);
 A=f;
+di = 0;
 for i=1:nPeaks
 	[Xmax,iMax]=max(y);
 	if Xmax==0
@@ -71,7 +72,6 @@ for i=1:nPeaks
 			A(i)=A(i)/2;
 		end
 		y(1:2)=0;
-		di = 0;
 	elseif iMax==length(x)
 		%!!! not really optimal!!!
 		f(i)=x(iMax);
@@ -92,13 +92,11 @@ for i=1:nPeaks
 			case 0	% Xm_n = Xm_p
 				A(i)=Xmax;
 				i_f=iMax;
-				di = 0;
 			case 1	% Xm_n > Xm_p
 				r=Xmax/Xm_n;
 				p=(2-r)/(r+1);
 				i_f=iMax+p;
 				A(i)=(1-p^2)/sinc(p)*Xmax;
-				di = 0;
 		end
 		if i<nPeaks
 			% put peak to 0 for next peaks

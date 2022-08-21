@@ -20,6 +20,15 @@ if nargin>1
 end
 
 if ischar(fName)&&strcmpi(fName,'web')
+	if ischar(tPeriod)
+		if startsWith(tPeriod,'cont','IgnoreCase',true)
+			[~,I] = ReadWaterinfoRadarHDF5('last','--bPlot');
+			tPeriod = ceil((now-I.t(end))*24);
+			fprintf('Reading data for a period of %d hours\n',tPeriod)
+		else
+			error('Wrong input')
+		end
+	end
 	fName = sprintf('rastervalues_%04d%02d%02d_%02d%02d%02.0f.hdf5',clock);
 	if isempty(pth)
 		pth = DefaultPath();
