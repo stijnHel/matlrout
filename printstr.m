@@ -27,9 +27,21 @@ function printstr(x1,x2,varargin)
 
 % option to limit number of characters?
 
+nArgIn = nargin;	% to be able to change it...
+vargs = varargin;
+if isenum(x1) && isscalar(x1) && nArgIn==1
+	[e,en] = enumeration(x1);
+	x1 = '%s';
+	x2 = en;
+	vMax = max(abs(double(e)));
+	nDig = ceil(log10(max(2,vMax)))+1;
+	vargs = {sprintf('%%%dd',nDig),e};
+	nArgIn = 4;
+end
+
 [bPrintNumbers] = true;
 [nrOffset] = 0;
-if nargin==0
+if nArgIn==0
 	error('Minstens 1 input !')
 elseif isstruct(x1)
 	if isempty(x1)
@@ -38,20 +50,20 @@ elseif isstruct(x1)
 	fn=fieldnames(x1);
 	bScalars=false;
 	discard=[];	% fieldnames to be printed
-	if nargin>1
+	if nArgIn>1
 		opts={};
 		if iscell(x2)
 			fn=x2;
-			if nargin>3
-				opts=varargin;
-			elseif nargin>2
-				opts=varargin;
+			if nArgIn>3
+				opts=vargs;
+			elseif nArgIn>2
+				opts=vargs;
 				if isscalar(opts)&&iscell(opts{1})
 					opts=opts{1};
 				end
 			end
-		elseif nargin>2
-			opts=[{x2},varargin];
+		elseif nArgIn>2
+			opts=[{x2},vargs];
 		else
 			opts={x2};
 		end
@@ -125,14 +137,14 @@ elseif isa(x1,'Simulink.SimulationData.Dataset')
 		C{i} = x1{i}.BlockPath.getBlock(1);
 		C{i,2} = x1{i}.Name;
 	end
-	if nargin==1
+	if nArgIn==1
 		options = {};
 	else
-		options = [{x2},varargin];
+		options = [{x2},vargs];
 	end
 	printstr(C,options{:})
 	return
-elseif nargin==1
+elseif nArgIn==1
 	F={'%s'};
 	if min(size(x1))>1
 		F=F(1,ones(1,size(x1,2)));
@@ -141,13 +153,13 @@ elseif nargin==1
 		D={x1};
 	end
 else
-	nArg = length(varargin);
+	nArg = length(vargs);
 	n = 0;
 	opts = {};
 	while n+2<=nArg
-		if ischar(varargin{n+1})
-			if strcmpi(varargin{n+1},'options')
-				opts = varargin(n+2:end);
+		if ischar(vargs{n+1})
+			if strcmpi(vargs{n+1},'options')
+				opts = vargs(n+2:end);
 				break
 			end
 		else
@@ -156,8 +168,8 @@ else
 		n = n+2;
 	end
 	if isempty(opts) && nArg==n+1
-		if iscell(varargin{nArg}) || ischar(varargin{nArg})
-			opts = varargin(nArg);
+		if iscell(vargs{nArg}) || ischar(vargs{nArg})
+			opts = vargs(nArg);
 		else
 			error('Wrong inputs')
 		end
@@ -165,8 +177,8 @@ else
 	if ~isempty(opts)
 		setoptions({'bPrintNumbers','nrOffset'},opts{:})
 	end
-	F={x1,varargin{1:2:n}};
-	D={x2,varargin{2:2:n}};
+	F={x1,vargs{1:2:n}};
+	D={x2,vargs{2:2:n}};
 	for i=1:length(F)
 		if (size(D{i},1)==1)&&(size(D{i},2)>1)
 			D{i}=D{i}';

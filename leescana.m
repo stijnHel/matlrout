@@ -58,12 +58,20 @@ while ~feof(fid)
 		break;
 	end
 	[a1,n,~,in]=sscanf(x1,'%g %d %x',3);
+	bTx = 0;
 	if n==3
 		% use of additional 'x' is not used (extended ID)
-		[a2,n2,~,in2]=sscanf(x1(in+1:end),' Rx d %d',1);
-		n=n+n2;
-		in=in+in2;
-		a1=[a1;a2];
+		if any(x1=='R')
+			[a2,n2,~,in2]=sscanf(x1(in+1:end),' Rx d %d',1);
+		elseif any(x1=='T')
+			[a2,n2,~,in2]=sscanf(x1(in+1:end),' Tx d %d',1);
+			bTx = 1;
+		else
+			error('Other format? ("%s")',x1)
+		end
+		n = n+n2;
+		in = in+in2;
+		a1 = [a1;a2]; %#ok<AGROW>
 	end
 	if n~=4
 		while in>1&&x1(in-1)~=' '	% (!) vooral om het lezen van 'e' te "compenseren"
@@ -109,14 +117,16 @@ while ~feof(fid)
 			end
 			if nx==0
 				estN=ceil((flen-p1)/(length(x1)+2));
-				X=zeros(estN,10);
+				X=zeros(estN,12);
 			elseif nx>=size(X,1)
-				X=[X;zeros(100,10)];	%#ok<AGROW> %?? tweede estimation?
+				X=[X;zeros(100,12)];	%#ok<AGROW> %?? tweede estimation?
 			end
 			nx=nx+1;
 			X(nx)=a1(3);	%#ok<AGROW> % ID
 			X(nx,10)=a1(1);	%#ok<AGROW> % t
 			X(nx,2:1+a1(4))=d; %#ok<AGROW>
+			X(nx,11) = a1(4);
+			X(nx,12) = bTx;
 			if nx>=nMax
 				break
 			end
@@ -134,5 +144,5 @@ if p1<flen
 end
 X=X(1:nx,:);
 if nargout>1
-	nX={'ID','d1','d2','d3','d4','d5','d6','d7','d8','t'};
+	nX={'ID','d1','d2','d3','d4','d5','d6','d7','d8','t','DLC','Tx'};
 end

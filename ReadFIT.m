@@ -187,7 +187,12 @@ if bProcess
 		Xrecord(:,1) = Xrecord(:,1)/86400+t0Data;
 	end
 	
-	G = var2struct(Dtot,Z1,t0);
+	if nargout>5
+		dD = dPts;
+		dD(isnan(dD)) = 0;
+		cumD = [0;cumsum(dD)];
+		G = var2struct(Dtot,Z1,t0,dPts,cumD);
+	end
 end		% if bProcess
 
 	function crc=CalcCRC(x)
@@ -288,7 +293,7 @@ end		% if bProcess
 								DEF.offset(j)=DEF.fields{B,7};
 							end
 						else
-							warning('Unknown field (%s.%d)!',DEF.msgName,fldData(1,j))
+							UnknownTag(DEF.msgName,fldData(1,j))
 						end
 					end		% for j
 				end
@@ -520,3 +525,15 @@ if isempty(t0)
 end
 s=datestr(X/86400+t0,'yyyy-mm-ddTHH:MM:SSZ');
 end		% GetStimeUTC
+
+function UnknownTag(msg,tagNr)
+persistent UNKNOWNTAGS
+
+tag = sprintf('%s.%d',msg,tagNr);
+if isempty(UNKNOWNTAGS)
+	UNKNOWNTAGS = {tag};
+elseif ~any(strcmp(UNKNOWNTAGS,tag))
+	UNKNOWNTAGS{1,end+1} = tag;
+	warning('Unknown field (%s)!',tag)
+end
+end		% UnknownTag

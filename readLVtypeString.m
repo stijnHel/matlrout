@@ -123,7 +123,8 @@ if iscell(x)
 				D=struct(DD{:});
 			end
 		else	% variable length structures
-			warning('Variable length structure not ready!!!')
+			warning('Variable length structure not ready - only the first element is kept!!!')
+			D = D(:,[2 1]);
 		end
 	elseif bStruct
 		D=lvData2struct(D);

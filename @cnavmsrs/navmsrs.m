@@ -422,13 +422,13 @@ else
 			if kols(j)>0
 				lnr=lnr+1;
 				Y=e(:,kols(j));
-				if isfield(c.opties,'cfunc')
+				if isfield(c.opties,'cfunc')	% character based function (transforming Y-values)
 					if ischar(c.opties.cfunc)
 						Y=eval([c.opties.cfunc '(Y);']);
 					else
 						Y=eval([c.opties.cfunc{lnr} '(Y);']);
 					end
-				elseif isfield(c.opties,'hfunc')
+				elseif isfield(c.opties,'hfunc') % function handle based function (transforming Y-values)
 					if isa(c.opties.hfunc,'function_handle')
 						Y=c.opties.hfunc(Y);
 					else
@@ -461,4 +461,8 @@ if bHandleLinked && ~isempty(c.opties.postNavFcn)
 	else
 		error('Error using postNavFcn!')
 	end
+end
+ax = GetNormalAxes(hFig);
+if isequal(getappdata(ax(1),'updateAxes'),@axtick2date)
+	axtick2date(hFig)
 end

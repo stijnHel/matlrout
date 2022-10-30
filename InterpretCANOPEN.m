@@ -46,6 +46,8 @@ else
 end
 if size(X.D,1)==8&&isfield(X,'DLC')
 	X.D=[X.DLC(:),X.D'];
+elseif size(X.D,2)==8&&isfield(X,'DLC')
+	X.D=[X.DLC(:),X.D];
 end
 
 SNMTservices={1,'Start_RemoteNode';
@@ -61,11 +63,15 @@ Sstates={0,'Initializing';
 	  5,'Operational';
 	127,'Pre-Operational'};
 
-X.fcnCode=floor(X.ID/128);
+fcnCode = min(15,floor(X.ID/128));
+X.fcnCode=enum_COfcnCode(fcnCode);
 X.nodeID=rem(X.ID,128);
 X.coInterp=cell(size(X.ID));
+B_SDO = fcnCode==11 | fcnCode==12;
 X.SDOobIdx=nan(length(X.ID),1);
 X.SDOobSidx=X.SDOobIdx;
+X.SDOobIdx(~B_SDO) = 0;
+X.SDOobSidx(~B_SDO) = 0;
 X.SDOval=X.SDOobIdx;
 xI16=[1;256];
 xI32=[1;256;65536;16777216];

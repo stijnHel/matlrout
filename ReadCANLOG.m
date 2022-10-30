@@ -18,7 +18,7 @@ if nargin<2||isempty(typ)
 	switch lower(fExt)
 		case '.bin'
 			typ='LV_IXXAT';
-		case '.csv'
+		case {'.csv','.tr0'}
 			typ='mini_ixxat';
 		case '.log'
 			if strcmp(char(xStart(1:4)),'(159')
@@ -26,6 +26,8 @@ if nargin<2||isempty(typ)
 			else
 				typ='busmaster';
 			end
+		case '.asc'
+			typ='vector';
 		otherwise
 			fid.fclose();
 			error('Unknown type')
@@ -50,26 +52,63 @@ switch lower(typ)
 			return
 		end
 		fseek(fid,-4,'cof');
+		fStart = ftell(fid);
 		X=fread(fid,[4+n+16,Inf],'*uint8');
-		XD=X(5:n+4,:);
-		T=lvtime(X(n+5:end,:));
-		DD=readLVtypeString(TT,XD(:),'-ball');
+		if all(all(X(1:4,:)==X(1:4,1),2))	% all equal size
+			XD=X(5:n+4,:);
+			T=lvtime(X(n+5:end,:));
+			DD=readLVtypeString(TT,XD(:),'-ball');
+		else	% not equal size blocks
+			warning('Not all blocks have the same size!')
+			fseek(fid,fStart+n+20,'bof');
+			x=fread(fid,[1 Inf],'*uint8');
+			DD = readLVtypeString(TT,reshape(X(5:n+4,1),[],1));
+			DD = DD(:,[2 ones(1,size(X,2))]);	% (with size(X,2) an estimation of number of elements
+			T=lvtime(X(n+5:end,1));
+			T(size(X,2)) = T;
+			ix = 0;
+			iD = 2;
+			while ix<length(x)
+				n = double(typecast(x(ix+4:-1:ix+1),'uint32'));
+				if n<=4	% apparently it can happen?!!
+					warning('Empty data?!')
+					ix = ix+20;
+					continue
+				end
+				try
+					DDi = readLVtypeString(TT,x(ix+5:ix+n+4));
+				catch err
+					DispErr(err)
+					warning('Error when reading file - file writing stopped suddenly?')
+					break
+				end
+				DD(:,iD+1) = DDi(:,1);
+				T(iD) = lvtime(x(ix+n+5:ix+n+20));
+				ix = ix+n+20;
+				iD = iD+1;
+			end
+			if iD<size(DD,2)
+				DD = DD(:,1:iD);
+				T = T(1:iD-1);
+			end
+		end
 		if any(strcmp(TT(:,4),'Data'))
 			bT = strcmp(TT(:,4),'Timestamp');
 			bID = strcmp(TT(:,4),'Arbitration ID');
 			[fldExtra,iExtra] = setdiff(TT(:,4),{'Timestamp','Arbitration ID','Data'});
 			bD = strcmp(TT(:,4),'Data');
-			D = zeros(8,size(DD,2),'uint8');
-			DLC = zeros(size(DD,2),1);
-			T = cat(1,DD{bT,:});
-			ID = cat(1,DD{bID,:});
-			for i=1:size(DD,2)
-				Di = DD{bD,i};
+			D = zeros(8,size(DD,2)-1,'uint8');
+			DLC = zeros(size(DD,2)-1,1);
+			%T = cat(1,DD{bT,2:end});
+			TS = T-T(1);
+			ID = cat(1,DD{bID,2:end});
+			for i=1:size(DD,2)-1
+				Di = DD{bD,i+1};
 				DLC(i) = length(Di);
 				D(1:DLC(i),i) = Di;
 			end
 			for i=1:length(fldExtra)
-				Dextra.(fldExtra{i}) = cat(1,DD{iExtra(i),:});
+				Dextra.(MakeVarNames(fldExtra{i})) = cat(1,DD{iExtra(i),2:end});
 			end
 		else
 			%Dall=cell2mat(DD(:,2:end));
@@ -79,18 +118,19 @@ switch lower(typ)
 			Dextra=lvData2struct(DD(4:9,[2 1]));
 			flds=fieldnames(Dextra);
 			for i=4:9
-				Dextra.(flds{i-3}) = [DD{i,2:end}];
+				Dextra.(MakeVarNames(flds{i-3})) = [DD{i,2:end}];
 			end
 			D = cell2mat(DD(10:17,2:end));
 		end
-	case 'ixxat???'
-		D=leescana(fid);
-		t0=[];
-		T=D.X(:,10);
-		TS=D.X(:,10);
-		DLC=8+zeros(length(T),1);	%!!!!!!!!!!!
-		ID=D.X(:,1);
-		D=D.D(:,2:9);
+	case 'vector'
+		X = leescana(fid);
+		t0 = [];
+		T = X(:,10);
+		TS = X(:,10);
+		DLC = X(:,11);
+		% Do something with Tx? (column 11)
+		ID = X(:,1);
+		D = X(:,2:9);
 	case 'mini_ixxat'
 		fclose(fid);
 		X=readIXXATtrace(fFullPath(fName));
@@ -200,7 +240,7 @@ switch lower(typ)
 		error('Unknown log-type')
 end
 fid.fclose();
-uID=unique(ID);
+uID=unique(ID(:)');
 bScalar=isscalar(uID);
 if bScalar
 	nID=length(ID);

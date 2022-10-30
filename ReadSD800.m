@@ -7,9 +7,17 @@ sTitle=[];
 [bSaveGraph]=[];
 fGraphName=[];
 [bRemoveBadDates]=true;
+[startDate] = -1;
+[bAddMarkers] = false;
 
 if nargin>1
-	setoptions({'bPlot','sTitle','bSaveGraph','fGraphName','bRemoveBadDates'},varargin{:})
+	setoptions({'bPlot','sTitle','bSaveGraph','fGraphName','bRemoveBadDates'	...
+		,'startDate','bAddMarkers'},varargin{:})
+end
+if length(startDate)>2
+	startDate = datenum(startDate);
+elseif startDate<0	% 31 days ago
+	startDate = now-31;
 end
 
 if isempty(zetev)||(~exist(fFullPath('CHA01',false,[],false),'dir')&&isempty(direv('CHA*.XLS')))
@@ -22,7 +30,12 @@ if nargin>0 && ischar(fName)
 			error('Sorry, no figure found!!!!')
 		end
 		Tloc = ReadInfo();
-		subp(3,1,3)
+		subp(3,1,3);
+		xl = xlim;
+		if Tloc{1}<xl(1) || Tloc{end,1}>xl(2)
+			T = [Tloc{:,1}];
+			Tloc(T<xl(1) | T>xl(2),:) = [];
+		end
 		for i=1:size(Tloc,1)
 			line(Tloc{i}+[0 0],[200 500],'color',[1 0 0])
 			text(Tloc{i}+5/86400,200,Tloc{i,2},'color',[1 0 0]	...
@@ -38,12 +51,15 @@ if exist(zetev([],'CHA01'),'dir')
 	X=cell(1,length(dDir));
 	for i=1:length(dDir)
 		zetev(fullfile(dDir(i).folder,dDir(i).name))
-		[X{i},nX,dX]=ReadSD800([],'bRemoveBadDates',bRemoveBadDates);
+		[X{i},nX,dX]=ReadSD800([],'bRemoveBadDates',bRemoveBadDates,'startDate',startDate);
 	end
 	zetev(dDir(1).folder)
 	X=cat(1,X{:});
 	if bPlot
 		PlotMeas(X,nX,dX,bSaveGraph,fGraphName,sTitle)
+		if bAddMarkers
+			ReadSD800 AddMarkers
+		end
 	end
 	if nargout
 		Xout=X;
@@ -51,20 +67,32 @@ if exist(zetev([],'CHA01'),'dir')
 	return
 elseif nargin==0||isempty(fName)
 	fName=direv('CHA01*.xls');
+	if ~isempty(startDate)
+		B = [fName.datenum]<startDate;
+		if any(B)
+			fName(B) = [];
+		end
+	end
 	l=cellfun('length',{fName.name});
 	fName(l~=12)=[];
 	fName=sort(fName,'name');
 end
 if ~ischar(fName)&&length(fName)>1
 	X=cell(length(fName),3);
+	cStat = cStatus('Reading files',0);
 	for i=1:length(fName)
-		[X{i,:}]=ReadSD800(fName(i),'bRemoveBadDates',bRemoveBadDates);
+		[X{i,:}]=ReadSD800(fName(i),'bRemoveBadDates',bRemoveBadDates,'startDate',startDate);
+		cStat.status(i/length(fName))
 	end
+	cStat.close();
 	nX=X{1,2};
 	dX=X{1,3};
 	X=cat(1,X{:,1});
 	if bPlot
 		PlotMeas(X,nX,dX,bSaveGraph,fGraphName,sTitle)
+		if bAddMarkers
+			ReadSD800 AddMarkers
+		end
 	end
 	if nargout
 		Xout=X;

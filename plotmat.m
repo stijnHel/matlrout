@@ -1,4 +1,4 @@
-function [assen,LIJNEN,NGevonden,kols,x]=plotmat(e,kols,x,naame,de,varargin)
+function [assen,lijnen,ngevonden,kols,x]=plotmat(e,kols,x,naame,de,varargin)
 % PLOTMAT - plot gegevens uit matrix
 %    plotmat(e,kols,x,ne,de,opties)
 %        e : matrix met gegevens, 1 kolom per kanaal
@@ -375,7 +375,7 @@ end
 
 if ~isempty(lijntype)&&isnumeric(lijntype)&&isscalar(lijntype)&&(lijntype==1) %#ok<BDSCI>
 	lijntype=['- ';': ';'-.';'--'];
-elseif ischar(lijntype) && size(lijntype,1)==1
+elseif ischar(lijntype) && size(lijntype,1)==1 && any(lijntype==';')
 	i=find(';'==[lijntype ';']);
 	s=zeros(length(i),2);
 	for j=1:length(i)
@@ -746,7 +746,7 @@ for i=1:nkan
 		end
 		if ~isempty(punttype)
 			for ipl=1:length(pl)
-				set(pl(ipl),'Marker',punttype(rem(1+ipl-1,length(punttype))))
+				set(pl(ipl),'Marker',punttype(1+rem(ipl-1,length(punttype))))
 			end
 		end
 		if ~isempty(naame)
@@ -854,12 +854,6 @@ if nargout
 		lijnen=reshape([lijnen(:,1);cell(nrij*nkol-size(lijnen,1),1)],nkol,nrij)';
 	end
 	assen=ass;
-	if nargout>1
-		LIJNEN=lijnen;
-		if nargout>2
-			NGevonden=ngevonden;
-		end
-	end
 end
 
 function MenuCall(h,~)
@@ -895,7 +889,7 @@ if strcmpi(get(hCM,'Type'),'uicontextmenu')
 end
 
 function SetOut(out)
-vOut = {'assen','LIJNEN','NGevonden','kols','x'};
+vOut = {'assen','lijnen','ngevonden','kols','x'};
 for i=1:size(out,2)
 	if size(out,1)==1
 		assignin('caller',vOut{i},out{i})

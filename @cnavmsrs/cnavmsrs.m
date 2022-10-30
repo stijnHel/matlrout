@@ -63,7 +63,7 @@ classdef cnavmsrs < handle
 			
 			opties=struct('kols',[],'kanx',1,'ne',[],'fnr',1,'minNrFiles',1	...
 				,'evdir',[],'postNavFcn',[],'bWrap',true,'bVarSignames',false	...
-				,'readOptions',{{}});
+				,'b2Dnavigation',false,'blockName','block','readOptions',{{}});
 			if isnumeric(fnaam)||istable(fnaam)
 				opties.kanx=-1;
 			end
@@ -261,6 +261,13 @@ classdef cnavmsrs < handle
 			else
 				nePlot=[];
 			end
+			if opties.b2Dnavigation && isempty(opties.kols)
+				if isscalar(opties.kanx) && opties.kanx>0
+					opties.kols = 2;
+				else
+					opties.kols = 1;
+				end
+			end
 			[hAx,hL,~,kols,kanx]=plotmat(e,opties.kols,opties.kanx,nePlot,[],plotOptions{:});
 			fNr=get(hAx(1),'Parent');
 			if isscalar(opties.kanx)&&(opties.kanx<0||opties.kanx>floor(opties.kanx))
@@ -277,12 +284,20 @@ classdef cnavmsrs < handle
 			c.kols = kols;
 			c.kanx = kanx;
 			c.opties = opties;
-			c.nr = 0;
 			c.nFiles = nFiles;
-			set(gcf,'UserData',c,'KeyPressFcn',@(~,~) c.navmsrs(),'Name',f1)
-			c.navmsrs(fnr)	% to set everything the same as normal
+			set(fNr,'UserData',c,'KeyPressFcn',@(~,~) c.navmsrs(),'Name',f1)
+			if c.opties.b2Dnavigation
+				c.nr = 1;
+				c.Set2Dlayer(1)
+				navfig('addkey','pageup',0,@(~) c.Set2Dlayer([0 1]))
+				navfig('addkey','pagedown',0,@(~) c.Set2Dlayer([0 -1]))
+			else
+				c.nr = 0;
+				c.navmsrs(fnr)	% to set everything the same as normal
+			end
+			
 			if nargout==0
-				clear c		% is this possible?
+				clear c		% avoid displaying the class info in Command Window
 			end
 		end
 		
@@ -306,12 +321,30 @@ classdef cnavmsrs < handle
 			c.opties.postNavFcn=fcn;
 		end		% SetPostNavFcn
 		
+		function Set2Dlayer(c,layerNr)
+			if isscalar(c.kanx) && c.kanx>0
+				nrOffset = 1;
+			else
+				nrOffset = 0;
+			end
+			if ~isscalar(layerNr)
+				nChannels = size(c.fnaam{1},2);	% (!)Only for local data!!!
+				layerNr = max(1,min(nChannels,c.kols+layerNr(2))-nrOffset);
+			end
+			for i=1:length(c.ne)
+				c.ne{i} = sprintf('%s - %s %d',c.opties.ne{i},c.opties.blockName,layerNr);
+			end
+			c.kols = layerNr+nrOffset;
+			c.navmsrs(c.nr,true)
+		end		% Set2Dlayer
+		
 		% destructor?
 	end		% methods
 	
 	methods		% methods defined externally
 		out=navmsrs(c,varargin)
 		del(c,nr)
+		LinkFig(c,figToLink)
 	end		% externally defined methods
 	
 end		% classdef
