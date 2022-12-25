@@ -107,7 +107,13 @@ if isempty(maxLen)
 	maxLen=1e9;
 end
 if isstruct(fname)&&isscalar(fname)
-	fname=fname.name;
+	if isfield(fname,'fullname')
+		fname = fname.fullname;
+	elseif isfield(fname,'folder')
+		fname = fullfile(fname.folder,fname.name);
+	else
+		fname = fname.name;
+	end
 elseif isnumeric(fname)||~ischar(fname)
 	if isscalar(fname)&&isnumeric(fname)
 		fname=zetev({'*.tdms','sortd','file'},fname);
@@ -838,16 +844,12 @@ else	% get measurement data from channels
 		nChan=0;
 		de={};
 		chanData={};
-	elseif any(cellfun(@isempty,channels))
-		if length(channels)>1
-			warning('Combining empty channels??')
-		end
-		chanNames={};
-		nChan=0;
-		de={};
-		chanData={};
-		channels=[channels{:}];
 	else
+% 		if any(cellfun(@isempty,channels))
+% 			if length(channels)>1
+% 				warning('Combining empty channels??')
+% 			end
+% 		end
 		channels=[channels{:}];
 		chanNames={channels.name};
 		nChan=length(channels);

@@ -28,6 +28,8 @@ if nargin<2||isempty(typ)
 			end
 		case '.asc'
 			typ='vector';
+		case '.mat'
+			typ = 'mat_ixxat';	% could be different things!
 		otherwise
 			fid.fclose();
 			error('Unknown type')
@@ -236,10 +238,32 @@ switch lower(typ)
 		D=D(1:nD,:);
 		ID=ID(1:nD);
 		CHAN=CHAN(1:nD);
+	case 'mat_ixxat'
+		fclose(fid);
+		fid = [];
+		X = load(fFull);
+		fn = fieldnames(X);
+		if ~isscalar(fn)
+			error('Sorry, only one variable was expected!')
+		end
+		X = X.(fn{1});
+		T = cat(1,X.time);
+		DLC = cat(1,X.dlc);
+		D = zeros(length(X),8,'uint8');
+		for i=1:length(X)
+			D(i,1:DLC(i)) = X(i).data;
+		end
+		ID = cat(1,X.ID);
+		CHAN = [];	%????
+		t0 = T(1);
+		TS = [];
+		Dextra = [];
 	otherwise
 		error('Unknown log-type')
 end
-fid.fclose();
+if ~isempty(fid)
+	fid.fclose();
+end
 uID=unique(ID(:)');
 bScalar=isscalar(uID);
 if bScalar

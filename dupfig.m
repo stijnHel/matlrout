@@ -109,14 +109,13 @@ for i=1:length(assen)
 			, 'Clipping', get(a, 'Clipping')	...
 			);
 		b=get(a, 'Children');
+		B = false(size(b));
 		for j=1:length(b)
-			if strcmp(get(b(j),'Visible'),'off')
-				b(j)=-1;
-			end
+			B(j) = strcmp(get(b(j),'Visible'),'off');
 		end
 		set(a1,'NextPlot','add');
-		if length(b)
-			b(find(b==-1))=[];
+		if any(B)
+			b(B)=[];
 		end
 		for j=1:length(b)
 			bType=get(b(j),'Type');

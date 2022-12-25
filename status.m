@@ -23,10 +23,11 @@ function [fOut,out2]=status(sArg,prcin,varargin)
 
 persistent STATUSTIME FIGwin
 persistent BLOG NLOG LOG
-persistent TSTART
+persistent TSTART TABS
 
 if isempty(TSTART)
 	TSTART = tic;
+	TABS = now;
 end
 
 tNow=toc(TSTART);
@@ -88,7 +89,7 @@ if ischar(prcin)
 			prcLast=getappdata(f,'lastStatusData');
 			if ~isempty(prcLast)
 				fprintf('       total time: %5.1f s cpu, %5.1f s duration (ended %s)\n',	...
-					(prcLast(4:5)-prcLast(2:3)).*[1 86400],datestr(prcLast(5)))
+					(prcLast(4:5)-prcLast(2:3)),datestr(TABS+prcLast(5)/86400))
 			end
 		case 'status'
 			if isempty(f)

@@ -32,11 +32,14 @@ if isempty(UNITinfo)
 	addunit('m','L1',1)
 	addunit('in','L1',0.0254)
 	addunit('mi','L1',1609.344)
+	addunit('nmi','L1',1852)	% nautical mile
 	addunit('ft','L1',0.3048)
 	addunit('yd','L1',0.9144)
 	addunit('lyr','L1',9.46052840488e15)
-	addunit('AU','L1',1.49597870691e11)
-	addunit('pc','L1',1.49597870691e11*206265)	% 3.0857e16, 3.26 lyr
+	addunit('AU','L1',149597870700)	% IAU 2012
+	addunit('pc','L1',unitcon('AU')*648000/pi)	% (IAU resolution B2, august 2015)
+	%addunit('AU','L1',1.49597870691e11)
+	%addunit('pc','L1',1.49597870691e11*648000/pi)	% (IAU resolution B2, august 2015)
 	
 	addunit('l','L3',1e-3)
 	addunit('cc','L3',1e-6)

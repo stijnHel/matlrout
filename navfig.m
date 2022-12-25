@@ -660,6 +660,10 @@ for i=1:length(l)
 		XL(2)=max(XL(2),max(X));
 	end
 end
+x = xlim;
+if isdatetime(x)
+	XL = datetime(XL,'ConvertFrom','datenum','TimeZone',x.TimeZone);
+end
 
 function fs=GetAvailableHandles(fs)
 fpos=union(get(0,'Children'),findobj('Type','axes'));

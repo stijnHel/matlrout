@@ -66,6 +66,9 @@ while ~feof(fid)
 		elseif any(x1=='T')
 			[a2,n2,~,in2]=sscanf(x1(in+1:end),' Tx d %d',1);
 			bTx = 1;
+		elseif contains(x1,'ErrorFrame')
+			fprintf('ErrorFrame! --- discarded --- "%s"\n',x1)
+			continue
 		else
 			error('Other format? ("%s")',x1)
 		end

@@ -1,4 +1,4 @@
-function [D,IDundefined]=MapCANDBC(Xlog,Cdbc,bReplaceFE_id,node_id,bDiscardPrio)
+function [D,IDundefined,Ilog]=MapCANDBC(Xlog,Cdbc,bReplaceFE_id,node_id,bDiscardPrio)
 %MapCANDBC - Map logged CAN-data with DBC-specification
 %    [D,IDundefined]=MapCANDBC(Xlog,Cdbc)
 %        Xlog: log of CAN data (see ReadCANLOG)

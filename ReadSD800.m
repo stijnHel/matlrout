@@ -9,10 +9,11 @@ fGraphName=[];
 [bRemoveBadDates]=true;
 [startDate] = -1;
 [bAddMarkers] = false;
+[tOffset] = -1.5/24;
 
 if nargin>1
 	setoptions({'bPlot','sTitle','bSaveGraph','fGraphName','bRemoveBadDates'	...
-		,'startDate','bAddMarkers'},varargin{:})
+		,'startDate','bAddMarkers','tOffset'},varargin{:})
 end
 if length(startDate)>2
 	startDate = datenum(startDate);
@@ -51,7 +52,8 @@ if exist(zetev([],'CHA01'),'dir')
 	X=cell(1,length(dDir));
 	for i=1:length(dDir)
 		zetev(fullfile(dDir(i).folder,dDir(i).name))
-		[X{i},nX,dX]=ReadSD800([],'bRemoveBadDates',bRemoveBadDates,'startDate',startDate);
+		[X{i},nX,dX]=ReadSD800([],'bRemoveBadDates',bRemoveBadDates		...
+			,'startDate',startDate,'tOffset',tOffset);
 	end
 	zetev(dDir(1).folder)
 	X=cat(1,X{:});
@@ -81,7 +83,8 @@ if ~ischar(fName)&&length(fName)>1
 	X=cell(length(fName),3);
 	cStat = cStatus('Reading files',0);
 	for i=1:length(fName)
-		[X{i,:}]=ReadSD800(fName(i),'bRemoveBadDates',bRemoveBadDates,'startDate',startDate);
+		[X{i,:}]=ReadSD800(fName(i),'bRemoveBadDates',bRemoveBadDates	...
+			,'startDate',startDate,'tOffset',tOffset);
 		cStat.status(i/length(fName))
 	end
 	cStat.close();
@@ -128,6 +131,9 @@ if bRemoveBadDates
 	if any(B)
 		X(B,:)=[];
 	end
+end
+if tOffset~=0
+	X(:,2) = X(:,2)+tOffset;
 end
 
 if bPlot

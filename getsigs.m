@@ -43,6 +43,13 @@ for i=1:numel(graphs)
 		else
 			X{i}{j}=[Xdata;Ydata;Xdata>=xl(1)&Xdata<=xl(2);Ydata>=yl(1)&Ydata<=yl(2)]';
 		end
+		if isprop(l(j),'BrushData') && any(l(j).BrushData) && ~all(l(j).BrushData)
+			X{i}{j}(1:length(l(j).BrushData),end+1) = l(j).BrushData(:)>0;
+		end
+		if isprop(l(j),'MarkerIndicesMode')		...
+				&& length(l(j).MarkerIndices)<length(Xdata)
+			X{i}{j}(l(j).MarkerIndices,end+1) = 1;
+		end
 	end
 	if length(l)==1&&~bKeepCell
 		X{i}=X{i}{1};
@@ -51,6 +58,4 @@ end
 if length(X)==1&&~bKeepCell
 	X=X{1};
 end
-if nargout>1
-	Xinfo=Xi;
-end
+Xinfo=Xi;
