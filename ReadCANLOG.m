@@ -9,36 +9,41 @@ function X=ReadCANLOG(fName,typ,varargin)
 
 [bCANOPEN] = false;
 [optsUnused] = {};
-fFull = fFullPath(fName);
-fid=file(fFull,'r','ieee-be');
-xStart = fid.fread([1 32],'*uint8');
-fid.fseek(0,'bof');
-if nargin<2||isempty(typ)
-	[~,~,fExt]=fileparts(fFull);
-	switch lower(fExt)
-		case '.bin'
-			typ='LV_IXXAT';
-		case {'.csv','.tr0'}
-			typ='mini_ixxat';
-		case '.log'
-			if strcmp(char(xStart(1:4)),'(159')
-				typ = 'candump';
-			else
-				typ='busmaster';
-			end
-		case '.asc'
-			typ='vector';
-		case '.mat'
-			typ = 'mat_ixxat';	% could be different things!
-		otherwise
-			fid.fclose();
-			error('Unknown type')
-	end		% switch
-end		% no given type
-if nargin>2
-	[~,~,optsUnused]=setoptions([2,0],{'bCANOPEN'},varargin{:});
+if isstruct(fName) && length(fName)>1 && isfield(fName,'data')
+	% Log from "IXXAT-CAN-msg-struct" (see IXXATcom)
+	fid = [];
+	typ = 'IXXAT_RAW_DIRECT';
+else
+	fFull = fFullPath(fName);
+	fid=file(fFull,'r','ieee-be');
+	xStart = fid.fread([1 32],'*uint8');
+	fid.fseek(0,'bof');
+	if nargin<2||isempty(typ)
+		[~,~,fExt]=fileparts(fFull);
+		switch lower(fExt)
+			case '.bin'
+				typ='LV_IXXAT';
+			case {'.csv','.tr0'}
+				typ='mini_ixxat';
+			case '.log'
+				if strcmp(char(xStart(1:4)),'(159')
+					typ = 'candump';
+				else
+					typ='busmaster';
+				end
+			case '.asc'
+				typ='vector';
+			case '.mat'
+				typ = 'mat_ixxat';	% could be different things!
+			otherwise
+				fid.fclose();
+				error('Unknown type')
+		end		% switch
+	end		% no given type
+	if nargin>2
+		[~,~,optsUnused]=setoptions([2,0],{'bCANOPEN'},varargin{:});
+	end
 end
-
 CHAN=1;
 Dextra=[];
 switch lower(typ)
@@ -238,15 +243,19 @@ switch lower(typ)
 		D=D(1:nD,:);
 		ID=ID(1:nD);
 		CHAN=CHAN(1:nD);
-	case 'mat_ixxat'
-		fclose(fid);
-		fid = [];
-		X = load(fFull);
-		fn = fieldnames(X);
-		if ~isscalar(fn)
-			error('Sorry, only one variable was expected!')
+	case {'mat_ixxat','ixxat_raw_direct'}
+		if isempty(fid)
+			X = fName;
+		else
+			fclose(fid);
+			fid = [];
+			X = load(fFull);
+			fn = fieldnames(X);
+			if ~isscalar(fn)
+				error('Sorry, only one variable was expected!')
+			end
+			X = X.(fn{1});
 		end
-		X = X.(fn{1});
 		T = cat(1,X.time);
 		DLC = cat(1,X.dlc);
 		D = zeros(length(X),8,'uint8');

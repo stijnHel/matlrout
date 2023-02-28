@@ -1,4 +1,4 @@
-function full=fFullPath(fName,bFreeExt,fExt,bRaiseError)
+function [full,bExist] = fFullPath(fName,bFreeExt,fExt,bRaiseError)
 %fFullPath - Find full pathname of a file
 %    full=fFullPath(fName[,bFreeExt[,fExt]])
 %             bFreeExt: allow free extension
@@ -23,6 +23,7 @@ if nargin<4||isempty(bRaiseError)
 	bRaiseError=true;
 end
 
+bExist = true;
 if isstruct(fName)
 	if isscalar(fName)
 		fName=GetFilenameFromDirStr(fName);
@@ -77,6 +78,7 @@ if any(fName=='*')
 				error('No file found!')
 			else
 				full=[];
+				bExist = false;
 				return
 			end
 		elseif bRaiseError

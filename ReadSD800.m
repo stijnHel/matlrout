@@ -19,6 +19,7 @@ if length(startDate)>2
 	startDate = datenum(startDate);
 elseif startDate<0	% 31 days ago
 	startDate = now-31;
+	fprintf('Look for data starting from %s\n',datestr(startDate))
 end
 
 if isempty(zetev)||(~exist(fFullPath('CHA01',false,[],false),'dir')&&isempty(direv('CHA*.XLS')))
@@ -31,16 +32,18 @@ if nargin>0 && ischar(fName)
 			error('Sorry, no figure found!!!!')
 		end
 		Tloc = ReadInfo();
-		subp(3,1,3);
-		xl = xlim;
-		if Tloc{1}<xl(1) || Tloc{end,1}>xl(2)
-			T = [Tloc{:,1}];
-			Tloc(T<xl(1) | T>xl(2),:) = [];
-		end
-		for i=1:size(Tloc,1)
-			line(Tloc{i}+[0 0],[200 500],'color',[1 0 0])
-			text(Tloc{i}+5/86400,200,Tloc{i,2},'color',[1 0 0]	...
-				,'horizontalal','left','verticalal','bottom')
+		if ~isempty(Tloc)
+			subp(3,1,3);
+			xl = xlim;
+			if Tloc{1}<xl(1) || Tloc{end,1}>xl(2)
+				T = [Tloc{:,1}];
+				Tloc(T<xl(1) | T>xl(2),:) = [];
+			end
+			for i=1:size(Tloc,1)
+				line(Tloc{i}+[0 0],[200 500],'color',[1 0 0])
+				text(Tloc{i}+5/86400,200,Tloc{i,2},'color',[1 0 0]	...
+					,'horizontalal','left','verticalal','bottom')
+			end
 		end
 		return
 	end
@@ -50,17 +53,24 @@ if exist(zetev([],'CHA01'),'dir')
 	dDir=direv('CHA*','dir');
 	
 	X=cell(1,length(dDir));
+	Bok = false(1,length(dDir));
 	for i=1:length(dDir)
 		zetev(fullfile(dDir(i).folder,dDir(i).name))
 		[X{i},nX,dX]=ReadSD800([],'bRemoveBadDates',bRemoveBadDates		...
 			,'startDate',startDate,'tOffset',tOffset);
+		Bok(i) = ~isempty(X{i});
 	end
 	zetev(dDir(1).folder)
-	X=cat(1,X{:});
-	if bPlot
-		PlotMeas(X,nX,dX,bSaveGraph,fGraphName,sTitle)
-		if bAddMarkers
-			ReadSD800 AddMarkers
+	X = X(Bok);
+	if isempty(X)
+		warning('No data?!')
+	else
+		X=cat(1,X{:});
+		if bPlot
+			PlotMeas(X,nX,dX,bSaveGraph,fGraphName,sTitle)
+			if bAddMarkers
+				ReadSD800 AddMarkers
+			end
 		end
 	end
 	if nargout
@@ -68,12 +78,21 @@ if exist(zetev([],'CHA01'),'dir')
 	end
 	return
 elseif nargin==0||isempty(fName)
-	fName=direv('CHA01*.xls');
+	fName=direv('CHA*.xls');
 	if ~isempty(startDate)
 		B = [fName.datenum]<startDate;
 		if any(B)
 			fName(B) = [];
 		end
+	end
+	if isempty(fName)
+		fprintf('No files found (%s)!\n',zetev())
+		if nargout
+			Xout = [];
+			nX = {};
+			dX = {};
+		end
+		return
 	end
 	l=cellfun('length',{fName.name});
 	fName(l~=12)=[];
@@ -188,7 +207,13 @@ if bSaveGraph
 end
 
 function L = ReadInfo()
-cF = cBufTextFile(fFullPath('info.txt'));
+[fName,bExist] = fFullPath('info.txt',true,[],false);
+if ~bExist
+	warning('No info found (to put markers)!')
+	L = {};
+	return
+end
+cF = cBufTextFile(fName);
 LT = cF.fgetlN(10000);
 L = cell(length(LT),2);
 nL = 0;

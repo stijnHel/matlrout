@@ -242,6 +242,16 @@ for i=1:length(xd)
 		xtl{i}=sprintf('%d/%d',dd([3 2]));
 	end
 end
+%----------------------------
+%related to unwanted ticks during printing
+if false
+	fig = ancestor(ax(1),'figure');
+	fprintf('axis pos: [%.2f %.2f %.2f %.2f]\n',axP)
+	fprintf('fig pos ("%s"): [%.2f %.2f %.2f %.2f]\n',fig.Units,fig.Position)
+	printstr(xtl)
+end
+%----------------------------
+
 set(ax,sXtick,(xd-tOffset)*tScale,sXtickL,xtl)
 
 function [tScale,tOffset]=GetTimeScale(ax,xl)

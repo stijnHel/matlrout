@@ -150,7 +150,24 @@ if ~isfield(Xlog,'iID')
 		Xlog.iID{i}=find(Xlog.ID==Xlog.uID(i));
 	end
 end
-if size(Xlog.D,1)>8
+if min(size(Xlog.D))>8
+	% expecting one DLC-column of row
+	BdBytes = size(Xlog.D)==9;
+	if ~any(BdBytes)
+		error('Minimally 1 dimension of D must be at most 9!')
+	elseif all(BdBytes)
+		if any(Xlog.D(1,:)>8)
+			Xlog.D = Xlog.D';
+			if any(Xlog.D(1,:)>8)
+				error('First column or row of D not DLC?!')
+			end
+		end
+	elseif BdBytes(2)
+		Xlog.D = Xlog.D';
+	end
+	Xlog.DLC = Xlog.D(1,:);
+	Xlog.D = Xlog.D(2:end,:);
+elseif size(Xlog.D,1)>8
 	Xlog.D=Xlog.D';
 end
 

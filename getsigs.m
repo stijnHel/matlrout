@@ -10,10 +10,15 @@ function [X,Xinfo]=getsigs(graphs,varargin)
 if nargin==0||isempty(graphs)
 	graphs=gcf;
 end
-bClipData=false;
-bKeepCell=false;	% if true, cell output also if only one channel
+[bClipData] = false;
+[bKeepCell] = false;	% if true, cell output also if only one channel
+[bRemoveHiddenPoints] = false;
 if nargin>1
-	setoptions({'bClipData','bKeepCell'},varargin{:})
+	setoptions({'bClipData','bKeepCell','bRemoveHiddenPoints'},varargin{:})
+end
+if bRemoveHiddenPoints && ~bClipData
+	warning('bRemoveHiddenPoints only works if bClipData!')
+	bRemoveHiddenPoints = false;
 end
 
 if strcmp(get(graphs(1),'type'),'figure')
@@ -38,8 +43,7 @@ for i=1:numel(graphs)
 		Xdata=double(get(l(j),'XData'));	% double - to prevent problems with combining X and Y with integer data
 		Ydata=double(get(l(j),'YData'));
 		if bClipData
-			B=Xdata>=xl(1)&Xdata<=xl(2);Ydata>=yl(1)&Ydata<=yl(2);
-			X{i}{j}=[Xdata(B)' Ydata(B)'];
+			B=Xdata>=xl(1)&Xdata<=xl(2) & Ydata>=yl(1)&Ydata<=yl(2);
 		else
 			X{i}{j}=[Xdata;Ydata;Xdata>=xl(1)&Xdata<=xl(2);Ydata>=yl(1)&Ydata<=yl(2)]';
 		end
@@ -48,9 +52,18 @@ for i=1:numel(graphs)
 		end
 		if isprop(l(j),'MarkerIndicesMode')		...
 				&& length(l(j).MarkerIndices)<length(Xdata)
-			X{i}{j}(l(j).MarkerIndices,end+1) = 1;
+			if bRemoveHiddenPoints
+				B1 = false(size(B));
+				B1(l(j).MarkerIndices) = true;
+				B = B&B1;
+			else
+				X{i}{j}(l(j).MarkerIndices,end+1) = 1;
+			end
+		end		% if MarkerIndices
+		if bClipData
+			X{i}{j} = [Xdata(B)' Ydata(B)'];
 		end
-	end
+	end		% for i
 	if length(l)==1&&~bKeepCell
 		X{i}=X{i}{1};
 	end

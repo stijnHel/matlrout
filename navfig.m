@@ -234,18 +234,22 @@ if ischar(c)&&length(c)>1
 				end
 			end
 		case 'updateaxest'
-			navfig('updateAxes',@axtick2date)
+			navfig(f,'updateAxes',@axtick2date)
+			if isempty(get(f,'SizeChangedFcn'))
+				set(f,'SizeChangedFcn',@(f,~)axtick2date(f))
+			end
 		case 'updateaxes'
 			if ninput<2
 				error('navfig(''updateAxes'') must have an update function as second argumen!')
 			end
 			if isempty(get(f,'KeyPressFcn'))
-				navfig	% start navfig-functionality
+				navfig(f)	% start navfig-functionality
 			end
 			assen=GetNormalAxes(f);
 			if ischar(x2)&&strcmpi(x2,'stop')
 				x2=[];
 				set(assen,'XTickMode','auto','XTickLabelMode','auto')
+				set(f,'SizeChangedFcn',[])
 			end
 			for i=1:length(assen)
 				setappdata(assen(i),'updateAxes',x2)
@@ -754,6 +758,7 @@ end
 function KeyPressed(f,ev)
 global NAVFIGsets NAVFIGlogs
 global TESTtxtCOR
+f = ancestor(f,'figure');	% to allow adding KeyPressFcn to objects in a figure
 bUIhandling = getappdata(f,'uihandlingactive');
 if ~isempty(bUIhandling) && bUIhandling
 	return	% don't handle
@@ -1510,10 +1515,7 @@ if ~reedsverwerkt
 			end
 			a=getappdata(assen(1),'updateAxes');
 			if isempty(a)
-				navfig('updateAxes',@axtick2date)
-				if isempty(get(f,'SizeChangedFcn'))
-					set(f,'SizeChangedFcn',@(f,~)axtick2date(f))
-				end
+				navfig('updateAxesT')
 			else
 				navfig('updateAxes','stop')
 			end

@@ -17,13 +17,19 @@ fileGPX=[];
 bProcess=nargout>1;
 [bRelTime] = nargout>5;
 [bRemoveNaNs] = true;
+[bPlot] = nargout==0;
+[bAnalyse] = false;
+maxStandStillTime = 5/1440;
+minDistBlock = 100;
+minVedges = 0.1;
 Z1 = [];
 if nargin>1
-	setoptions({'bInterpret','bGPX','fileGPX','Z1','bRelTime','bRemoveNaNs'},varargin{:})
-	bGPX=bGPX||ischar(fileGPX);
-	bProcess=bProcess||bGPX;
-	bInterpret=bInterpret||bGPX;
+	setoptions({'bInterpret','bGPX','fileGPX','Z1','bRelTime','bRemoveNaNs'	...
+		,'bPlot','bAnalyse','maxStandStillTime','minDistBlock','minVedges'},varargin{:})
 end
+bGPX=bGPX||ischar(fileGPX);
+bProcess=bProcess||bGPX||bPlot||bAnalyse;
+bInterpret=bInterpret||bGPX;
 
 BE16=[1;256];
 BE32=[1;256;65536;16777216];
@@ -194,6 +200,67 @@ if bProcess
 		G = var2struct(Dtot,Z1,t0,dPts,cumD);
 	end
 end		% if bProcess
+iX_V = find(strcmp(nX,'enhanced_speed'));
+iX_H = find(strcmp(nX,'enhanced_altitude'));
+if bAnalyse
+	jj = [0;find(diff(Xrecord(:,1))>maxStandStillTime);size(Xrecord,1)];
+	lBlock = cumD(jj(2:end))-cumD(jj(1:end-1)+1);
+	Bshort = lBlock<minDistBlock;
+	jj(Bshort) = [];
+	jjStart = jj(1:end-1)+1;
+	jjEnd = jj(2:end);
+	nBlock = length(jjStart);
+	for ix = 1:nBlock
+		%(!!)assuming no long logs with only very low speed!!
+		while any(Xrecord(jjStart(ix)+[0 1],iX_V)<minVedges)
+			jjStart(ix) = jjStart(ix)+1;
+		end
+		while any(Xrecord(jjEnd(ix)+[-1 0],iX_V)<minVedges)
+			jjEnd(ix) = jjEnd(ix)-1;
+		end
+	end
+	lBlock = cumD(jjEnd)-cumD(jjStart);
+	dtBlock = (Xrecord(jjEnd)-Xrecord(jjStart))*86400;
+	Vblock = lBlock./dtBlock*3.6;	% (!) km/h
+	DH = diff(Xrecord(:,iX_H));
+	dH = Xrecord(jjEnd,iX_H)-Xrecord(jjStart,iX_H);
+	dHasc = zeros(1,nBlock);
+	dHdesc = zeros(1,nBlock);
+	for ix=1:nBlock
+		DH_i = DH(jjStart(ix):jjEnd(ix)-1);
+		dHasc(ix) = sum(max(0,DH_i));
+		dHdesc(ix) = -sum(min(0,DH_i));
+	end
+	
+	D.Tblock = [Xrecord(jjStart,1),Xrecord(jjEnd,1)];
+	D.lBlock = lBlock';
+	D.dtBlock = dtBlock';
+	D.Vblock = Vblock';
+	D.dH = dH';
+	D.dHasc = dHasc;
+	D.dHdesc = dHdesc;
+end
+if bPlot
+	ax1=plotmat(NE,1,2);axis equal;
+	ax2=plotmat(NE,[],Xrecord(:,1),{'North','East'},[],'-btna');
+	VH = Xrecord(:,[1,iX_V,iX_H]).*[1 3.6 1];
+	ax3=plotmat(VH,[2;3],1,nX([1,iX_V,iX_H]),{'','km/h','m'},'-btNav');
+	tFigs = [ancestor(ax2(1),'figure'),ancestor(ax3(1),'figure')];
+	volglijn(tFigs,ancestor(ax1,'figure'))
+	if bAnalyse
+		for ix=1:length(dH)
+			line(D.Tblock(:,1),VH(jj(1:end-1)+1,2),'Color',[0 0.75 0]	...
+				,'Linestyle','none','Marker','o','Parent',ax3(1))
+			line(D.Tblock(:,2),VH(jj(2:end),2),'Color',[1 0 0]	...
+				,'Linestyle','none','Marker','x','Parent',ax3(1))
+			line(D.Tblock(:,1),VH(jj(1:end-1)+1,3),'Color',[0 0.75 0]	...
+				,'Linestyle','none','Marker','o','Parent',ax3(2))
+			line(D.Tblock(:,2),VH(jj(2:end),3),'Color',[1 0 0]	...
+				,'Linestyle','none','Marker','x','Parent',ax3(2))
+		end
+	end
+	navfig('link',tFigs)
+end
 
 	function crc=CalcCRC(x)
 		crc=uint16(0);

@@ -788,7 +788,20 @@ end
 function printstring(f,s)
 % PRINTSTRING - Print a string to the file
 %    Only some conversions are done of special characters.
-s=strrep(s,'&','&amp;');
+if any(s=='&')
+	i = 0;
+	while i<length(s)
+		i = i+1;
+		if s(i)=='&'
+			if i==1 || s(i-1)~='\'
+				s = [s(1:i) 'amp;' s(i+1:end)];
+				i = i+3;
+			else	% replace '\&' by '&'
+				s = [s(1:i-2) s(i:end)];
+			end
+		end
+	end
+end
 s=strrep(s,'<','&lt;');
 s=strrep(s,'>','&gt;');
 s=strrep(s,'�','&eacute;');

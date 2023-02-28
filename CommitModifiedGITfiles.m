@@ -32,8 +32,9 @@ else
 	bPull = [];
 end
 [filesToAdd] = {};
+[fileExtension] = [];
 if ~isempty(options)
-	setoptions({'bPush','bPull','discardFiles','filesToAdd'},options{:})
+	setoptions({'bPush','bPull','discardFiles','filesToAdd','fileExtension'},options{:})
 end
 if isempty(bPush)
 	bPush = false;
@@ -46,7 +47,7 @@ end
 if status
 	warning('Status didn''t return zero?! (%d)',status)
 end
-[fList,fNew,sBranch] = GetFiles(sGIT);
+[fList,fNew,sBranch] = GetFiles(sGIT,fileExtension);
 
 if ~isempty(discardFiles)
 	if ischar(discardFiles)
@@ -73,7 +74,7 @@ end
 if nargout<3
 	fprintf('Current branch: %s\n',sBranch)
 end
-if any(sComment=='"') && ~contains(sComment,'\"')
+if nargin && ~isempty(sComment) && any(sComment=='"') && ~contains(sComment,'\"')
 	sComment = strrep(sComment,'"','\"');
 end
 if isempty(fList)&&isempty(filesToAdd)
@@ -99,7 +100,7 @@ elseif nargin&&~isempty(sComment)
 	end
 end
 
-function [fList,fNew,sBranch] = GetFiles(sGIT)
+function [fList,fNew,sBranch] = GetFiles(sGIT,fileExtension)
 ii = [0 find(sGIT==10) length(sGIT)+1];
 
 fList = cell(1,length(ii)-3);
@@ -152,3 +153,9 @@ for i=1:length(ii)-1
 end		% for all lines
 fList = fList(1:nFlist);
 fNew = fNew(1:nNew);
+if ~isempty(fileExtension)
+	B = endsWith(fList,fileExtension);
+	fList = fList(B);
+	B = endsWith(fNew,fileExtension);
+	fNew = fNew(B);
+end

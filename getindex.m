@@ -4,7 +4,8 @@ function [iList,hOut]=getindex(bAll)
 if nargin==0
 	bAll=false;
 end
-l=[findobj(gca,'type','line');findobj(gca,'type','image');findobj(gca,'type','stair')];
+l=[findobj(gca,'type','line');findobj(gca,'type','image');
+	findobj(gca,'type','stair');findobj(gca,'type','scatter')];
 if isempty(l)
 	error('geen lijn gevonden in huidige as')
 end
