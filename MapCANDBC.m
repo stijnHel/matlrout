@@ -266,45 +266,29 @@ for j=1:length(msg)
 		% now interpreted in leesdbc
 	bReverseBits = msg(j).bBigEndian;
 	V=D(msg(j).byte+1,:);
-	if length(msg(j).byte)==4
-		if bReverseBits
-			V=[16777216 65536 256 1]*double(V);
-		else
-			V=[1 256 65536 16777216]*double(V);
-		end
-	elseif length(msg(j).byte)==2
-		if bReverseBits
-			V=[256 1]*double(V);
-		else
-			V=[1 256]*double(V);
-		end
-	elseif length(msg(j).byte)>1
-		warning('Unexpected number of bytes! (signal "%s")',msg(j).signal)
-		Vs = 2.^[8*(0:size(V,1)-1)];
-		if bReverseBits
-			V = Vs(end:-1:1)*double(V);
-		else
-			V = Vs*double(V);
-		end
-	end
-	bb=rem(msg(j).bit,8);
+	bb=rem(msg(j).bit(1),8);
+	nBits = msg(j).bit(2);
+	nBytes = length(msg(j).byte);
 	if bReverseBits
-		bb(1)=7-bb(1);
+		Vs = 2.^(8*(size(V,1)-1:-1:0));
+		fBits = 8*nBytes-nBits-7+bb;
+	else
+		Vs = 2.^(8*(0:nBytes-1));
+		fBits = bb;
 	end
-	if any(bb)
-		if bb(1)
-			V=floor(V/2^bb(1));
-		end
-		if bb(2)
-			V=bitand(V,2^msg(j).bit(2)-1);
-		end
+	V = Vs*double(V);
+	if fBits>0
+		V=floor(V/2^fBits);
+	end
+	if 	length(msg(j).byte)*8>nBits+fBits
+		V=bitand(V,2^nBits-1);
 	end
 	%if msg(j).bitorder(end)=='-'
-	if msg(j).bSigned
-		if ~isfloat(V)
+	if msg(j).bSigned && nBits>1
+		if ~isfloat(V)	% always in the current version?!!
 			V=double(V);
 		end
-		V=V-2^msg(j).bit(2)*(V>=2^(msg(j).bit(2)-1));
+		V=V-2^nBits*(V>=2^(nBits-1));
 	end
 	V=V*msg(j).scale(1)+msg(j).scale(2);
 	X(:,j)=V;

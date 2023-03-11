@@ -4,6 +4,9 @@ function [e,ne,de,e2,gegs]=leesFMTClvXMLmeas(fname,start,lengte,kans)
 
 bAddTime=false;
 
+if isstruct(fname)
+	fname = fFullPath(fname);
+end
 if isnumeric(fname)
 	if fname<0
 		d=direv('*.xml','sort');

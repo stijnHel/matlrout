@@ -1,10 +1,9 @@
-function [d,Ms,Ns]=leesjpegstruc(f)
+function [d,Ms,Ns,x]=leesjpegstruc(f)
 % LEESJPEGSTRUCT - Leest structuur (en info) van JPEG-files
 
 % ref : ISO/IEC 10918-1 = 1993(E)
 
 global JPEGMarkers
-global LASTJPEGdata
 
 if isempty(JPEGMarkers)
 	JPEGMarkers={	...
@@ -87,7 +86,6 @@ if ischar(f)
 else
 	x=f(:);
 end
-LASTJPEGdata=x;
 x=double(x);	% omdat de rest niet werkt met uint8!!
 
 i=find(x(1:end-1)==255&x(2:end)>0&x(2:end)<255);
@@ -114,7 +112,11 @@ for j=1:length(i)
 			end
 		elseif strcmp(d(j).markerName,'EOI')	% stop reading
 			if length(x)-i(j)>10
-				warning('Extra bytes in JPEG-file (#%d)\n',length(x)-i(j)-1)
+				if x(i(j+1)+1)==216	% second SOI!
+					warning('Extra JPEG-block after the main JPEG-block!')
+				else
+					warning('Extra bytes in JPEG-file (#%d)\n',length(x)-i(j)-1)
+				end
 			end
 			break
 		end
