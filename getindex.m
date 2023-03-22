@@ -1,5 +1,5 @@
 function [iList,hOut]=getindex(bAll)
-% GETINDEX - Geeft indices van getoonde meetsignaal (gelimitteerd volgens x-as)
+% GETINDEX - Geeft indices van getoonde meetsignaal (gelimiteerd volgens x-as)
 
 if nargin==0
 	bAll=false;

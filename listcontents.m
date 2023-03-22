@@ -70,7 +70,7 @@ elseif isstruct(pth)
 else
 	error('verkeerd gebruik van listcontents')
 end
-for i=1:length(d);
+for i=1:length(d)
 	if docomment
 		fprintf('%%')
 	end
@@ -84,7 +84,7 @@ for i=1:length(d);
 			fprintf('(!p)');
 		else
 			fprintf('    ');
-		end;
+		end
 	end
 	a=help(nd1);
 	if testfirst
@@ -92,11 +92,11 @@ for i=1:length(d);
 			fprintf('----')
 		else
 			b=sscanf(a,'%s',1);
-			if ~strcmpi(b,nd1);
+			if ~strcmpi(b,nd1)
 				fprintf('(!n)');
 			else
 				fprintf('    ');
-			end;
+			end
 		end
 	end
 	if testfunc
@@ -121,9 +121,9 @@ for i=1:length(d);
 	else
 		j=find(a==10);
 	end
-	if isempty(j);
+	if isempty(j)
 		j=length(a+1);
-	end;
+	end
 	fprintf('%-15s : %s\n',nd1,a(1:j(1)-1));
 end
 
@@ -164,7 +164,7 @@ while ~feof(fid)
 			l='xxx';
 		end
 		i=find(l=='=');
-		l(end+1)='(';	% sentinel
+		l(end+1)='(';	%#ok<AGROW> % sentinel
 		if isempty(i)
 			i=1;
 		else

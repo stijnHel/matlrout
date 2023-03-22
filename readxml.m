@@ -1,6 +1,6 @@
 function S=readxml(fname,bFlat,bSimplify,bStruct,varargin)
 %readxml  - Reads an xml-like format
-%    S=readxml(fname[,bFlat[,bSimplify]])
+%    S=readxml(fname[,bFlat[,bSimplify,bStruct]])
 %    S=readxml({<text>}[,bFlat])
 %         bFlat: flatten structure - default true(!)
 %         bSimplify: Remove data added for reading (default true)
@@ -33,6 +33,9 @@ if nargin>1 && ischar(bFlat)	% (better to work with all varargin's!)
 	bSimplify = [];
 	bStruct = [];
 	setoptions({'bFlat','bSimplify','bStruct','bWarning'},options{:})
+	if isempty(bFlat) && (bSimplify || bStruct)
+		bFlat = false;
+	end
 elseif nargin<4
 	bStruct=[];
 	if nargin<3
@@ -62,7 +65,7 @@ elseif isstruct(fname)&&isfield(fname,'type')
 	S=Structure(fname,bFlat,bStruct);
 	return
 else
-	fid=fopen(fname,'r');
+	fid=fopen(fFullPath(fname),'r');
 	if fid<3
 		error('Can''t open the file')
 	end

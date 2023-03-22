@@ -15,7 +15,7 @@ bInterpret=nargout>1;
 bGPX=false;
 fileGPX=[];
 bProcess=nargout>1;
-[bRelTime] = nargout>5;
+[bRelTime] = false;
 [bRemoveNaNs] = true;
 [bPlot] = nargout==0;
 [bAnalyse] = false;
@@ -188,7 +188,7 @@ if bProcess
 		t0Data = t0Data+1/24;
 	end
 	if bRelTime
-		Xrecord(:,1) = Xrecord(:,1)-t0;
+		Xrecord(:,1) = Xrecord(:,1)-t0X;
 	else
 		Xrecord(:,1) = Xrecord(:,1)/86400+t0Data;
 	end
@@ -199,9 +199,9 @@ if bProcess
 		cumD = [0;cumsum(dD)];
 		G = var2struct(Dtot,Z1,t0,dPts,cumD);
 	end
+	iX_V = find(strcmp(nX,'enhanced_speed'));
+	iX_H = find(strcmp(nX,'enhanced_altitude'));
 end		% if bProcess
-iX_V = find(strcmp(nX,'enhanced_speed'));
-iX_H = find(strcmp(nX,'enhanced_altitude'));
 if bAnalyse
 	jj = [0;find(diff(Xrecord(:,1))>maxStandStillTime);size(Xrecord,1)];
 	lBlock = cumD(jj(2:end))-cumD(jj(1:end-1)+1);

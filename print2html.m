@@ -165,6 +165,7 @@ stroptions=struct('maxcolarray',6,'maxrowarray',10,'maxel',20	...
 	,'optcelltable',''	...
 	,'printhead',0	...
 	,'useCSS',0	...
+	,'bodyStyle',[]	...
 	,'structStyle',[]	...
 	,'cellStyle',[]	...
 	,'title','Matlab-data display'	...
@@ -176,7 +177,7 @@ stroptions=struct('maxcolarray',6,'maxrowarray',10,'maxel',20	...
 	,'bCellChar',true	... add starting/closing bracket ('{'/'}') for cells
 	,'bExpandLink',false	... create a link for "collapsed data"
 	,'webArguments',{{}}	... arguments "forwarded" to web-call
-	,'figure',[]	... figure if matlab figure brwowser is requested
+	,'figure',[]	... figure if matlab figure browser is requested
 	);
 
 if ~exist('nrecurs','var')||isempty(nrecurs)
@@ -190,7 +191,6 @@ end
 if ~exist('f','var')
 	f=[];
 end
-ownf=0;
 if nargout&&~isempty(f)
 	if isempty(options)
 		options=f;
@@ -207,18 +207,14 @@ bFigureBrowser = false;
 if ischar(f)
 	if strcmpi(f,'web')||strcmpi(f,'browser')
 		bSystemBrowser=strcmpi(f,'browser');
-		f=struct('buffer',char(zeros(1,10000)),'n',0);
+		f = CFlexFile(10000);
 	elseif strcmpi(f,'figure')
 		bFigureBrowser = true;
-		f=struct('buffer',char(zeros(1,10000)),'n',0);
+		f = CFlexFile(10000);
 	else
-		f=fopen(f,'wt');
-		if f<3
-			error('Can''t open file');
-		end
+		f = CFlexFile(f,'wt');
 	end
 	stroptions.printhead=1;
-	ownf=1;
 end
 
 if ~isempty(options)
@@ -265,50 +261,44 @@ end
 
 if stroptions.printhead
 	% print html-header
-	localprint(f,'<html>\n<head>\n<title>%s</title>\n<meta name="GENERATOR" content="PRINT2HTML - Matlab function">\n',stroptions.title);
+	f.printf('<html>\n<head>\n<title>%s</title>\n<meta name="GENERATOR" content="PRINT2HTML - Matlab function">\n',stroptions.title);
 	if stroptions.useCSS
 		printCSSdef(f,stroptions)
 	end
-	localprint(f,'</head>\n<body>\n');
+	f.printf('</head>\n<body>\n');
 end
 
-f=printdata(f,s,nrecurs,stroptions);
+printdata(f,s,nrecurs,stroptions);
 REFidx = printdata();
 TESTREF = REFidx;
 
 if stroptions.printhead
-	localprint(f,'</body>\n</html>\n');
+	f.printf('</body>\n</html>\n');
 end
-if ownf
+f.close()
+if f.bMemFile
+	S = f.get();
 	if nargout
-		if ~isstruct(f)
-			error('Something went wrong in this program!!!!')
-		end
-		HTMLout=f.buffer(1:f.n);
+		HTMLout = S;
 		return
 	end
-	if isstruct(f)
-		S = f.buffer(1:f.n);
-		if bSystemBrowser
-			web(['text://' S],'-browser',stroptions.webArguments{:})
-		elseif bFigureBrowser
-			AddToFigure(S,stroptions)
-		else
-			web(['text://' S],stroptions.webArguments{:})
-		end
+	if bSystemBrowser
+		web(['text://' S],'-browser',stroptions.webArguments{:})
+	elseif bFigureBrowser
+		AddToFigure(S,stroptions)
 	else
-		fclose(f);
+		web(['text://' S],stroptions.webArguments{:})
 	end
 end
 
-function f=printdata(f,d,nrecurs,options,Sref0)
+function R=printdata(f,d,nrecurs,options,Sref0)
 %printdata - print field-data
 %  called recursively
 
 persistent REFidx
 
 if nargin==0
-	f = REFidx;
+	R = REFidx;
 	return
 end
 
@@ -347,7 +337,7 @@ if ~isempty(fcn)
 	if ~ischar(s)
 		error('custum output function must return a char!')
 	end
-	localprint(f,'%s',s)
+	f.printf('%s',s)
 else
 	class_d=class(d);
 	if isstruct(d)
@@ -397,36 +387,36 @@ else
 		case 'struct'
 			fields=fieldnames(d);
 			if options.bLinks && isscalar(d) && length(fieldnames(d))==2 && isfield(d,'link') && isfield(d,'text')
-				localprint(f,'<a href="%s">',d.link);
+				f.printf('<a href="%s">',d.link);
 				printstring(f,d.text);
-				localprint(f,'</a><br>');
+				f.printf('</a><br>');
 			elseif nrecurs>0&&n<=options.maxel
 				if isempty(d)
-					localprint(f,'empty %s (%d fields)<br>\n',typS,length(fields));
+					f.printf('empty %s (%d fields)<br>\n',typS,length(fields));
 					if options.bStructFields&&~isempty(fields)
-						localprint(f,'(%s',fields{1})
+						f.printf('(%s',fields{1})
 						if length(fields)>1
-							localprint(f,', %s',fields{2:end})
+							f.printf(', %s',fields{2:end})
 						end
-						localprint(f,')<br>\n');
+						f.printf(')<br>\n');
 					end
 				elseif isscalar(d)
-					localprint(f,'<table%s>\n',options.optstructtable);
+					f.printf('<table%s>\n',options.optstructtable);
 					Sref = Sref0;
 					Sref(end+1).type = '.';
 					for i=1:length(fields)
-						localprint(f,'<tr><td>%s :</td><td>',fields{i});
+						f.printf('<tr><td>%s :</td><td>',fields{i});
 						Sref(end).subs = fields{i};
-						f=printdata(f,d.(fields{i}),nrecurs-1,options,Sref);
-						localprint(f,'</td></tr>\n');
+						printdata(f,d.(fields{i}),nrecurs-1,options,Sref);
+						f.printf('</td></tr>\n');
 					end
-					localprint(f,'</table>\n');
+					f.printf('</table>\n');
 				else
-					localprint(f,'<table%s>\n<tr><td> </td>',options.optstructtable);
+					f.printf('<table%s>\n<tr><td> </td>',options.optstructtable);
 					for i=1:length(fields)
-						localprint(f,'<td>%s</td>',fields{i});
+						f.printf('<td>%s</td>',fields{i});
 					end
-					localprint(f,'</tr>\n');
+					f.printf('</tr>\n');
 					a=cell(1,ndim0);
 					Sref = Sref0;
 					Sref(end+1).type = '()';
@@ -435,116 +425,116 @@ else
 					iSrefField = length(Sref);
 					for i=1:n
 						Sref(iSrefArr).subs = {i};
-						localprint(f,'<tr><td valign="top">%d',i);
+						f.printf('<tr><td valign="top">%d',i);
 						if ndim>1	% add full index
 							[a{:}]=ind2sub(sz,i);
-							localprint(f,' (%d',a{1});
-							localprint(f,',%d',a{2:ndim0});
-							localprint(f,')');
+							f.printf(' (%d',a{1});
+							f.printf(',%d',a{2:ndim0});
+							f.printf(')');
 						end
-						localprint(f,'</td>\n');
+						f.printf('</td>\n');
 						for j=1:length(fields)
-							localprint(f,'<td>');
+							f.printf('<td>');
 							Sref(iSrefField).subs = fields{j};
-							f=printdata(f,getfield(d,{i},fields{j}),nrecurs-1,options,Sref);
-							localprint(f,'</td>\n');
+							printdata(f,getfield(d,{i},fields{j}),nrecurs-1,options,Sref);
+							f.printf('</td>\n');
 						end	% fields
-						localprint(f,'</tr>\n');
+						f.printf('</tr>\n');
 					end	% rows
-					localprint(f,'</table>\n');
+					f.printf('</table>\n');
 				end	% struct array
 			else
 				s = sprintf('%s %s (%d fields)',typS,stringsize(sz),length(fields));
 				REFidx(end+1) = struct('label',s,'sref',Sref0);
-				localprint(f,'%s\n',s);
+				f.printf('%s\n',s);
 				if options.bStructFields&&~isempty(fields)
-					localprint(f,'<br>\n(%s',fields{1})
+					f.printf('<br>\n(%s',fields{1})
 					if length(fields)>1
-						localprint(f,', %s',fields{2:end})
+						f.printf(', %s',fields{2:end})
 					end
-					localprint(f,')');
+					f.printf(')');
 				end
 			end
 		case 'table'
 			if size(d,2)>10	%(!!!!!!! option !!!!!)
 				bGenClassView = true;
 			else
-				localprint(f,'<table border="3">\n<tr>');
-				localprint(f,'   <td><b>%s</b></td>\n',d.Properties.VariableNames{:});
-				localprint(f,'</tr>\n');
+				f.printf('<table border="3">\n<tr>');
+				f.printf('   <td><b>%s</b></td>\n',d.Properties.VariableNames{:});
+				f.printf('</tr>\n');
 				if sz(1)>20
-					localprint(f,'<tr><td colspan="%d">%d elements</td></tr>\n',sz([2,1]));
+					f.printf('<tr><td colspan="%d">%d elements</td></tr>\n',sz([2,1]));
 				else
 					Sref = Sref0;
 					Sref(end+1).type = '.';
 					iSrefArr = length(Sref);
 					Sref(end+1).type = '()';
 					for i=1:sz(1)
-						localprint(f,'<tr>');
+						f.printf('<tr>');
 						Sref(iSrefArr+1).subs = {[i]};
 						for j=1:sz(2)
 							Sref(iSrefArr).subs = d.Properties.VariableNames{j};
-							localprint(f,'<td>');
-							f=printdata(f,d.(Sref(iSrefArr).subs)(i),nrecurs-1,options,Sref);
-							localprint(f,'</td>');
+							f.printf('<td>');
+							printdata(f,d.(Sref(iSrefArr).subs)(i),nrecurs-1,options,Sref);
+							f.printf('</td>');
 						end
-						localprint(f,'</tr>\n');
+						f.printf('</tr>\n');
 					end	% rows
 				end
-				localprint(f,'</table>\n');
+				f.printf('</table>\n');
 			end
 		case {'double','single','uint8','int8','uint16','int16'	...
 				,'uint32','int32','uint64','int64','sparse','logical'}
 			if n==1
-				localprint(f,FormNumber(d,options));
+				f.printf(FormNumber(d,options));
 			elseif n==0
-				localprint(f,options.emptyArray);
+				f.printf(options.emptyArray);
 			elseif ndim0==2&&sz(1)<=options.maxrowarray&&sz(2)<=options.maxcolarray
-				localprint(f,'<table%s>\n',options.optnumtable);
+				f.printf('<table%s>\n',options.optnumtable);
 				for i=1:sz(1)
-					localprint(f,'<tr>');
+					f.printf('<tr>');
 					for j=1:sz(2)
-						localprint(f,'<td>');
+						f.printf('<td>');
 						if i*j==1
-							localprint(f,'[');
+							f.printf('[');
 						end
-						localprint(f,FormNumber(d(i,j),options));
+						f.printf(FormNumber(d(i,j),options));
 						if i*j==sz(1)*sz(2)
-							localprint(f,']');
+							f.printf(']');
 						end
-						localprint(f,'</td>');
+						f.printf('</td>');
 					end
-					localprint(f,'</tr>\n');
+					f.printf('</tr>\n');
 				end	% rows
-				localprint(f,'</table>\n');
+				f.printf('</table>\n');
 			elseif n<=options.maxel
-				localprint(f,'<table%s>\n',options.optnumtable);
+				f.printf('<table%s>\n',options.optnumtable);
 				for i=1:n
 					[a{:}]=ind2sub(sz,i);
-					localprint(f,'<tr><td>%d (%d',i,a{1});
-					localprint(f,',%d',a{2:ndim0});
-					localprint(f,')</td><td>%s</td></tr>\n',FormNumber(d(i),options));
+					f.printf('<tr><td>%d (%d',i,a{1});
+					f.printf(',%d',a{2:ndim0});
+					f.printf(')</td><td>%s</td></tr>\n',FormNumber(d(i),options));
 				end
-				localprint(f,'</table>\n');
+				f.printf('</table>\n');
 			else
-				localprint(f,'%s ',stringsize(sz));
+				f.printf('%s ',stringsize(sz));
 				if issparse(d)
-					localprint(f,'sparse ');
+					f.printf('sparse ');
 				end
-				localprint(f,'array\n');
+				f.printf('array\n');
 			end
 		case 'cell'
 			if n==0
-				localprint(f,options.emptyCell);
+				f.printf(options.emptyCell);
 			elseif nrecurs<=0
-				localprint(f,'%s cell array\n',stringsize(sz));
+				f.printf('%s cell array\n',stringsize(sz));
 			elseif ndim0==2&&sz(1)<=options.maxrowcell&&sz(2)<=options.maxcolcell
-				localprint(f,'<table%s>\n',options.optcelltable);
+				f.printf('<table%s>\n',options.optcelltable);
 				Sref = Sref0;
 				Sref(end+1).type = '{}';
 				iSrefArr = length(Sref);
 				for i=1:sz(1)
-					localprint(f,'<tr>');
+					f.printf('<tr>');
 					bSpan = false;
 					for j = 2:sz(2)
 						if ischar(d{i,j}) && isscalar(d{i,j}) && d{i,j}==3
@@ -557,90 +547,90 @@ else
 					for j=1:sz(2)
 						if ~bSpan || j<jSpan		% else discard
 							if bSpan && j==jSpan-1
-								localprint(f,sprintf('<td colspan="%d">',sz(2)-j+1));
+								f.printf(sprintf('<td colspan="%d">',sz(2)-j+1));
 							else
-								localprint(f,'<td>');
+								f.printf('<td>');
 							end
 							if i*j==1 && options.bCellChar
-								localprint(f,'{');
+								f.printf('{');
 							end
 							Sref(iSrefArr).subs = {[i,j]};
-							f=printdata(f,d{i+(j-1)*sz(1)},nrecurs-1,options,Sref);
+							printdata(f,d{i+(j-1)*sz(1)},nrecurs-1,options,Sref);
 								% no d{i,j} to allow data types allowing only one index
 							if i*j==sz(1)*sz(2) && options.bCellChar
-								localprint(f,'}');
+								f.printf('}');
 							end
-							localprint(f,'</td>');
+							f.printf('</td>');
 						end
 					end
-					localprint(f,'</tr>\n');
+					f.printf('</tr>\n');
 				end	% rows
-				localprint(f,'</table>\n');
+				f.printf('</table>\n');
 			elseif n<=options.maxel&&nrecurs>0
-				localprint(f,'<table%s>\n',options.optcelltable);
+				f.printf('<table%s>\n',options.optcelltable);
 				Sref = Sref0;
 				Sref(end+1).type = '{}';
 				iSrefArr = length(Sref);
 				for i=1:n
 					[a{:}]=ind2sub(sz,i);
-					localprint(f,'<tr><td valign="top">%d (%d',i,a{1});
-					localprint(f,',%d',a{2:ndim0});
-					localprint(f,')</td><td>');
+					f.printf('<tr><td valign="top">%d (%d',i,a{1});
+					f.printf(',%d',a{2:ndim0});
+					f.printf(')</td><td>');
 					Sref(iSrefArr).subs = {i};
-					f=printdata(f,d{i},nrecurs-1,options,Sref);
-					localprint(f,'</td></tr>\n');
+					printdata(f,d{i},nrecurs-1,options,Sref);
+					f.printf('</td></tr>\n');
 				end
-				localprint(f,'</table>\n');
+				f.printf('</table>\n');
 			else
 				s = sprintf('%s cell array',stringsize(sz));
 				REFidx(end+1) = struct('label',s,'sref',Sref0);
-				localprint(f,'%s\n',s);
+				f.printf('%s\n',s);
 			end
 		case 'string'
 			if isscalar(d)
 				if strlength(d)>options.maxstrlen
-					localprint(f,'long string %d',strlength(d));
+					f.printf('long string %d',strlength(d));
 				else
-					localprint(f,'%s\n',d);
+					f.printf('%s\n',d);
 				end
 			elseif min(sz)>1 || length(sz)>options.maxrowarray
-				localprint(f,'%s string array',stringsize(sz));
+				f.printf('%s string array',stringsize(sz));
 			else
 				for i=1:max(sz)-1
 					if options.bDirectString
-						localprint(f,d(i))
+						f.printf(d(i))
 					else
 						printstring(f,d(i));
 					end
-					localprint(f,'<br>\n');
+					f.printf('<br>\n');
 				end
 				if options.bDirectString
-					localprint(f,d(end))
+					f.printf(d(end))
 				else
 					printstring(f,d(end));
 				end
 			end
 		case 'char'
 			if isempty(d)
-				localprint(f,'&nbsp;');
+				f.printf('&nbsp;');
 			elseif ndim0>2||(min(sz)==1&&max(sz)>options.maxstrlen)	...
 					||(min(sz)>1&&sz(1)>options.maxrowarray)
-				localprint(f,'%s char array',stringsize(sz));
+				f.printf('%s char array',stringsize(sz));
 			elseif sz(1)>1&&sz(2)==1	% transposed string?!
-				localprint(f,'"(')
+				f.printf('"(')
 				printstring(f,d');
-				localprint(f,')''"')
+				f.printf(')''"')
 			else
 				for i=1:sz(1)-1
 					if options.bDirectString
-						localprint(f,d(i,:))
+						f.printf(d(i,:))
 					else
 						printstring(f,d(i,:));
 					end
-					localprint(f,'<br>\n');
+					f.printf('<br>\n');
 				end
 				if options.bDirectString
-					localprint(f,d(end,:))
+					f.printf(d(end,:))
 				else
 					printstring(f,d(end,:));
 				end
@@ -651,57 +641,57 @@ else
 			else
 				for i=1:numel(d)
 					if i>1
-						localprint(f,'<br>\n')
+						f.printf('<br>\n')
 					end
-					localprint(f,'%s',char(d(i)))
+					f.printf('%s',char(d(i)))
 				end
 			end
 		case 'function_handle'
-			localprint(f,'%s',char(d))
+			f.printf('%s',char(d))
 		case 'timeseries'
 			if n==0
-				localprint(f,'%s timeseries',stringsize(sz));
+				f.printf('%s timeseries',stringsize(sz));
 			elseif n==1
 				if ismatrix(d.Data)
-					localprint(f,'timeseries %s, %dx%d %s',d.Name,size(d.Data),class(d.Data))
+					f.printf('timeseries %s, %dx%d %s',d.Name,size(d.Data),class(d.Data))
 				else
 					sz=size(d.Data);
-					localprint(f,'timeseries %s, (%d',d.Name,sz(1))
-					localprint(f,'x%d',sz(2:end))
-					localprint(f,') %s',class(d.Data))
+					f.printf('timeseries %s, (%d',d.Name,sz(1))
+					f.printf('x%d',sz(2:end))
+					f.printf(') %s',class(d.Data))
 				end
 			elseif n<=options.maxel
-				localprint(f,'<table%s>\n',options.optnumtable);
+				f.printf('<table%s>\n',options.optnumtable);
 				for i=1:n
-					localprint(f,'<tr><td>');
+					f.printf('<tr><td>');
 					if ismatrix(d(i).Data)
-						localprint(f,'timeseries %s, %dx%d %s',d(i).Name,size(d(i).Data),class(d(i).Data))
+						f.printf('timeseries %s, %dx%d %s',d(i).Name,size(d(i).Data),class(d(i).Data))
 					else
 						sz=size(d(i).Data);
-						localprint(f,'timeseries %s, (%d',d(i).Name,sz(1))
-						localprint(f,'x%d',sz(2:end))
-						localprint(f,') %s',class(d(i).Data))
+						f.printf('timeseries %s, (%d',d(i).Name,sz(1))
+						f.printf('x%d',sz(2:end))
+						f.printf(') %s',class(d(i).Data))
 					end
-					localprint(f,'</td></tr>\n');
+					f.printf('</td></tr>\n');
 				end
-				localprint(f,'</table>\n');
+				f.printf('</table>\n');
 			else
 				bGenClassView=true;
 			end
 		otherwise
 			if isenum(d)
-				localprint(f,'%s',string(d))
+				f.printf('%s',string(d))
 			else
 				bGenClassView=true;
 			end
 	end
 end
 if bGenClassView
-	localprint(f,'%s (%d',class(d),size(d,1));
+	f.printf('%s (%d',class(d),size(d,1));
 	for i=2:ndims(d)
-		localprint(f,'x%d',size(d,i));
+		f.printf('x%d',size(d,i));
 	end
-	localprint(f,')');
+	f.printf(')');
 end
 
 function ssize=stringsize(sz)
@@ -710,23 +700,26 @@ ssize=[ssize sprintf('x%d',sz(2:end))];
 
 function printCSSdef(f,options)
 % PRINTCSSHEAD - Print the definition of the CSS
-localprint(f,'<style type="text/css">\n');
-localprint(f,'.cstruct {\n');
+f.printf('<style type="text/css">\n');
+if ~isempty(options.bodyStyle)
+	f.printf(' body {%s}\n',options.bodyStyle);
+end
+f.printf('.cstruct {\n');
 if isempty(options.structStyle)
-	localprint(f,'    // no styles given\n');
+	f.printf('    // no styles given\n');
 else
 	printCSSdef1(f,options.structStyle);
 end	% struct styles
-localprint(f,'}\n');
-localprint(f,'.ccell {\n');
+f.printf('}\n');
+f.printf('.ccell {\n');
 if isempty(options.cellStyle)
-	localprint(f,'    // no styles given\n');
+	f.printf('    // no styles given\n');
 else
 	printCSSdef1(f,options.cellStyle);
 end	% cell styles
-localprint(f,'}\n');
+f.printf('}\n');
 %fprintf(f,'.cnum {\n    %s}\n',options.CSSnum);
-localprint(f,'</style>\n');
+f.printf('</style>\n');
 
 function printCSSdef1(f,options)
 % PRINTCSSDEF1 - Print 1 definition (for CSS-usage)
@@ -737,11 +730,11 @@ for i=1:length(fields)
 		case 'border'
 			% not in CSS (?!!)
 		case 'color'
-			localprint(f,'    color: %s;\n',getcolorspec(value));
+			f.printf('    color: %s;\n',getcolorspec(value));
 		case 'bgColor'
-			localprint(f,'    background: %s;\n',getcolorspec(value));
+			f.printf('    background: %s;\n',getcolorspec(value));
 		case 'font'
-			localprint(f,'    font-family: %s;\n',value);
+			f.printf('    font-family: %s;\n',value);
 			% also :
 			%  font-weigth
 			%  font-style
@@ -749,12 +742,12 @@ for i=1:length(fields)
 			%  text-decoration
 		case 'fontSize'
 			if ischar(value)
-				localprint(f,'    font-size: "%s";\n',value);
+				f.printf('    font-size: "%s";\n',value);
 			else
-				localprint(f,'    font-size: "%dpt";\n',value);
+				f.printf('    font-size: "%dpt";\n',value);
 			end
 		case 'extra'
-			localprint(f,'    %s;\n',value);
+			f.printf('    %s;\n',value);
 		otherwise
 			error('!!!!unknown spec!!!')
 	end
@@ -817,10 +810,7 @@ while any(B)
 	s=sprintf('%s#%03o%s',s(1:i-1),abs(s(i)),s(i+1:end));
 	B=s<32|(s>=127&s<160);
 end
-localprint(f,'%s',s);
-assignin('caller','f',f)
-% This is not so nice Matlab-code, but prevents adding
-%     f=localp.... everywhere.
+f.printf('%s',s);
 
 function [options,n]=setlocoptions(options,opt,value,forcevalue)
 % SETLOCOPTIONS - set option according to user supplied option
@@ -904,24 +894,6 @@ if isnumeric(value)
 	end
 else
 	s=value;
-end
-
-function localprint(f,varargin)
-% localprint - for flexible ouput writing (to buffer or file)
-
-if isstruct(f)
-	s=sprintf(varargin{:});
-	if length(f.buffer)<f.n+length(s)
-		f.buffer(end+length(s)+1000)=char(0);
-	end
-	n=f.n+length(s);
-	f.buffer(f.n+1:n)=s;
-	f.n=n;
-	assignin('caller','f',f)
-	% This is not so nice Matlab-code, but prevents adding
-	%     f=localp.... everywhere.
-else
-	fprintf(f,varargin{:});
 end
 
 function s=FormNumber(x,options)
