@@ -60,6 +60,12 @@ if iscell(fname)
 	else
 		x=fname{1};
 	end
+	if isinteger(x)
+		x = char(x);
+	end
+	fname='direct-input';
+elseif isinteger(fname)
+	x = char(fname);
 	fname='direct-input';
 elseif isstruct(fname)&&isfield(fname,'type')
 	S=Structure(fname,bFlat,bStruct);

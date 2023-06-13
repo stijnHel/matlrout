@@ -1,20 +1,22 @@
-function B=ne(S1,S2,varargin)
+function [B,S1,S2] = ne(S1,S2,varargin)
 %struct/ne - Test of fields of structures are not equal
 %   B = ne(S1,S2)
 %     or
 %   B = S1 ~= S2
 
-[bExactFields]=false;
-[bSortFields]=true;
-[bIntersecFields]=true;
-[iMaxRecursive]=0;
+[bExactFields] = false;
+[bSortFields] = true;
+[bIntersecFields] = true;
+[iMaxRecursive] = 0;
+[bRemoveEquals] = false;
 
 if ~isstruct(S1)||~isstruct(S2)
 	error('Both inputs must be of type struct!')
 end
 
 if nargin>2
-	setoptions({'bExactFields','bSortFields','bIntersecFields','iMaxRecursive'}	...
+	setoptions({'bExactFields','bSortFields','bIntersecFields'	...
+		,'iMaxRecursive','bRemoveEquals'}	...
 		,varargin{:})
 end
 
@@ -76,14 +78,25 @@ for i=1:numel(B)
 		else
 			f2=S2(i).(fn{j});
 		end
-		b1=isequal(f1,f2);
+		b1=isequaln(f1,f2);
 		if b1
 			B(i).(fn{j})=false;
 		elseif isstruct(f1)&&isstruct(f1)&&isequal(size(f1),size(f2))	...
 				&&iMaxRecursive>0
-			B(i).(fn{j})=ne(f1,f2,'iMaxRecursive',iMaxRecursive-1);
+			B(i).(fn{j})=ne(f1,f2,varargin{:},'iMaxRecursive',iMaxRecursive-1);
 		else
 			B(i).(fn{j})=true;
 		end
 	end		% for j (length(fn))
 end		% for i (numel(B))
+if bRemoveEquals
+	for j=1:length(fn)
+		if ~isstruct(B.(fn{j})) && ~any([B.(fn{j})])
+			B = rmfield(B,fn{j});
+			if nargout>1
+				S1 = rmfield(S1,fn{j});
+				S2 = rmfield(S2,fn{j});
+			end
+		end
+	end
+end

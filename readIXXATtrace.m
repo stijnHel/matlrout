@@ -103,10 +103,12 @@ else
 		H{1}=lTitle;
 		l=cFile.fgetl();
 		while l(1)~='"'
-			l=cFile.fgetl();
 			nH=nH+1;
 			H{nH}=l;
+			l=cFile.fgetl();
 		end
+		nH=nH+1;
+		H{nH}=l;
 		H=H(1:nH);
 		ii=find(l=='"');
 		for i=1:2:length(ii)

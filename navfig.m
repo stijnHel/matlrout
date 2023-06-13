@@ -156,7 +156,7 @@ if ischar(c)&&length(c)>1
 	% Add here help-text to avoid "splitting data" (so that "help" can
 	% directly use this info).
 	NFcmds=lower({'volg','link','rlink','nlink','relink','addlink'	...
-		,'assen','updateAxes','updateAxesT'	...
+		,'assen','updateAxes','addUpdateAxes','updateAxesT'	...
 		,'mouse','mdown','mmoved','mup','delui','navfigx','keys'	...
 		,'addkey','addkey1','verwkey','rmkey','verwkey1','rmkey1'	...
 		,'keylist','savept','clearpt','stopsave','resample','settings'	...
@@ -178,7 +178,7 @@ if ischar(c)&&length(c)>1
 			setlinked(f,x2)
 		case {'link','rlink'}
 			if ~exist('x2','var')||isempty(x2)
-				x2=sort(get(0,'children'));
+				x2=sort(findobj('Type','figure','Visible','on'));
 			elseif ischar(x2)
 				x2=str2num(x2); %#ok<ST2NM>
 			end
@@ -238,21 +238,38 @@ if ischar(c)&&length(c)>1
 			if isempty(get(f,'SizeChangedFcn'))
 				set(f,'SizeChangedFcn',@(f,~)axtick2date(f))
 			end
-		case 'updateaxes'
+		case {'updateaxes','addupdateaxes'}
 			if ninput<2
 				error('navfig(''updateAxes'') must have an update function as second argumen!')
 			end
 			if isempty(get(f,'KeyPressFcn'))
 				navfig(f)	% start navfig-functionality
 			end
+			bAdd = strcmpi(c,'addUpdateAxes');
 			assen=GetNormalAxes(f);
 			if ischar(x2)&&strcmpi(x2,'stop')
 				x2=[];
 				set(assen,'XTickMode','auto','XTickLabelMode','auto')
 				set(f,'SizeChangedFcn',[])
 			end
+			if ischar(x2) && ~isempty(x2)
+				x2 = str2func(x2);
+			end
 			for i=1:length(assen)
-				setappdata(assen(i),'updateAxes',x2)
+				if bAdd
+					fcnUpd = getappdata(assen(i),'updateAxes');
+					if isempty(fcnUpd)
+						fcnUpd = x2;
+					else
+						if ~iscell(fcnUpd)
+							fcnUpd = {fcnUpd};
+						end
+						fcnUpd{1,end+1} = x2; %#ok<AGROW>
+					end
+				else
+					fcnUpd = x2;
+				end
+				setappdata(assen(i),'updateAxes',fcnUpd)
 				if isempty(x2)
 					% reset timeformat (assuming axtick2date!!)
 					setappdata(assen(i),'TIMEFORMAT',[])
@@ -1446,7 +1463,13 @@ if ~reedsverwerkt
 				[K{2,:}] = deal(': ');
 				[K{4,:}] = deal(newline);
 				for i=1:size(K,2)
-					if ~ischar(K{3,i})
+					if iscell(K{3,i})
+						if length(K{3,i})==2 && isequal(K{3,i}{1},1) && length(K{3,i}{2})==2
+							K{3,i} = sprintf('zoom %g..%g',K{3,i}{2});
+						else
+							K{3,i} = 'zoom';
+						end
+					elseif ~ischar(K{3,i})	% what's the use of this?
 						K{3,i} = char(K{3,i});
 					end
 				end
@@ -1813,10 +1836,11 @@ for i=1:length(assen)
 	if ~isempty(fcn)
 		if isempty(fcnArgs)&&ischar(fcn)
 			eval(fcn)
-		else
-			if ischar(fcn)
-				fcn=str2func(fcn);
+		elseif iscell(fcn)
+			for j=1:length(fcn)
+				fcn{j}(assen(i),fcnArgs{:})
 			end
+		else
 			fcn(assen(i),fcnArgs{:})
 		end
 	end

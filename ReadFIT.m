@@ -11,6 +11,50 @@ function [D,Xrecord,nX,NE,V,G]=ReadFIT(fName,varargin)
 %          (couple of points that are related to previous use, or "saving
 %          time")
 
+if nargin && ischar(fName)
+	switch lower(fName)
+		case 'get'
+			Dall = get(gcf,'UserData');
+			if isempty(Dall) || ~isstruct(Dall) || ~isfield(Dall,'NE')
+				error('Wrong current figure?')
+			end
+			A = volglijn('GetMarkedData');
+			i1 = A.i1;
+			i2 = A.i2;
+			d_x = (Dall.G.cumD(i2)-Dall.G.cumD(i1))/1000;
+			tSpan = [Dall.Xrecord(i1),Dall.Xrecord(i2)];
+			d_t = diff(tSpan)*24;
+			v = d_x/d_t;
+			fprintf('%s..%s - %5.1f km, %5.2f hr, %6.2f km/h\n'	...
+				,datestr(tSpan(1)),datestr(tSpan(2)),d_x,d_t,v)
+			if nargout
+				D = var2struct(tSpan,d_x,d_t,v);
+			end
+			return
+		case 'navi'
+			if nargin>1
+				dFITs = varargin{1};
+			else
+				dFITs = [];
+			end
+			if isempty(dFITs)
+				dFITs = direv('*.fit','sortd');
+				if isempty(dFITs)
+					error('Can''t find FIT-files!')
+				end
+			end
+			nr = length(dFITs);
+			fprintf('%s:\n',dFITs(nr).name)
+			[~,~,~,~,~,~] = ReadFIT(dFITs(nr),'--brelt','-bplot','-bBelg','-bAnal','-bfixedf','-bremoveno');
+				% output arguments just to set nargout!!!!!
+			xlabel(sprintf('FIT-file %d/%d',nr,length(dFITs)))
+			volglijn('SetKeyFun',@MyKeyActions)
+			setappdata(gcf,'dFITs',dFITs)
+			setappdata(gcf,'FITnr',nr)
+			return
+	end
+end
+
 bInterpret=nargout>1;
 bGPX=false;
 fileGPX=[];
@@ -18,18 +62,33 @@ bProcess=nargout>1;
 [bRelTime] = false;
 [bRemoveNaNs] = true;
 [bPlot] = nargout==0;
-[bAnalyse] = false;
+[bAnalyse] = false;	% Find blocks of movement
+[bDispAnal] = true;	% display analysis-results (if analysed)
+[bRemoveNonBlocks] = true;
 maxStandStillTime = 5/1440;
-minDistBlock = 100;
+minDistBlock = 500;
 minVedges = 0.1;
 Z1 = [];
+[bBelgiPlot] = false;
+[bFixedFigures] = false;
+figTagNEtime = [];
+figTagVHD = [];
+figTagNE = [];
 if nargin>1
 	setoptions({'bInterpret','bGPX','fileGPX','Z1','bRelTime','bRemoveNaNs'	...
-		,'bPlot','bAnalyse','maxStandStillTime','minDistBlock','minVedges'},varargin{:})
+		,'bPlot','bAnalyse','maxStandStillTime','minDistBlock','minVedges','bBelgiPlot'	...
+		,'bDispAnal','bRemoveNonBlocks','bFixedFigures'	...
+		,'figTagNEtime','figTagVHD','figTagNE'	...
+		},varargin{:})
 end
 bGPX=bGPX||ischar(fileGPX);
 bProcess=bProcess||bGPX||bPlot||bAnalyse;
 bInterpret=bInterpret||bGPX;
+if bFixedFigures
+	figTagNEtime = 'NEtimePlot';
+	figTagVHD = 'VHDplot';
+	figTagNE = 'NEplot';
+end
 
 BE16=[1;256];
 BE32=[1;256;65536;16777216];
@@ -153,6 +212,15 @@ if bProcess
 			end
 		end
 	end
+	if bPlot && bBelgiPlot	% (put here to have Z1)
+		if isempty(figTagNE)
+			nfigure
+		else
+			getmakefig(figTagNE)
+		end
+		[~,~,Z1]=PlotGemeentes();
+		Z1 = Z1([2 1]);
+	end
 	if nargout>3
 		[NE,V,~,Z1]=ProjGPS2XY(Xrecord(:,1:3),'Z1',Z1);
 		dPts = sqrt(sum(diff(NE).^2,2));
@@ -192,72 +260,133 @@ if bProcess
 	else
 		Xrecord(:,1) = Xrecord(:,1)/86400+t0Data;
 	end
+	dD = dPts;
+	dD(isnan(dD)) = 0;
+	cumD = [0;cumsum(dD)];
 	
-	if nargout>5
-		dD = dPts;
-		dD(isnan(dD)) = 0;
-		cumD = [0;cumsum(dD)];
-		G = var2struct(Dtot,Z1,t0,dPts,cumD);
-	end
 	iX_V = find(strcmp(nX,'enhanced_speed'));
 	iX_H = find(strcmp(nX,'enhanced_altitude'));
-end		% if bProcess
-if bAnalyse
-	jj = [0;find(diff(Xrecord(:,1))>maxStandStillTime);size(Xrecord,1)];
-	lBlock = cumD(jj(2:end))-cumD(jj(1:end-1)+1);
-	Bshort = lBlock<minDistBlock;
-	jj(Bshort) = [];
-	jjStart = jj(1:end-1)+1;
-	jjEnd = jj(2:end);
-	nBlock = length(jjStart);
-	for ix = 1:nBlock
-		%(!!)assuming no long logs with only very low speed!!
-		while any(Xrecord(jjStart(ix)+[0 1],iX_V)<minVedges)
-			jjStart(ix) = jjStart(ix)+1;
-		end
-		while any(Xrecord(jjEnd(ix)+[-1 0],iX_V)<minVedges)
-			jjEnd(ix) = jjEnd(ix)-1;
-		end
-	end
-	lBlock = cumD(jjEnd)-cumD(jjStart);
-	dtBlock = (Xrecord(jjEnd)-Xrecord(jjStart))*86400;
-	Vblock = lBlock./dtBlock*3.6;	% (!) km/h
-	DH = diff(Xrecord(:,iX_H));
-	dH = Xrecord(jjEnd,iX_H)-Xrecord(jjStart,iX_H);
-	dHasc = zeros(1,nBlock);
-	dHdesc = zeros(1,nBlock);
-	for ix=1:nBlock
-		DH_i = DH(jjStart(ix):jjEnd(ix)-1);
-		dHasc(ix) = sum(max(0,DH_i));
-		dHdesc(ix) = -sum(min(0,DH_i));
-	end
 	
-	D.Tblock = [Xrecord(jjStart,1),Xrecord(jjEnd,1)];
-	D.lBlock = lBlock';
-	D.dtBlock = dtBlock';
-	D.Vblock = Vblock';
-	D.dH = dH';
-	D.dHasc = dHasc;
-	D.dHdesc = dHdesc;
-end
-if bPlot
-	ax1=plotmat(NE,1,2);axis equal;
-	ax2=plotmat(NE,[],Xrecord(:,1),{'North','East'},[],'-btna');
-	VH = Xrecord(:,[1,iX_V,iX_H]).*[1 3.6 1];
-	ax3=plotmat(VH,[2;3],1,nX([1,iX_V,iX_H]),{'','km/h','m'},'-btNav');
-	tFigs = [ancestor(ax2(1),'figure'),ancestor(ax3(1),'figure')];
-	volglijn(tFigs,ancestor(ax1,'figure'))
 	if bAnalyse
-		for ix=1:length(dH)
-			line(D.Tblock(:,1),VH(jj(1:end-1)+1,2),'Color',[0 0.75 0]	...
-				,'Linestyle','none','Marker','o','Parent',ax3(1))
-			line(D.Tblock(:,2),VH(jj(2:end),2),'Color',[1 0 0]	...
-				,'Linestyle','none','Marker','x','Parent',ax3(1))
-			line(D.Tblock(:,1),VH(jj(1:end-1)+1,3),'Color',[0 0.75 0]	...
-				,'Linestyle','none','Marker','o','Parent',ax3(2))
-			line(D.Tblock(:,2),VH(jj(2:end),3),'Color',[1 0 0]	...
-				,'Linestyle','none','Marker','x','Parent',ax3(2))
+		jj = [0;find(diff(Xrecord(:,1))>maxStandStillTime);size(Xrecord,1)];
+		lBlock = cumD(jj(2:end))-cumD(jj(1:end-1)+1);
+		Bshort = lBlock<minDistBlock;
+		jj0 = jj;	% if last part has to be removed
+		jj(Bshort) = [];
+		if isempty(jj)
+			warning('No valid block?!')
+		else
+			if bRemoveNonBlocks && ~isempty(jj)
+				if Bshort(1)	% remove starting samples
+					Xrecord(1:jj(1),:) = [];
+					NE(1:jj(1),:) = [];
+					V(1:jj(1)) = [];
+					dPts(1:jj(1)) = [];
+					cumD = cumD(jj(1)+1:end)-cumD(jj(1)+1);
+					jj0 = jj0-jj(1);
+					jj = jj-jj(1);
+				end
+				if Bshort(end)
+					jEnd = jj0(find(~Bshort,1,'last')+1);
+					jj(end) = jEnd;
+					Xrecord(jEnd+1:end,:) = [];
+					NE(jEnd+1:end,:) = [];
+					V(jEnd:end) = [];
+					dPts(jEnd:end) = [];
+					cumD(jEnd+1:end) = [];
+				end
+				Dtot = cumD(end);
+			end
+			jjStart = jj(1:end-1)+1;
+			jjEnd = jj(2:end);
+			nBlock = length(jjStart);
+			for ix = 1:nBlock
+				%(!!)assuming no long logs with only very low speed!!
+				while any(Xrecord(jjStart(ix)+[0 1],iX_V)<minVedges)
+					jjStart(ix) = jjStart(ix)+1;
+				end
+				while any(Xrecord(jjEnd(ix)+[-1 0],iX_V)<minVedges)
+					jjEnd(ix) = jjEnd(ix)-1;
+				end
+			end
+			lBlock = cumD(jjEnd)-cumD(jjStart);
+			dtBlock = (Xrecord(jjEnd)-Xrecord(jjStart))*86400;
+			Vblock = lBlock./dtBlock*3.6;	% (!) km/h
+			DH = diff(Xrecord(:,iX_H));
+			dH = Xrecord(jjEnd,iX_H)-Xrecord(jjStart,iX_H);
+			dHasc = zeros(1,nBlock);
+			dHdesc = zeros(1,nBlock);
+			for ix=1:nBlock
+				DH_i = DH(jjStart(ix):jjEnd(ix)-1);
+				dHasc(ix) = sum(max(0,DH_i));
+				dHdesc(ix) = -sum(min(0,DH_i));
+			end
+
+			D.Tblock = [Xrecord(jjStart,1),Xrecord(jjEnd,1)];
+			D.lBlock = lBlock';
+			D.dtBlock = dtBlock';
+			D.Vblock = Vblock';
+			D.dH = dH';
+			D.dHasc = dHasc;
+			D.dHdesc = dHdesc;
+			if bDispAnal
+				for ix=1:nBlock
+					fprintf('%s..%s - %5.1f km, %5.2f hr, %6.2f km/h\n'	...
+						,datestr(D.Tblock(ix)),datestr(D.Tblock(ix,2))	...
+						,lBlock(ix)/1000,dtBlock(ix)/3600,Vblock(ix)	...
+						)
+				end
+			end
 		end
+	end
+	G = var2struct(Dtot,Z1,t0,dPts,cumD);
+end		% if bProcess
+[~,fTitle] = fileparts(fName);
+if bPlot
+	if bBelgiPlot
+		line(NE(:,2),NE(:,1),'Color',[1 0 0],'LineWidth',1.5)
+		ax1 = gca;
+	else
+		ax1 = plotmat(NE,1,2,[],[],'fig',figTagNE);
+	end
+	title(fTitle,'Interpreter','none')
+	axis equal;
+	ax2=plotmat(NE/1000,[],Xrecord(:,1),{'North','East'},{'km','km'}	...
+		,'-btna','fig',figTagNEtime);
+	xlabel(fTitle,'Interpreter','none')
+	fig2 = ancestor(ax2(1),'figure');
+	VH = Xrecord(:,[1,iX_V,iX_H]).*[1 3.6 1];
+	ax3=plotmat(VH,[2;3;0],1,nX([1,iX_V,iX_H]),{'','km/h','m'}	...
+		,'fig',figTagVHD);
+	fig3 = ancestor(ax3(1),'figure');
+	plot(Xrecord(:,1),cumD/1000);grid
+	title 'Cumulative distance'
+	xlabel(fTitle,'Interpreter','none')
+	ylabel '[km]'
+	navfig
+	navfig(char(4))
+	if bAnalyse
+		for ix=1:min(10,length(dH))
+			navfig(fig2,'addkey',num2str(rem(ix,10)),1,{1,D.Tblock(ix,:)})
+			navfig(fig3,'addkey',num2str(rem(ix,10)),1,{1,D.Tblock(ix,:)})
+		end
+	end
+	tFigs = [fig2,fig3];
+	volglijn(tFigs,ancestor(ax1,'figure'))
+	set([ancestor(ax1,'figure'),tFigs],'UserData',var2struct(Xrecord,nX,NE,V,G))
+	if bAnalyse
+		line(D.Tblock(:,1),VH(jj(1:end-1)+1,2),'Color',[0 0.75 0]	...
+			,'Linestyle','none','Marker','o','Tag','blockData','Parent',ax3(1))
+		line(D.Tblock(:,2),VH(jj(2:end),2),'Color',[1 0 0]	...
+			,'Linestyle','none','Marker','x','Tag','blockData','Parent',ax3(1))
+		line(D.Tblock(:,1),VH(jj(1:end-1)+1,3),'Color',[0 0.75 0]	...
+			,'Linestyle','none','Marker','o','Tag','blockData','Parent',ax3(2))
+		line(D.Tblock(:,2),VH(jj(2:end),3),'Color',[1 0 0]	...
+			,'Linestyle','none','Marker','x','Tag','blockData','Parent',ax3(2))
+		line(D.Tblock(:,1),cumD(jj(1:end-1)+1)/1000,'Color',[0 0.75 0]	...
+			,'Linestyle','none','Marker','o','Tag','blockData','Parent',ax3(3))
+		line(D.Tblock(:,2),cumD(jj(2:end))/1000,'Color',[1 0 0]	...
+			,'Linestyle','none','Marker','x','Tag','blockData','Parent',ax3(3))
 	end
 	navfig('link',tFigs)
 end
@@ -604,3 +733,24 @@ elseif ~any(strcmp(UNKNOWNTAGS,tag))
 	warning('Unknown field (%s)!',tag)
 end
 end		% UnknownTag
+
+function MyKeyActions(S,c)
+dFITs = getappdata(gcf,'dFITs');
+nr = getappdata(gcf,'FITnr');
+nr0 = nr;
+bPlot = false;
+switch c
+	case 1	% ctrl-A
+		nr = max(nr-1,1);
+		bPlot = nr~=nr0;
+	case 19	% ctrl-S
+		nr = min(nr+1,length(dFITs));
+		bPlot = nr~=nr0;
+end
+if bPlot
+	fprintf('%s:\n',dFITs(nr).name)
+	[~,~,~,~,~,~] = ReadFIT(dFITs(nr),'--brelt','-bplot','-bBelg','-bAnal','-bfixedf','-bremoveno');
+	xlabel(sprintf('FIT-file %d/%d',nr,length(dFITs)))
+	setappdata(gcf,'FITnr',nr)
+end
+end		% MyKeyActions

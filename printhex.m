@@ -10,6 +10,15 @@ if isempty(offset)
 elseif ischar(offset)
 	offset=sscanf(offset,'%x');
 end
+
+if iscell(x)
+	for i=1:length(x)
+		fprintf('%3d\n',i)
+		printhex(x{i})
+	end
+	return
+end
+
 x=x(:);
 if any(x>255)&&all(x>=0&x<=65535)
 	if nargin==1
@@ -49,8 +58,7 @@ nok=[0:31 127:255];	% !!
 pos=[1:3:10 14:3:23 27:3:36 40:3:49];
 pos1=53;
 ckonv=0:255;
-%ckonv(nok+1)=(127-ismac)*ones(1,length(nok));	% 127 is not printed on mac
-ckonv(nok+1)=126*ones(1,length(nok));	% windows ook niet meer...
+ckonv(nok+1)=126;
 s='xx xx xx xx  xx xx xx xx  xx xx xx xx  xx xx xx xx -0123456789abcdef';
 bFileOwner=false;
 if ~exist('f','var')||isempty(f)

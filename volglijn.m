@@ -1,4 +1,4 @@
-function volglijn(lvar,lvast,lvolg)
+function [varargout] = volglijn(lvar,lvast,lvolg)
 % VOLGLIJN - verplaatsen van lijn op basis pointer op andere lijn
 %      volglijn(lvariabel,lvast,lvolg)
 %           lvariabel : handle van lijn(en) die moet(en) volgen
@@ -32,6 +32,7 @@ function volglijn(lvar,lvast,lvolg)
 %          'R' : herstart (restart) volg (zelfde als volglijn volgopnieuw)
 %          'L' : make markers to the right limit
 %          'v' : volg lijnen (door lijnen in centrum van as te houden) aan/afzetten
+%          'M' : show/toggle logged points
 %
 %    andere volglijn-mogelijkheden :
 %        volglijn stop : stopt met volgen (laat lijnen staan)
@@ -290,7 +291,7 @@ try
 				setappdata(S.fvast,'volglijn_fvast',S);
 			case 'link'
 				setappdata(S.fvast,'VL_AXlink',GetNormalAxes(lvast))
-				navfig('link',[S.fvar lvast(:)'])
+				navfig('link',[S.fvast lvar(:)'])
 			case 'setpt'
 				i=lvast;
 				upd_lijn=true;
@@ -429,6 +430,8 @@ try
 						end
 						set(ax,'XLim',xl)
 						set(VLl,'Visible','on')
+					case 'M'
+						volglijn('addlogpts')
 					case 'C'
 						close(S.fvast);
 						close(S.fvar);
@@ -451,15 +454,23 @@ try
 					case 't'	% toon punt
 						ShowPt(S,i)
 					case 27		% ESC - automatic axes in XY-graph
-						axC=get(VLcurl,'parent');
-						set(axC,'XLimMode','auto','YLimMode','auto')
-					case 'g'
+						set(S.VLa,'XLimMode','auto','YLimMode','auto')
+						axis(S.VLa,'equal')	% otherwise it might look ugly
+					case 'x'
 						fprintf('Active point: %d\n',i)
+						LOGidx = getappdata(S.fvast,'LOGidx');
+						LOGidx(1,end+1) = i;
+						setappdata(S.fvast,'LOGidx',LOGidx)
 					case 'X'
-						axis auto
+						xl = [min(S.lvast.XData),max(S.lvast.XData)];
+						yl = [min(S.lvast.YData),max(S.lvast.YData)];
+						SetAxisLimits(S.VLa,xl,yl);
+					case 12	% ctrl-L
+						volglijn('ShowZoomed')
 					case 16	% ctrl-P - set marker 1
-						fprintf('abc\n')
+						SetMarker('marker1',i,S)
 					case 17 % ctrl-Q - set marker 2
+						SetMarker('marker2',i,S)
 					case 18	% ctrl-R - reset pointer lines
 							% similer to 'L' (but different)!!!!
 						set(VLl,'Visible','off')
@@ -497,6 +508,8 @@ try
 					case 'A'
 						set(S.lvar,'Marker','none');
 						set(S.lvast,'Marker','none');
+					case 'Z'
+						volglijn('MatchZoom')
 					case 'f1'
 						CR=newline;
 							helpS=['keycodes:',CR,	...
@@ -511,16 +524,20 @@ try
 								'"i" : zoom in (T-plot)',CR,	...
 								'"o" : zoom out (T-plot)',CR,	...
 								'<arrows> : scroll in XY-plot',CR,	...
-								'"a" : show line markers',CR,	...
-								'"A" : remove line markers',CR,	...
-								'"X" : full measurement view',CR,	...
-								'"S" : stop following',CR,	...
-								'"R" : restart following',CR,	...
-								'"L" : remake marker lines',CR,	...
-								'"g" : show index of current point',CR,	...
 								'"a" : show points on lines',CR,	...
 								'"A" : hide points on lines',CR,	...
+								'"x" : show index of current point',CR,	...
+								'"L" : remake marker lines',CR,	...
+								'"M" : show/toggle logged points',CR	...
+								'"S" : stop following',CR,	...
+								'"R" : restart following',CR,	...
 								'"v" : start/stop keeping marker in the middle'	...
+								'"X" : full measurement view',CR,	...
+								'"Z" : zoom to zoomed parts in T-plots',CR,	...
+								'"ctrl-P": mark point 1',CR,	...
+								'"ctrl-Q": mark point 2',CR,	...
+								'"ctrl-R": reset pointer lines (similar to "L")',CR,
+								'"ctrl-L": plot(/toggle) line of zoomed parts in T-plots',CR,	...
 								];
 							helpdlg(helpS,'VolgLijn-help')
 					otherwise
@@ -531,6 +548,58 @@ try
 				end
 			case 'setkeyfun'
 				setappdata(S.fvast,'funKey',lvast)
+			case 'getlog'
+				LOGidx = getappdata(S.fvast,'LOGidx');
+				LOG = struct('idx',LOGidx	...
+					,'t',S.VLvx(LOGidx)	...
+					,'X',S.lvast.XData(LOGidx),'Y',S.lvast.YData(LOGidx)	...
+					);
+				varargout = {LOG};
+			case 'addlogpts'
+				LOGidx = getappdata(S.fvast,'LOGidx');
+				lLOGmarkers = findobj([S.fvast;S.fvar(:)],'Type','line','Tag','LOGmarker');
+				if ~isempty(lLOGmarkers)
+					delete(lLOGmarkers)
+				else
+					L = [S.lvast;S.lvar(:)];
+					for i=1:length(L)
+						line(ancestor(L(i),'axes'),L(i).XData(LOGidx),L(i).YData(LOGidx)	...
+							,'Color',[0 1 0],'Marker','o','Linestyle','none'	...
+							,'Tag','LOGmarker'	...
+							)
+					end
+				end
+			case 'matchzoom'	% match zoom of XY-plot with zoomed part in T-plots
+				xl = S.lvar(1).Parent.XLim;
+				B = S.lvar(1).XData>=xl(1) & S.lvar(1).XData<=xl(2);
+				Xmin = min(S.lvast.XData(B));
+				Xmax = max(S.lvast.XData(B));
+				Ymin = min(S.lvast.YData(B));
+				Ymax = max(S.lvast.YData(B));
+				SetAxisLimits(S.VLa,[Xmin,Xmax],[Ymin,Ymax]);
+			case 'showzoomed'	% plot part shown in T-plots
+				l = findobj(S.VLa,'Tag','partPlot');
+				if isempty(l)
+					xl = S.lvar(1).Parent.XLim;
+					B = S.lvar(1).XData>=xl(1) & S.lvar(1).XData<=xl(2);
+					X = S.lvast.XData(B);
+					Y = S.lvast.YData(B);
+					line(S.VLa,X,Y,'Color',[0 1 0],'Tag','partPlot','LineWidth',2)
+				else
+					%set(l,'XData',X,'YData',Y)
+					delete(l)
+				end
+			case 'getmarkeddata'
+				i1 = getappdata(S.fvast,'marker1');
+				i2 = getappdata(S.fvast,'marker2');
+				if isempty(i1) || isempty(i2)
+					error('Sorry, but this function only works if start&stop markers are created! (use ctrl-P and ctrl-P)')
+				end
+				ii = i1:i2;
+				t = S.VLvx(ii)';
+				X = S.lvast.XData(ii)';
+				Y = S.lvast.YData(ii)';
+				varargout = {var2struct(i1,i2,t,X,Y),S};
 		end
 	else
 		if isempty(S)
@@ -664,3 +733,69 @@ if nargin>1
 		end
 	end
 end		% minimum or exact size requested
+
+function [xl,yl] = SetAxisLimits(ax,xl,yl)
+xl0 = get(ax,'XLim');
+yl0 = get(ax,'YLim');
+if diff(xl)==0
+	xl = xl0+mean(xl)-mean(xl0);
+end
+if diff(yl)==0
+	yl = yl0+mean(yl)-mean(yl0);
+end
+yRatio0 = diff(yl0)/diff(xl0);
+yRatio = diff(yl)/diff(xl);
+if yRatio>yRatio0
+	xl = (xl0-mean(xl0))*diff(yl)/diff(yl0)+mean(xl);
+elseif yRatio<yRatio0
+	yl = (yl0-mean(yl0))*diff(xl)/diff(xl0)+mean(yl);
+end
+axis(ax,[xl,yl])
+
+function SetMarker(sTag,iMarker,S)
+lMarker = findobj([S.fvast;S.fvar(:)],'Tag',sTag);
+if ~isempty(lMarker)
+	if lMarker(1).UserData.i==iMarker
+		delete(lMarker)
+		return
+	end
+end
+t = S.VLvx(iMarker);
+setappdata(S.fvast,sTag,iMarker)
+if isempty(lMarker)
+	if iMarker==1
+		c = [1 1 0];
+	elseif iMarker==2
+		c = [1 0 1];
+	else	% no use (yet)
+		c = [0 1 1];
+	end
+	line(S.VLa,S.VLcurl.XData,S.VLcurl.YData	...
+		,'Marker','x','Tag',sTag,'Color',c	...
+		,'UserData',struct('i',iMarker,'type','XY'))
+	St = struct('i',iMarker,'type','t');
+	for i=1:length(S.VLl)
+		l = S.VLl(i);
+		if isnumeric(l)
+			l = handle(l);
+		end
+		line(l.Parent,l.XData,l.YData,'Tag',sTag,'UserData',St,'Color',c)
+	end
+else
+	for i=1:length(lMarker)
+		switch lMarker(i).UserData.type
+			case 'XY'
+				lMarker(i).XData = S.lvast.XData(iMarker);
+				lMarker(i).YData = S.lvast.YData(iMarker);
+			case 't'
+				lMarker(i).XData(:) = t;
+		end
+		lMarker(i).UserData.i = iMarker;
+	end
+end
+if t>=720000 && t<=750000
+	st = datestr(t);
+else
+	st = num2str(t);
+end
+fprintf('Set %s: #%4d - %s\n',sTag,iMarker,st)

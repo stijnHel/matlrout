@@ -97,9 +97,11 @@ try
     inputStream.close;
     byteArrayOutputStream.close;
     output = typecast(byteArrayOutputStream.toByteArray,'uint8');
-catch
+catch err
     if catchErrors, return
-    else error('MATLAB:urlread:ConnectionFailed','Error downloading URL.');
+	else
+		DispErr(err)
+		error('MATLAB:urlread:ConnectionFailed','Error downloading URL.');
     end
 end
 

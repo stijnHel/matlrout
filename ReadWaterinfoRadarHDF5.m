@@ -15,8 +15,9 @@ tPause = 0.2;
 tPeriod = 3;	% for downloading data
 pth = [];
 pos = [];
+tEnd = [];
 if nargin>1
-	setoptions({'bPlot','bAnim','nRepeat','tPause','tPeriod','pth','pos'},varargin{:})
+	setoptions({'bPlot','bAnim','nRepeat','tPause','tPeriod','pth','pos','tEnd'},varargin{:})
 end
 
 if ischar(fName)&&strcmpi(fName,'web')
@@ -29,12 +30,9 @@ if ischar(fName)&&strcmpi(fName,'web')
 			error('Wrong input')
 		end
 	end
-	fName = sprintf('rastervalues_%04d%02d%02d_%02d%02d%02.0f.hdf5',clock);
-	if isempty(pth)
-		pth = DefaultPath();
+	if isempty(tEnd)
+		tEnd = now;
 	end
-	fName = fullfile(pth,fName);
-	tEnd = now;
 	tEnd = floor(tEnd*288-3)/288;	% previous 5 minute rounded time
 	%tStart = tEnd-tPeriod/24;
 	%dt = 1+isDST(tStart);
@@ -43,11 +41,22 @@ if ischar(fName)&&strcmpi(fName,'web')
 	%URLformat = 'https://hydro.vmm.be/grid/kiwis/KiWIS?datasource=10&service=kisters&type=queryServices&request=getrastertimeseriesvalues&ts_path=COMP_VMM/Vlaanderen_VMM/N/5m.Cmd.Raster.O.PAC_1h_1km_cappi_adj&period=PT%dH&from=%04d-%02d-%02dT%02d:%02d:%02d.000+%02d:0000&format=hdf5';
 	%          PAC: Precipitation Accumulation (?)
 	%urlString = sprintf(URLformat,tPeriod,tVec,dt);
-	tVec = datevec(tEnd);
+	if isDST(tEnd)
+		tVec = datevec(tEnd-1/24);
+	else
+		tVec = datevec(tEnd);
+	end
 	URLformat = 'https://hydro.vmm.be/grid/kiwis/KiWIS?datasource=10&service=kisters&type=queryServices&request=getrastertimeseriesvalues&ts_path=COMP_VMM/Vlaanderen_VMM/Ni/5m.Cmd.Raster.O.SRI_1km_cappi&period=PT%dH&to=%04d-%02d-%02dT%02d:%02d:%02d&format=hdf5';
 	%          DPSRI: Surface Rainfall Intensity
 	urlString = sprintf(URLformat,tPeriod,tVec);
 	H5 = urlbinread(urlString);
+	tv = datevec(tEnd-tPeriod/24);
+	%fName = sprintf('rastervalues_%04d%02d%02d_%02d%02d%02.0f.hdf5',clock);
+	fName = sprintf('rastervalues_%04d%02d%02d_%02d%02d%02.0f_%02.0fhr.hdf5',tv,tPeriod);
+	if isempty(pth)
+		pth = DefaultPath();
+	end
+	fName = fullfile(pth,fName);
 	fid = fopen(fName,'w');
 	if fid<3
 		error('Can''t open the file for writing?! (%d)',fName)
@@ -70,12 +79,14 @@ elseif ischar(fName)
 		end
 		pth = DefaultPath();
 		d = dir(fullfile(pth,'*.hdf5'));
-		[~,ii] = sort([d.datenum]);
+		%[~,ii] = sort([d.datenum]);
+		[~,ii] = sort({d.name});
 		fName = {d(ii(end-nLast+1:end)).name};
 	elseif strcmpi(fName,'list')
 		pth = DefaultPath();
 		d = dir(fullfile(pth,'*.hdf5'));
-		[~,ii] = sort([d.datenum]);
+		%[~,ii] = sort([d.datenum]);
+		[~,ii] = sort({d.name});
 		IMGs = d(ii);
 		return
 	end

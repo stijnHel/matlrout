@@ -14,15 +14,20 @@ if size(Z,1)~=length(t_lF)
 	error('Sorry, but length of time and XY(Z) data must be the same!')
 end
 
-setappdata(figFollow,'followNavData',struct('lFollow',lFollow,'t',t_lF,'Z',Z))
-navfig(figFollow,'updateAxes',@UpdateLine)
-
 ax = GetNormalAxes(figFollow);
+ax = ax(1);
+setappdata(figFollow,'followNavData'	...
+	,struct('lFollow',lFollow,'axFollow',ax,'t',t_lF,'Z',Z))
+navfig(figFollow,'addUpdateAxes',@UpdateLine)
+
 UpdateLine(ax)
 
 function UpdateLine(ax)
 xl = xlim(ax);
 D = getappdata(ancestor(ax,'figure'),'followNavData');
+if D.axFollow~=ax	% don't do anything for other axes
+	return
+end
 if ~ishandle(D.lFollow)
 	warning('follow-line does not exist anymore!')
 	navfig(ancestor(ax,'figure'),'updateAxesT')
