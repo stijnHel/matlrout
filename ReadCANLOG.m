@@ -6,6 +6,7 @@ function X=ReadCANLOG(fName,typ,varargin)
 %       *.csv ---> IXXAT Can Analyzer mini
 %       *.log ---> * Other IXXAT file format? ("save dump" in old version?)
 %                  * CNH-log file
+%       *.asc ---> Vector CAN-log
 
 [bCANOPEN] = false;
 [optsUnused] = {};
@@ -130,14 +131,20 @@ switch lower(typ)
 			D = cell2mat(DD(10:17,2:end));
 		end
 	case 'vector'
-		X = leescana(fid);
+		[X,~,Dcmt] = leescana(fid);
 		t0 = [];
 		T = X(:,10);
 		TS = X(:,10);
-		DLC = X(:,11);
-		% Do something with Tx? (column 11)
-		ID = X(:,1);
-		D = X(:,2:9);
+		DLC = uint8(X(:,11));
+		ID = uint32(X(:,1));
+		D = uint8(X(:,2:9));
+		CHAN = X(:,13);
+		Dextra = struct(	...
+			'TX', logical(X(:,12))	...
+			, 'MSGlen', X(:,14)	...
+			, 'BitCount', X(:,15)	...
+			, 'Dcmt',Dcmt	...
+			);
 	case 'mini_ixxat'
 		fclose(fid);
 		X=readIXXATtrace(fFullPath(fName));

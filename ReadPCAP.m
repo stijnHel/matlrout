@@ -11,13 +11,23 @@ end
 x=fread(fid,[1 Inf],'*uint8');
 fclose(fid);
 
+nsTime = false;
+
 MN=typecast(x(1:4),'uint32');
 if MN==2712847316
 	bByteSwap=false;
 elseif MN==3569595041
 	bByteSwap=true;
+elseif MN==2712812621	% nanoseconds accuracy (?A1B23C4D? expected 1A2B3C4D !) 
+	bByteSwap=false;
+	nsTime = true;
 else
-	error('Unknown type!')
+	error('Unknown type! (0x%08X)',MN)
+end
+if nsTime
+	fracTfactor = 1e-9;
+else
+	fracTfactor = 1e-6;
 end
 ix=4;
 [v,ix]=GetUInt16(x,ix,bByteSwap,2);
@@ -41,7 +51,7 @@ while ix<length(x)-16
 	end
 	nMsgs=nMsgs+1;
 	MSGs(nMsgs).t=I(1:2);
-	MSGs(nMsgs).ts=double(I(1:2))*[1;1e-6];
+	MSGs(nMsgs).ts=double(I(1:2))*[1;fracTfactor];
 	MSGs(nMsgs).msg=x(ix+1:ix+I(4));
 	ix=ix+I(3);
 end

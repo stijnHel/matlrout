@@ -1,8 +1,22 @@
-function [e,ne,de,e2,gegs]=leesFMTClvXMLmeas(fname,start,lengte,kans)
+function [e,ne,de,e2,gegs]=leesFMTClvXMLmeas(fname,start,lengte,kans,varargin)
 %leesFMTClvXMLmeas - Reads a FMTC-style measurement from labview
 %   [e,ne,de,e2,gegs]=leesFMTClvXMLmeas(fname)
 
-bAddTime=false;
+[bAddTime] = false;
+if nargin>1 && ischar(start)
+	if nargin>3
+		options = [{start,lengte,kans},varargin];
+	elseif nargin>2
+		options = {start,lengte};
+	else
+		options = {start};
+	end
+else
+	options = varargin;
+end
+if ~isempty(options)
+	setoptions({'bAddTime'},options{:})
+end
 
 if isstruct(fname)
 	fname = fFullPath(fname);
@@ -20,7 +34,7 @@ if isnumeric(fname)
 	fpth=zetev;
 	fname=zetev([],d(fname).name);
 else
-	[fpth,fnm,fext]=fileparts(fname);
+	[fpth,~,fext]=fileparts(fname);
 	if isempty(fext)
 		fname=[fname '.xml'];
 	end

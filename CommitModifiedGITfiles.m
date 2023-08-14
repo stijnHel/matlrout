@@ -1,7 +1,7 @@
-function [fListOut,fNew,sBranch] = CommitModifiedGITfiles(sComment,bPush,bPull,varargin)
+function [fListOut,fNew,fDeleted,sBranch,fAlreadyAdded,fAlreadyNew,fAlreadyDeleted] = CommitModifiedGITfiles(sComment,bPush,bPull,varargin)
 %CommitModifiedGITfiles - Commit modified files on git
 %     CommitModifiedGITfiles(sComment,bPush,bPull)
-%     [fList,fNew,branch] = CommitModifiedGITfiles()	 - only gives the list of changed files
+%     [fList,fNew,fDeleted,branch] = CommitModifiedGITfiles()	 - only gives the list of changed files
 %             if bPush is given (and true) push is done after commit
 %             if bPull is given (and true) repository is pulled before pushing
 
@@ -47,7 +47,7 @@ end
 if status
 	warning('Status didn''t return zero?! (%d)',status)
 end
-[fList,fNew,sBranch] = GetFiles(sGIT,fileExtension);
+[fList,fNew,fDeleted,sBranch,fAlreadyAdded,fAlreadyNew,fAlreadyDeleted] = GetFiles(sGIT,fileExtension);
 
 if ~isempty(discardFiles)
 	if ischar(discardFiles)
@@ -100,53 +100,66 @@ elseif nargin&&~isempty(sComment)
 	end
 end
 
-function [fList,fNew,sBranch] = GetFiles(sGIT,fileExtension)
+function [fList,fNew,fDeleted,sBranch,fAlreadyAdded,fAlreadyNew,fAlreadyDeleted] = GetFiles(sGIT,fileExtension)
 ii = [0 find(sGIT==10) length(sGIT)+1];
 
 fList = cell(1,length(ii)-3);
 nFlist = 0;
 fNew = cell(1,length(ii)-3);
 nNew = 0;
+fDeleted = {};
+fAlreadyAdded = {};
+fAlreadyNew = {};
+fAlreadyDeleted = {};
 
 typ = '';
 nEmpty = 0;
 for i=1:length(ii)-1
 	l = sGIT(ii(i)+1:ii(i+1)-1);
 	lTrimmed = strtrim(l);
-	if startsWith(l,'On branch')
-		sBranch = l(11:end);
-	elseif isempty(typ)
-		if startsWith(lTrimmed,'modified:')
-			typ = 'modified';
-			l = strtrim(lTrimmed(11:end));
-			if ~isempty(l)
-				nFlist = nFlist+1;
-				fList{nFlist} = l;
-			end
-		elseif startsWith(lTrimmed,'Untracked files:')
-			nEmpty = 0;
-			typ = 'untracked';
-		end
-	elseif isempty(l)
-		if strcmp(typ,'untracked')
-			nEmpty = nEmpty+1;
-			if nEmpty>1
-				typ = '';
-			end
-		else
+	if isempty(lTrimmed)
+		nEmpty = nEmpty+1;
+		if ~isempty(typ)
 			typ = '';
 		end
-	elseif strcmp(typ,'modified')
+	else
+		nEmpty = 0;
+	end
+	if startsWith(l,'On branch')
+		sBranch = l(11:end);
+	elseif startsWith(lTrimmed,'Changes to be committed:')
+		typ = 'staged';
+	elseif startsWith(lTrimmed,'Changes not staged for commit:')
+		typ = 'notstaged';
+	elseif startsWith(lTrimmed,'Untracked files:')
+		typ = 'untracked';
+	elseif isempty(typ)
+		% do nothing
+	elseif strcmp(typ,'staged')
+		if startsWith(lTrimmed,'modified:')
+			fAlreadyAdded{1,end+1} = l; %#ok<AGROW> 
+		elseif startsWith(lTrimmed,'new file:')
+			fAlreadyNew{1,end+1} = strtrim(lTrimmed(11:end)); %#ok<AGROW> 
+		elseif startsWith(lTrimmed,'deleted:')
+			fAlreadyDeleted{1,end+1} = strtrim(lTrimmed(10:end)); %#ok<AGROW> 
+		elseif lTrimmed(1)~='('
+			warning('Unexpected line! ("%s")',l)
+		end
+	elseif strcmp(typ,'notstaged')
 		if startsWith(lTrimmed,'modified:')
 			l = strtrim(lTrimmed(11:end));
 			nFlist = nFlist+1;
 			fList{nFlist} = l;
-		else
+		elseif startsWith(lTrimmed,'deleted:')
+			fDeleted{1,end+1} = strtrim(lTrimmed(10:end)); %#ok<AGROW> 
+		elseif lTrimmed(1)~='('
 			warning('Unexpected line! ("%s")',l)
 		end
 	elseif strcmp(typ,'untracked')
-		nNew = nNew+1;
-		fNew{nNew} = strtrim(l);
+		if lTrimmed(1)~='('
+			nNew = nNew+1;
+			fNew{nNew} = lTrimmed;
+		end
 	else
 		warning('Not implemented? (%s)',typ)
 	end

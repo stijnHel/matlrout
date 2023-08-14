@@ -27,14 +27,22 @@ end
 Z1=[];
 [bNoFiltV]=false;
 iFiltV=[];	% number of points to filter
+[bInverse] = false;	% for inverse calculation (XY-->coor)
 
 Req=6378140;
 Rpol=6356760;
 
 if ~isempty(varargin)
-	setoptions({'bSphere','Z1','bNoFiltV','iFiltV','Req','Rpol'},varargin{:})
+	setoptions({'bSphere','Z1','bNoFiltV','iFiltV','Req','Rpol','bInverse'},varargin{:})
 end
 
+if bInverse
+	if isempty(Z1)
+		error('For inverse calculation, reference coordinates must be supplied!')
+	end
+	[XY,V] = InverseProj(P,Z1,Req,Rpol);
+	return
+end
 if size(P,2)==2
 	Lat=P(:,1);		% (phi)
 	Long=P(:,2);	% (lambda)
@@ -64,7 +72,7 @@ elseif bOld
 		Req=Req+H;
 		Rpol=Rpol+H;
 	end
-	XYZ=[Req.*cosd(Lat).*cosd(Long),Req.*cosd(Lat).*sind(Long),Rpol.*sind(Lat)];
+	XYZ=[Req.*cosd(Lat).*cosd(Long),Req.*cosd(Lat).*sind(Long),Rpol.*sind(Lat)];	% correct?!!!
 else
 	XYZ = CalcXYZ(Lat,Long,H);
 end
@@ -82,44 +90,7 @@ if isempty(Z1)
 		Z1=[mean(Lat),mean(Long)];
 	end
 end
-if length(Z1)==3&&any(abs(Z1)>360)
-	XYZ0 = Z1(:)';
-	XY0=sqrt(Z1(1)^2+Z1(2)^2);
-	if Z1(3)*0.001>XY0	% north pole
-		Xe=[0 1 0];
-		Xn=[-1 0 0];
-	elseif Z1(3)*-0.001>XY0	% south pole
-		Xe=[0 1 0];
-		Xn=[-1 0 0];
-	else
-		%(The rest should be able to use this part too!!!)
-		Z1=Z1/sqrt(Z1*Z1');
-		Xe=[-Z1(2),Z1(1),0];	% orthogonal to Z1 in XY-plane
-		rX=sqrt(Xe*Xe');
-		Xe=Xe/rX;
-		Xn=cross(Z1,Xe);
-	end
-elseif abs(Z1(1))<89.9
-	%!possibly non spherical XYZ-calculation, but projection based on spherical configuration?!
-	XYZ0=CalcXYZ(Z1(1),Z1(2),[]);
-	sLat=sind(Z1(1));
-	sLong=sind(Z1(2));
-	cLat=cosd(Z1(1));
-	cLong=cosd(Z1(2));
-	Xn=[-sLat.*cLong, -sLat.*sLong, cLat];
-	Xe=[-sLong,       cLong,        0];
-	%N=-sind(Lat).*cosd(Long).*dP(:,1) - sind(Lat).*sind(Long).*dP(:,2) + cosd(Lat).*dP(:,3);	% is this OK???
-	%	% shouldn't dP be transformed with fixed vector to (N,E)?
-	%E=-sind(Long).*dP(:,1)            + cosd(Long).*dP(:,2);
-elseif Z1(1)>0	% north pole
-	XYZ0=[Rpol,0,0];
-	Xe=[1 0 0];
-	Xn=[0 1 0];
-else	% south pole
-	XYZ0=[-Rpol,0,0];
-	Xe=[0 1 0];
-	Xn=[-1 0 0];
-end
+[XYZ0,Xe,Xn] = GetRefFrame(Z1);
 dP=bsxfun(@minus,XYZ,XYZ0);
 XY=dP*[Xn' Xe'];	% ? first column north (to be consistent with angle based (on normally used)
 %XY=XYZn(:,1:2);
@@ -149,7 +120,7 @@ if nargout>1
 end
 
 function XYZ = CalcXYZ(Lat,Long,H)
-a=6378137.0;
+a=6378137.0;	% !!!! other/separate radius compared to main function!!!!
 f=1/298.257223563;
 
 % excentricity e (squared) 
@@ -161,3 +132,54 @@ if ~isempty(H)
 end
 R=N.*cosd(Lat);
 XYZ = [R.*cosd(Long), R.*sind(Long), (N-e2.*N).*sind(Lat)];
+
+function [XYZ0,Xe,Xn] = GetRefFrame(Z1)
+if length(Z1)==3&&any(abs(Z1)>360)	% 3D coordinates as reference point
+	XYZ0 = Z1(:)';
+	XY0=sqrt(Z1(1)^2+Z1(2)^2);
+	if Z1(3)*0.001>XY0	% north pole
+		Xe=[0 1 0];
+		Xn=[-1 0 0];
+	elseif Z1(3)*-0.001>XY0	% south pole
+		Xe=[0 1 0];
+		Xn=[-1 0 0];
+	else
+		%(The rest should be able to use this part too!!!)
+		Z1=Z1/sqrt(Z1*Z1');
+		Xe=[-Z1(2),Z1(1),0];	% orthogonal to Z1 in XY-plane
+		rX=sqrt(Xe*Xe');
+		Xe=Xe/rX;
+		Xn=cross(Z1,Xe);
+	end
+elseif abs(Z1(1))<89.9	% normal case (long/lat & not on the poles)
+	%!possibly non spherical XYZ-calculation, but projection based on spherical configuration?!
+	XYZ0=CalcXYZ(Z1(1),Z1(2),[]);
+	sLat=sind(Z1(1));
+	sLong=sind(Z1(2));
+	cLat=cosd(Z1(1));
+	cLong=cosd(Z1(2));
+	Xn=[-sLat.*cLong, -sLat.*sLong, cLat];
+	Xe=[-sLong,       cLong,        0];
+	%N=-sind(Lat).*cosd(Long).*dP(:,1) - sind(Lat).*sind(Long).*dP(:,2) + cosd(Lat).*dP(:,3);	% is this OK???
+	%	% shouldn't dP be transformed with fixed vector to (N,E)?
+	%E=-sind(Long).*dP(:,1)            + cosd(Long).*dP(:,2);
+elseif Z1(1)>0	% north pole
+	XYZ0=[Rpol,0,0];
+	Xe=[1 0 0];
+	Xn=[0 1 0];
+else	% south pole
+	XYZ0=[-Rpol,0,0];
+	Xe=[0 1 0];
+	Xn=[-1 0 0];
+end
+
+function [P,H] = InverseProj(NE,Z1,Req,Rpol)
+% not correct calculation (spherical, not ellipsoidal)
+[XYZ0,Xe,Xn] = GetRefFrame(Z1);
+XYZ = XYZ0+NE*[Xn;Xe];
+Long = atan2d(XYZ(:,2),XYZ(:,1));
+%Lat = asind(XYZ(:,3)./sqrt(sum(XYZ.^2,2)));
+Lat = atan2d(XYZ(:,3)*(Req/Rpol)^2,sqrt(sum(XYZ(:,1:2).^2,2)));
+	% Req/Rpol is added to get "reasonable results", but not clear why!!!
+P = [Lat,Long];
+H = zeros(size(NE,1),1);

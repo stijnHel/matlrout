@@ -255,6 +255,7 @@ for i=1:length(Dtrk.children)
 end
 
 function D=GetTrkPt(Dpt)
+persistent UnknownTags
 D=struct;
 for i=1:length(Dpt.children)
 	Dchild=Dpt.children(i);
@@ -289,7 +290,18 @@ for i=1:length(Dpt.children)
 				end
 			end
 		otherwise
-			fprintf('Unknown field in TrkPt "%s"\n',Dchild.tag)
+			if isempty(UnknownTags)
+				UnknownTags = {Dchild.tag};
+				bUnknown = true;
+			elseif any(strcmp(UnknownTags,Dchild.tag))
+				bUnknown = false;
+			else
+				UnknownTags{1,end+1} = Dchild.tag; %#ok<AGROW> 
+				bUnknown = true;
+			end
+			if bUnknown
+				fprintf('Unknown field in TrkPt "%s"\n',Dchild.tag)
+			end
 	end
 end
 

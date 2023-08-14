@@ -55,30 +55,30 @@ end
 % defaults
 lijntype = [];
 punttype = [];
-doyyplot = true;
-bPlotLong = false;
+[doyyplot] = true;
+[bPlotLong] = false;
 autoconf = 0;
 cstates = ['bbbbbbbb';char(48:55)]';	% b0,b1,...
-usetex = false;
-bNavFig = false;
+[usetex] = false;
+[bNavFig] = false;
 fignr = [];
 nrij = [];
 nkol = [];
 fx = 1;
 dx = 0;
 titleFig = [];
-bAddPlot = [];
-bPlotCarr = true;
-bXdata = false;
-bNavfig = false;
-bTNavfig = [];
-bCMenu = false;
-bAbsTime = false;
+[bAddPlot] = [];
+[bPlotCarr] = true;
+[bXdata] = false;
+[bNavfig] = false;
+[bTNavfig] = [];
+[bCMenu] = false;
+[bAbsTime] = false;
 [bPlotEnum] = true;	% plot Simulink enum as PlotDiscrete
 sfTitle = [];
 [bRemoveRootName] = [];
 cPathDelim = '/';
-bDefMultiChan = false;
+[bDefMultiChan] = false;
 if nargin>5
 	opties=varargin;
 	if nargin==6&&iscell(opties{1})
@@ -259,7 +259,7 @@ elseif isa(e,'Simulink.SimulationData.Dataset')
 	end		% iscell(kols)
 elseif istable(e)
 	naame = e.Properties.VariableNames;
-	e = table2array(e);
+	%e = table2array(e);
 end
 bXvector = length(x)>1 && length(x)==size(e,1);
 
@@ -277,8 +277,13 @@ if bRemoveRootName
 	end
 end
 
-if isempty(naame)&&isa(e,'timeseries')
-	naame={e.Name};
+bXfirstColumn = false;
+bXcommon = true;
+if isa(e,'timeseries')
+	if isempty(naame)
+		naame={e.Name};
+	end
+	bXcommon = false;
 end
 
 if ischar(x)
@@ -289,12 +294,21 @@ if ischar(x)
 		warning('PLOTMAT:multiXchannel','meer dan 1 mogelijkheid voor x-kanaal, de eerste wordt genomen')
 		i=i(1);
 	end
+	bXfirstColumn = i==1;
 	x=i;
 elseif isstruct(x)
-	x=timevec(x,e,bAbsTime&&isfield(x,'t0')&&~isempty(x.t0));
+	x = timevec(x,e,bAbsTime&&isfield(x,'t0')&&~isempty(x.t0));
 	bXvector=true;
 elseif isscalar(x)&&(x>0)&&(x~=floor(x))
 	x=-x;
+elseif isempty(x)
+	if isnumeric(e)
+		x = 1;
+		bXfirstColumn = true;
+	end
+elseif all(x==0 | x==1)
+	bXfirstColumn = true;
+	bXcommon = true;
 end
 if ~ismatrix(e)
 	e=squeeze(e);
@@ -307,12 +321,12 @@ if ischar(kols)
 	kols={kols};
 elseif isnumeric(kols)
 	if isequal(kols,0)
-		kols=1:size(e,2);
+		kols=1:nChannels;
 	elseif isequal(kols,-1)
-		if ~isempty(x)&&(bXvector||all(x<0))||isa(e,'timeseries')
-			kols=1:size(e,2);
+		if bXfirstColumn
+			kols = 2:nChannels;
 		else
-			kols=2:size(e,2);
+			kols = 1:nChannels;
 		end
 	end
 end
@@ -330,9 +344,9 @@ if autoconf
 		warning('PLOTMAT:autoconfNoDim','Ik kan geen auto-configuratie doen zonder gegeven dimensies')
 	else
 		if ~isempty(x)&&(bXvector||all(x<0))
-			iChan=1:size(e,2);
+			iChan=1:nChannels;
 		else
-			iChan=2:size(e,2);
+			iChan=2:nChannels;
 		end
 		deunique=unique(de(iChan));
 		kols=cell(1,length(deunique));
@@ -480,21 +494,15 @@ if iscell(kols)
 		return
 	end
 end
-bAddedX=false;	% !!!should be removed ----- make X-vector
-		% care for x-names, ...! (that's why it's not done yet!)
+
+X = [];
 if isempty(x)
-	if ~isa(e,'timeseries')
-		x=1;
-	end
+	% do nothing (x is separate for signals, and available in e (e.g. timeseries)
 elseif bXvector
-	if ~strcmp(class(e),class(x))
-		% prevent converting doubles to int's - but then more general
-		x=double(x);
-		e=double(e);
+	X = x(:);	% not yet used (shoud replace added X)
+	if fx~=1 || dx~=0
+		X = double(X)*fx+dx;
 	end
-	e(:,end+1)=x(:);
-	bAddedX=true;
-	x=size(e,2);
 elseif numel(x)>numel(kols)&&~isempty(kols)&&all(kols>0)
 	error('Er is iets fout met de x=as')
 elseif x<=0
@@ -503,36 +511,26 @@ elseif x<=0
 	else
 		x=abs(x);
 	end
-	if ~isa(e,'double')
-		e=double(e);
+	X = (0:size(e,1)-1)'*x;
+else
+	X = e(:,x);
+	if fx~=1 || dx~=0
+		X = X*fx+dx;
 	end
-	e(:,end+1)=(0:size(e,1)-1)'*x;
-	bAddedX=true;
-	x=size(e,2);
+	bXcommon = all(x==x(1));
 end
 if isempty(kols)
-	nK=size(e,2);
-	if 	bAddedX
-		nK=nK-1;
-	end
-	if isequal(x,1)
-		kols=(2:nK)';
+	if bXfirstColumn
+		kols=(2:nChannels)';
 	else
-		kols=(1:nK)';
+		kols=(1:nChannels)';
 	end
 end
 if size(kols,1)>64
 	error('Too much graphs on one figure!')
 end
 
-xl=false;
-if ~isempty(naame)
-	if length(naame)==size(e,2)-1
-		naame=naame([1:end 1]);
-	else
-		xl=true;
-	end
-end
+xl = ~isempty(naame) && ~bXvector;
 if ~isempty(de)&&length(de)==size(e,2)-1
 	de=de([1:end 1]);
 end
@@ -570,13 +568,8 @@ if n<nkan
 	return
 end
 
-if ~isempty(x) && length(x)<nkan
-	x=x(:)*ones(1,ceil(nkan/length(x)));
-	x=x(1:nkan);
-end
-
 if isempty(bAddPlot)
-	bAddPlot=double(fignr)<0;
+	bAddPlot = double(fignr)<0;
 elseif ischar(bAddPlot)
 	switch bAddPlot
 		case 'all'
@@ -640,6 +633,16 @@ end
 corder=get(fignr,'DefaultAxesColorOrder');
 ass=zeros(nkan,2);
 lijnen=cell(nkan,2);
+nXi = [];
+if bXcommon
+	Xi = X;
+	if istable(Xi)
+		Xi = table2array(Xi);
+	end
+	if xl && isscalar(x) && x>=1
+		nXi = naame{x};
+	end
+end
 for i=1:nkan
 	ass(i)=subplot(nrij,nkol,i);
 	k=kols(i,:);
@@ -647,6 +650,18 @@ for i=1:nkan
 	k(k>nChannels)=[];
 	if isempty(k)
 		continue
+	end
+	
+	if ~bXcommon
+		if isnumeric(X) && ~isempty(X)
+			Xi = X(:,x(i));
+			if istable(Xi)
+				Xi = table2array(Xi);
+			end
+			if xl
+				nXi = naame{x(i)};
+			end
+		end
 	end
 	k2=[];
 	if ~isempty(de)
@@ -663,20 +678,20 @@ for i=1:nkan
 	end
 	xxx=[];
 	if bPlotCarr&&~isempty(naame)&&length(k)==1&&naame{k}(1)=='#'
-		xxx=plotcarr(e(:,k),e(:,x(i)),naame{k});
+		xxx=plotcarr(e(:,k),Xi,naame{k});
 	end
 	if isempty(xxx)&&~isempty(k)
 		if bPlotLong
-			pl=plotlong(e(:,x(i))*fx+dx,e(:,k)); %#ok<UNRCH>
+			pl=plotlong(Xi,e(:,k));
 		elseif isa(e,'timeseries')
 			if ~isempty(x)
 				Y = e(k).Data;
 				if isscalar(x)
-					X = e(x).Data;
+					Xi = e(x).Data;
 				else
-					X = x;
+					Xi = x;
 				end
-				pl = plot(X,Y);
+				pl = plot(Xi,Y);
 			elseif isscalar(k)
 				pl=plot(e(k));
 			else
@@ -718,7 +733,11 @@ for i=1:nkan
 			end
 			xl = false;
 		else
-			pl=plot(e(:,x(i))*fx+dx,e(:,k));
+			ePlot = e(:,k);
+			if istable(ePlot)
+				ePlot = table2array(ePlot);
+			end
+			pl=plot(Xi,ePlot);
 		end
 		for ik=1:length(k)
 			if ~isempty(naame)&&~isempty(naame{k(ik)})
@@ -726,7 +745,7 @@ for i=1:nkan
 			end
 		end
 		if bCMenu
-			for ik=1:length(k) %#ok<UNRCH>
+			for ik=1:length(k)
 				hCM=uicontextmenu('UserData',pl(ik));
 				uimenu(hCM,'label',sprintf('channel #%d',k(ik))	...
 					,'enable','off');
@@ -776,11 +795,13 @@ for i=1:nkan
 			end
 		end
 	end
-	if xl && ~isempty(x)
+	if ~isempty(nXi)	% move this to creation of nXi
 		if isempty(de)
-			xlabel(sprintf('%s',naame{x(i)}))
+			xlabel(sprintf('%s',nXi))
+		elseif bXcommon
+			xlabel(sprintf('%s [%s]',nXi,de{x}))
 		else
-			xlabel(sprintf('%s [%s]',naame{x(i)},de{x(i)}))
+			xlabel(sprintf('%s [%s]',nXi,de{x(i)}))
 		end
 	end
 	if ~isempty(k3)
@@ -793,12 +814,12 @@ for i=1:nkan
 			,'Color','none'	...
 			,'XTick',[]	...
 			);
-		pl=line(e(:,x(i))*fx+dx,e(:,k3));
+		pl=line(Xi,e(:,k3));
 		if ~isempty(naame)&&~isempty(naame{k3(1)})
 			set(pl,'tag',naame{k3(1)})	% (!)(1) added(!?)
 		end
 		if bCMenu
-			hCM=uicontextmenu; %#ok<UNRCH>
+			hCM=uicontextmenu;
 			uimenu(hCM,'label',sprintf('channel #%d',k3),'enabled',false);
 			if ~isempty(naame)&&~isempty(naame{k3})
 				uimenu(hCM,'label',naame{k3})
@@ -823,18 +844,6 @@ for i=1:nkan
 			end
 		end
 		ylabel(['[' de{k3(1)} ']'])
-		if 0	% is dit nog nuttig?
-			ylab=get(ass(i,2),'YLabel');
-			un=get(ylab,'Units');
-			set(ylab,'Units','normalized')
-			p=get(ylab,'Position');
-			set(ylab,'Rotation',90      ...
-				,'Position',[p(1),0.5]      ...
-				,'HorizontalAlignment','center'    ...
-				,'VerticalAlignment','bottom'      ...
-				);
-			set(ylab,'Units',un);
-		end
 	end
 end
 if bXdata

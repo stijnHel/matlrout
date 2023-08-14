@@ -1,17 +1,20 @@
-function D=ReadPCAPNG(fName)
+function D=ReadPCAPNG(fName,skipBytes)
 %ReadPCAPNG - Read PCAPNG-file - logfile of Wireshark
 %      D=ReadPCAPNG(fName)
 %
 % see http://wiki.wireshark.org/Development/LibpcapFileFormat
 %     http://www.winpcap.org/ntar/draft/PCAP-DumpFileFormat.html
+%
+%     and also https://pcapng.com/
+%        https://www.winpcap.org/ntar/draft/PCAP-DumpFileFormat.html
+%               (seems to match file format used on mac?!)
+%
+% See also ReadPCAP
 
-fid=fopen(zetev([],fName));
-if fid<3
-	fid=fopen(fName);
-	if fid<3
-		error('Can''t open the file')
-	end
-end
+% Heeft dit ooit gewerkt?  Ik vind geen files waarmee deze functie werkt!
+%  Wordt nu aangepast.
+
+fid=fopen(fFullPath(fName));
 x=fread(fid,[1 Inf],'*uint8');
 fclose(fid);
 
@@ -29,13 +32,17 @@ S5 = [];
 S6=struct('iID',cell(1,40000),'t',[],'nBcaptured',[],'nBpacket',[]	...
 	,'data',[],'options',[]);
 S3 = {};
-iX = 1;
+if nargin>1 && ~isempty(skipBytes)
+	iX = skipBytes+1;
+else
+	iX = 1;
+end
 notImplementedBT = zeros(1,0,'uint8');
 while iX<length(x)
 	[B,BT,iX]=GetBlock(x,iX);
 	nn(min(end,BT))=nn(min(end,BT))+1;
 	switch BT
-		case 168627466	% Section Header Block
+		case {168627466}	% Section Header Block (????)
 			DheaderBlock1 = ReadSectionHeader(B);
 			if ~isempty(DheaderBlock)
 				warning('Multiple section header blocks!')

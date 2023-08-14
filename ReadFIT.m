@@ -7,9 +7,11 @@ function [D,Xrecord,nX,NE,V,G]=ReadFIT(fName,varargin)
 %
 %  see also ProjGPS2XY
 
-% add option to remove "starting and ending singles"
+% * add option to remove "starting and ending singles"
 %          (couple of points that are related to previous use, or "saving
 %          time")
+% * started to use cGeography, but still a lot of geo-specific code that
+%   should be used from cGeography.
 
 if nargin && ischar(fName)
 	switch lower(fName)
@@ -218,7 +220,8 @@ if bProcess
 		else
 			getmakefig(figTagNE)
 		end
-		[~,~,Z1]=PlotGemeentes();
+		[l,~,Z1]=PlotGemeentes();
+		set(l,'Hittest','off')
 		Z1 = Z1([2 1]);
 	end
 	if nargout>3
@@ -346,6 +349,8 @@ if bPlot
 	if bBelgiPlot
 		line(NE(:,2),NE(:,1),'Color',[1 0 0],'LineWidth',1.5)
 		ax1 = gca;
+		ax1.ButtonDownFcn = @PointClicked;
+		G.cGEO = CreateGeography('country','Belgium','-bStoreCoors');
 	else
 		ax1 = plotmat(NE,1,2,[],[],'fig',figTagNE);
 	end
@@ -754,3 +759,16 @@ if bPlot
 	setappdata(gcf,'FITnr',nr)
 end
 end		% MyKeyActions
+
+function PointClicked(ax,ev)
+f = ancestor(ax,'figure');
+D = f.UserData;
+p = ProjGPS2XY(ev.IntersectionPoint([2 1]),'Z1',D.G.Z1,'-bInverse');
+[name,cntry] = D.G.cGEO.FindCommunity(p);
+if ~isempty(name)
+	if ~strcmpi(cntry,'BEL')
+		name = [cntry,':',name];
+	end
+end
+xlabel(name)
+end		% PointClicked

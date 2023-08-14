@@ -17,12 +17,16 @@ bBlank(1+[9 10 13 32])=true;
 bDelim=false(1,256);
 bDelim(1+('()<>[]{}/%'))=true;
 
-fid=fopen(fName);
-if fid<3
-	error('Can''t open the file')
+if isa(fName,'uint8')
+	x = char(fName);
+else
+	fid=fopen(fName);
+	if fid<3
+		error('Can''t open the file')
+	end
+	x=char(fread(fid,[1 Inf],'*uint8')); %#ok<FREAD>
+	fclose(fid);
 end
-x=char(fread(fid,[1 Inf],'*uint8')); %#ok<FREAD>
-fclose(fid);
 
 cEOL=x(end);
 bDEOL=cEOL==10&&x(end-1)==13;
@@ -34,7 +38,7 @@ if cEOL~=10&&cEOL~=13
 			printhex(x(1:min(32,end)))
 			error('No LF or CR in start???')
 		end
-		cEOL=char(10);
+		cEOL=newline;
 	elseif isempty(iLF)
 		cEOL=char(13);
 	else
@@ -44,7 +48,7 @@ if cEOL~=10&&cEOL~=13
 		else
 			bDEOL=true;
 		end
-		cEOL=char(10);
+		cEOL=newline;
 	end
 end
 BEOL=x==cEOL;

@@ -217,7 +217,13 @@ else
 	end
 end
 uID=unique(double(ID));
-nID=hist(double(ID),uID);
+if isempty(uID)
+	nID = 0;
+elseif isscalar(uID)
+	nID = length(ID);
+else
+	nID=hist(double(ID),uID);
+end
 iID=cell(1,length(uID));
 for i=1:length(uID)
 	iID{i}=find(ID==uID(i));
