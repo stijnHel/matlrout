@@ -8,6 +8,8 @@ function hOut=steppedline(varargin)
 %   steppedline(<handle>) - lines within object targeted by <handle> are
 %      converted to stepped lines or back
 %      steppedline(<handle>,'bReverse',true) - reverse order is used
+%
+% see also stairs
 
 bCompress=true;
 

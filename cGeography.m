@@ -4,15 +4,32 @@ classdef cGeography < handle
 	%
 	% see also CreateGeography (easy method to keep only one instance of this object)
 
+	% NE --> P --> NE geeft niet het oorspronkelijke resultaat!
+	%   bij Long==0 ==> geen (belangrijke) fout
+	%   Bij long~=0 ==> fout op N (100 km --> 2.6 m)
+	%   nog geen fout gevonden
+
+	properties (Constant)
+		a = 6378137.0			% earths equatorial radius (of ellipsoid approximation)
+		f = 1/298.257223563		% earths flattening
+	end		% constant properties
+
 	properties	% settings
 		bStoreCoors = false
-		dPosDeg = 0.01
+		dPosDeg = 0.05
 	end		% properties (settings)
 
 	properties
 		borderPath
 		countryTable
 		Countries
+	end
+
+	properties
+		lastZ1
+		lastXYZ0
+		lastXe
+		lastXn
 	end
 
 	methods
@@ -131,7 +148,6 @@ classdef cGeography < handle
 						C = c.Countries.(country);
 					else
 						X = ReadESRI(fullfile(c.borderPath,countryPath));
-							%!!!!!!!!!!!!!!move borders!!!!
 						[Z,~,Nc]=ReadESRI(X,'getCoor','all');
 						Pp = zeros(length(Z),2);
 						Bdouble = false(size(Nc));
@@ -166,11 +182,16 @@ classdef cGeography < handle
 			end
 		end		% GetCountry
 
-		function X = GetCountryData(c,cntry,bAddBorders)
+		function [Names,Coor,Z] = GetCountryData(c,cntry,bAddBorders)
 			if nargin<3 || isempty(bAddBorders)
-				bAddBorders = c.bStoreCoors;
+				bAddBorders = c.bStoreCoors || nargout>2;
 			end
 			X = c.GetCountry(cntry,bAddBorders);
+			Names = X.Names;
+			Coor = X.Coor;
+			if nargout>2
+				Z = X.Z;
+			end
 		end		%GetCountryData
 
 		function [P,Pborder] = GetCommunity(c,cntry,com)
@@ -209,7 +230,161 @@ classdef cGeography < handle
 		function C = GetCountries(c)
 			C = c.Countries;
 		end		%GetCountries
-	end		% methods
+
+		function [XYZ,y,z] = CalcXYZ(c,Lat,Long,H)
+			%cGeography/CalcXYZ - Cartesian coordinates from angular coordinates
+			%     XYZ = c.CalcXYZ(Lat,Long,H)
+			%            Lat, Long in degrees, H in meters
+			%            XYZ in meters
+			%  coordinates taking using the ellipsoidal approximation
+
+			e2 = 2*c.f - c.f^2;	% excentricity e (squared) 
+			
+			N = c.a ./ sqrt(1 - e2 .* sind(Lat).^2);
+			if nargin>3 && ~isempty(H)
+				N=N+H;
+			end
+			R=N.*cosd(Lat);
+			x = R.*cosd(Long);
+			y = R.*sind(Long);
+			z = (1-e2)*N.*sind(Lat);
+			if nargout<=1
+				XYZ = [x,y,z];
+			else
+				XYZ = x;
+			end
+		end		% CalcXYZ
+
+		function [XY,Z,XYZ] = ProjectXY(c,Lat,Long,Z1,H)
+			%cGeography/ProjectXY - Project geographical coordinates to a plane
+			%    [NE,Z,XYZ] = ProjectXY(c,Lat,Long,Z1,H)
+			%    [NE,Z,XYZ] = ProjectXY(c,[Lat,Long],Z1,H)
+			%            angles in degrees
+			%            Z1 are geographical coordinates ([Lat,Long]) or
+			%               cartesian coordintes ([x,y,z])
+			%               can be omitted (in that case the last frame is
+			%                  used - last frame is stored in object)
+			%            NE : [north east] in meters
+			%            Z : orthogonal distance between points and surface
+			%            XYZ : cartesian (3D) coordinates
+
+			if nargin<5
+				H = [];
+				if nargin<4
+					Z1 = [];
+					if nargin<3
+						Long = [];
+					end
+				end
+			end
+			if nargin<3 || ~isequal(size(Lat),size(Long))	% P(=[Lat,Long])
+				H = Z1;
+				Z1 = Long;
+				Long = Lat(:,2);
+				Lat = Lat(:,1);
+			end
+			if isempty(Z1)
+				XYZ0 = c.lastXYZ0;
+				Xe = c.lastXe;
+				Xn = c.lastXn;
+			else
+				if length(Z1)==3
+					XYZ0 = Z1(:)';
+				else
+					XYZ0 = c.CalcXYZ(Z1(1),Z1(2));
+				end
+				c.lastXYZ0 = XYZ0;
+				[Xe,Xn] = c.GetRefFrame(Z1);
+			end
+			XYZ = c.CalcXYZ(Lat(:),Long(:),H);
+			
+			dP = XYZ-XYZ0;
+			XY = dP*[Xn',Xe'];	% ? first column north (to be consistent with angle based (on normally used)
+			if nargout>1
+				Z = dP*cross(Xe,Xn)';
+			end
+		end		% ProjectXY
+
+		function [P,H] = InverseProj(c,NE,Z1)
+			%InverseProj - From projected points to geographical coordinates
+			%     [P,H] = c.InverseProj(NE,Z1)
+			%          NE: ["north" , "east"]
+			%          Z1: reference point (if not given last coordinates)
+			%          P: [Latitude, Longitude]
+			%          H: (not really useful) zeros (height)
+			%
+			%   (not completely correct!)
+
+			% not correct calculation (spherical, not ellipsoidal)
+			if nargin<3 || isempty(Z1)
+				XYZ0 = c.lastXYZ0;
+				Xe = c.lastXe;
+				Xn = c.lastXn;
+			else
+				if length(Z1)==3
+					XYZ0 = Z1(:)';
+				else
+					XYZ0 = c.CalcXYZ(Z1(1),Z1(2));
+				end
+				c.lastXYZ0 = XYZ0;
+				[Xe,Xn] = c.GetRefFrame(Z1);
+			end
+			XYZ = XYZ0+NE*[Xn;Xe];
+			% Force on the ellipsoid
+			XYZ = ProjPtsEllipsoid(XYZ,c.a,c.f,XYZ0);
+			Long = atan2d(XYZ(:,2),XYZ(:,1));
+			Lat = atan2d(XYZ(:,3)/(1-c.f)^2,sqrt(sum(XYZ(:,1:2).^2,2)));
+				% (1-c.f)^2 to calculate geographical coordinates
+			P = [Lat,Long];
+			H = zeros(size(Lat));
+		end		% InverseProj
+
+		function [Xe,Xn] = GetRefFrame(c,Z1)
+			%cGeography/GetRefFrame - Returns frame for 2D projection
+			%    [Xe,Xn] = GetRefFrame(Z1)
+			%    [Xe,Xn] = GetRefFrame(XYZ0)
+
+			if length(Z1)==3&&any(abs(Z1)>360)	% 3D coordinates as reference point
+				XY0=sqrt(Z1(1)^2+Z1(2)^2);
+				if Z1(3)*0.001>XY0	% north pole
+					Xe=[0 1 0];
+					Xn=[-1 0 0];
+				elseif Z1(3)*-0.001>XY0	% south pole
+					Xe=[0 1 0];
+					Xn=[-1 0 0];
+				else
+					%(The rest should be able to use this part too!!!)
+					Z1=Z1/sqrt(Z1*Z1');
+					Xe=[-Z1(2),Z1(1),0];	% orthogonal to Z1 in XY-plane
+					rX=sqrt(Xe*Xe');
+					Xe=Xe/rX;
+					Xn=cross(Z1,Xe);
+				end
+			elseif abs(Z1(1))<89.9	% normal case (long/lat & not on the poles)
+				%!possibly non spherical XYZ-calculation, but projection based on spherical configuration?!
+				sLat=sind(Z1(1));
+				sLong=sind(Z1(2));
+				cLat=cosd(Z1(1));
+				cLong=cosd(Z1(2));
+				Xn=[-sLat.*cLong, -sLat.*sLong, cLat];
+				Xe=[-sLong,       cLong,        0];
+				%N=-sind(Lat).*cosd(Long).*dP(:,1) - sind(Lat).*sind(Long).*dP(:,2) + cosd(Lat).*dP(:,3);	% is this OK???
+				%	% shouldn't dP be transformed with fixed vector to (N,E)?
+				%E=-sind(Long).*dP(:,1)            + cosd(Long).*dP(:,2);
+			elseif Z1(1)>0	% north pole
+				%XYZ0=[0,0,c.a*(1-c.f)];
+				Xe=[1 0 0];
+				Xn=[0 1 0];
+			else	% south pole
+				%XYZ0=[0,0,c.a*(c.f-1)];
+				Xe=[0 1 0];
+				Xn=[-1 0 0];
+			end
+			c.lastZ1 = Z1;
+			c.lastXe = Xe;
+			c.lastXn = Xn;
+		end		% GetRefFrame
+		end		% methods
 end		% cGeography
 
 
@@ -264,3 +439,31 @@ else
 	end
 end
 end		% IsInArea
+
+function XYZ = ProjPtsEllipsoid(Pts,a,f,XYZ0)
+%     goal: for InverseProjection, project from plane to ellipsoid
+%     idea: * "scale" to sphere (enlarge Z)
+%           * take normals of points
+%           * find r=a
+%           * "scale" back to ellipsoid
+
+% This is not completely right! (of toch?)
+%   the "unprojected" points before scaling back are not ortogonal to
+%      oringal points after scaling! - of toch?
+
+% Scale to sphere (points and reference surface)
+XYZ = Pts;
+XYZ(:,3) = XYZ(:,3)/(1-f);
+xyz0 = XYZ0;
+xyz0(3) = xyz0(3)/(1-f);	% becomes the normal to the sphere (should be...)
+xyz0 = xyz0/sqrt(xyz0*xyz0');	% make unit vector
+
+% Take normals to points and find radius(Pt + x.XYZ0) == a
+B = XYZ*xyz0';	% (half of the) linear coefficient of the polynome
+XYZ = XYZ+(sqrt(B.^2-(sum(XYZ.^2,2)-a^2))-B)*xyz0;
+	% the solution of the quadratical formula
+
+% Rescale to ellipsoid
+XYZ(:,3) = XYZ(:,3)*(1-f);
+
+end		% ProjPtsEllipsoid

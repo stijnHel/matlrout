@@ -1,6 +1,6 @@
-function [tML,timeFormat]=Tim2MLtime(t,timeFormat)
+function [tML,timeFormat]=Tim2MLtime(t,timeFormat,b2Datetime)
 %Tim2MLtime - Convert time to Matlab-timestamp
-%          tML=Tim2MLtime(t,timeFormat)
+%          tML=Tim2MLtime(t,timeFormat[,,b2Datetime])
 %                tymeFormat:
 %                     'excel' (days after -1/1/1900)
 %                     'matlab'
@@ -18,33 +18,42 @@ function [tML,timeFormat]=Tim2MLtime(t,timeFormat)
 %                              yyyymmddHHMMSS.FFF
 %                                only HH, HHMM, HHMMSS are also possible
 %                     'sec<time>' same as base.. but with seconds
+%                 b2Datetime: not Matlab datenum (orig format), but datetime
 %          [tScale,tOffset] = Tim2MLtime(timeFormat,t)
-%    extracted data from axtick2date
+%
+% See also datetime (with similar Matlab-builtin functionality)
+%          axtick2date
+
+if nargin<3 || isempty(b2Datetime)
+	b2Datetime = false;
+end
 
 if ~isnumeric(t)
 	if isa(t,'lvtime')
 		tML = double(t);
 		timeFormat = 'lvtime';
-		return
 	elseif ischar(t)
 		if nargin<2
 			timeFormat = [];
 		end
 		[tML,timeFormat]=GetScaleOffset(t,timeFormat);
-		return
 	else
 		error('Wrong input!')
 	end
+else
+	if nargin<2||isempty(timeFormat)
+		timeFormat=GetDefaultTF(t(1));
+	end
+	if isnumeric(t)&&~isfloat(t)
+		t=double(t);
+	end
+	[tScale,tOffset] = GetScaleOffset(timeFormat,t(1));
+	tML=double(t)/tScale+tOffset;
 end
 
-if nargin<2||isempty(timeFormat)
-	timeFormat=GetDefaultTF(t(1));
+if b2Datetime
+	tML = datetime(tML,'ConvertFrom','datenum');
 end
-if isnumeric(t)&&~isfloat(t)
-	t=double(t);
-end
-[tScale,tOffset] = GetScaleOffset(timeFormat,t(1));
-tML=double(t)/tScale+tOffset;
 
 function timeFormat=GetDefaultTF(t)
 if t<1e5

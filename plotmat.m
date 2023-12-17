@@ -296,6 +296,15 @@ if ischar(x)
 	end
 	bXfirstColumn = i==1;
 	x=i;
+elseif isa(x,'lvtime')
+	if length(x)~=size(e,1)
+		error('Wrong length of (lvtime-)timestamps!')
+	end
+	x = double(x);
+	if isempty(bTNavfig)
+		bXdata = true;
+		bNavfig = true;
+	end
 elseif isstruct(x)
 	x = timevec(x,e,bAbsTime&&isfield(x,'t0')&&~isempty(x.t0));
 	bXvector=true;
@@ -306,7 +315,7 @@ elseif isempty(x)
 		x = 1;
 		bXfirstColumn = true;
 	end
-elseif all(x==0 | x==1)
+elseif islogical(x) || (isnumeric(x) && all(x==0 | x==1))
 	bXfirstColumn = true;
 	bXcommon = true;
 end

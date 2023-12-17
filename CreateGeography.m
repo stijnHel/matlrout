@@ -4,7 +4,7 @@ function c = CreateGeography(varargin)
 
 persistent GEOG
 
-if isempty(GEOG)
+if isempty(GEOG) || ~isa(GEOG,'cGeography')
 	GEOG = cGeography(varargin{:});
 elseif nargin
 	GEOG.Update(varargin{:})

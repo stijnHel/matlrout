@@ -52,6 +52,8 @@ S=struct('colOrder',SETTINGS.defColOrder	...
 	,'colMap',SETTINGS.defColMap	...
 	,'menubar',SETTINGS.defMenubar	...
 	,'papertype',SETTINGS.defPapertype	...
+	,'bUIfigure',false	...
+	,'bNavfig',false	...
 	);
 if ~isempty(V)
 	[S,~,V]=setoptions(S,V{:});
@@ -67,8 +69,15 @@ for i=1:size(fN,1)
 	end
 end
 
-f=figure(V{:});
-orient(f,'landscape')
+if S.bUIfigure
+	f = uifigure(V{:});
+else
+	f=figure(V{:});
+	orient(f,'landscape')
+	if S.bNavfig
+		navfig
+	end
+end
 if nargout
 	fOut=f;
 end

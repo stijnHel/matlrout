@@ -33,6 +33,10 @@ function [varargout] = volglijn(lvar,lvast,lvolg)
 %          'L' : make markers to the right limit
 %          'v' : volg lijnen (door lijnen in centrum van as te houden) aan/afzetten
 %          'M' : show/toggle logged points
+%          'ctrl-P' : mark point 1
+%          'ctrl-Q' : mark point 2
+%          'ctrl-R' : reset pointer lines (similar to "L")
+%          'ctrl-L' : plot(/toggle) line of zoomed parts in T-plots
 %
 %    andere volglijn-mogelijkheden :
 %        volglijn stop : stopt met volgen (laat lijnen staan)
@@ -50,7 +54,10 @@ function [varargout] = volglijn(lvar,lvast,lvolg)
 
 % toe te voegen
 % - als te volgen assen "axtick2date" zijn, juist updaten bij scrollen
+%       --> klaar?
 % - delete-function bij marker-lijnen
+% - mogelijkheid om XY-plot te zoomen naar getoonde deel in Y/t plots
+%   en/of volledige track (zeker bij "belgie-mode")
 
 % Er is gestart met meerdere "vaste lijnen", maar nog niets werkends.
 
@@ -536,7 +543,7 @@ try
 								'"Z" : zoom to zoomed parts in T-plots',CR,	...
 								'"ctrl-P": mark point 1',CR,	...
 								'"ctrl-Q": mark point 2',CR,	...
-								'"ctrl-R": reset pointer lines (similar to "L")',CR,
+								'"ctrl-R": reset pointer lines (similar to "L")',CR,	...
 								'"ctrl-L": plot(/toggle) line of zoomed parts in T-plots',CR,	...
 								];
 							helpdlg(helpS,'VolgLijn-help')
@@ -585,6 +592,10 @@ try
 					X = S.lvast.XData(B);
 					Y = S.lvast.YData(B);
 					line(S.VLa,X,Y,'Color',[0 1 0],'Tag','partPlot','LineWidth',2)
+					for i=1:length(S.fvar)
+						navfig(S.fvar(i),'AddUpdateAxes',@UpdateZoomedPart)
+							% (!!!!) What if already added?!!!
+					end
 				else
 					%set(l,'XData',X,'YData',Y)
 					delete(l)
@@ -763,9 +774,9 @@ end
 t = S.VLvx(iMarker);
 setappdata(S.fvast,sTag,iMarker)
 if isempty(lMarker)
-	if iMarker==1
-		c = [1 1 0];
-	elseif iMarker==2
+	if strcmp(sTag,'marker1')
+		c = [0 1 0];
+	elseif strcmp(sTag,'marker2')
 		c = [1 0 1];
 	else	% no use (yet)
 		c = [0 1 1];
@@ -799,3 +810,16 @@ else
 	st = num2str(t);
 end
 fprintf('Set %s: #%4d - %s\n',sTag,iMarker,st)
+
+function UpdateZoomedPart(ax)
+fT = ancestor(ax,'figure');
+f = getappdata(fT,'VL_fvar');
+S = getappdata(f,'volglijn_fvast');
+l = findobj(S.VLa,'Tag','partPlot');
+if ~isempty(l)
+	xl = S.lvar(1).Parent.XLim;
+	B = S.lvar(1).XData>=xl(1) & S.lvar(1).XData<=xl(2);
+	X = S.lvast.XData(B);
+	Y = S.lvast.YData(B);
+	set(l,'XData',X,'YData',Y)
+end

@@ -7,12 +7,6 @@ function [D,Xrecord,nX,NE,V,G]=ReadFIT(fName,varargin)
 %
 %  see also ProjGPS2XY
 
-% * add option to remove "starting and ending singles"
-%          (couple of points that are related to previous use, or "saving
-%          time")
-% * started to use cGeography, but still a lot of geo-specific code that
-%   should be used from cGeography.
-
 if nargin && ischar(fName)
 	switch lower(fName)
 		case 'get'
@@ -66,8 +60,9 @@ bProcess=nargout>1;
 [bPlot] = nargout==0;
 [bAnalyse] = false;	% Find blocks of movement
 [bDispAnal] = true;	% display analysis-results (if analysed)
-[bRemoveNonBlocks] = true;
+[bRemoveNonBlocks] = true;	% remove "non-blocks" - too short blocks (currently only start and end)
 maxStandStillTime = 5/1440;
+minKeepBlockInterTime = 3/24;
 minDistBlock = 500;
 minVedges = 0.1;
 Z1 = [];
@@ -78,7 +73,7 @@ figTagVHD = [];
 figTagNE = [];
 if nargin>1
 	setoptions({'bInterpret','bGPX','fileGPX','Z1','bRelTime','bRemoveNaNs'	...
-		,'bPlot','bAnalyse','maxStandStillTime','minDistBlock','minVedges','bBelgiPlot'	...
+		,'bPlot','bAnalyse','maxStandStillTime','minKeepBlockInterTime','minDistBlock','minVedges','bBelgiPlot'	...
 		,'bDispAnal','bRemoveNonBlocks','bFixedFigures'	...
 		,'figTagNEtime','figTagVHD','figTagNE'	...
 		},varargin{:})
@@ -271,9 +266,20 @@ if bProcess
 	iX_H = find(strcmp(nX,'enhanced_altitude'));
 	
 	if bAnalyse
+		% Short blocks in the file (not start/end) result in extension of
+		% blocks of data.  This is not "expected behaviour".
+		% Better to extend removing first/last block to remove all
+		% "nonblocks" (with a larger standstill-time than
+		% maxStandStillTime).
+		% Now the "internal non-blocks" are kept.
 		jj = [0;find(diff(Xrecord(:,1))>maxStandStillTime);size(Xrecord,1)];
 		lBlock = cumD(jj(2:end))-cumD(jj(1:end-1)+1);
-		Bshort = lBlock<minDistBlock;
+		dtGap = (Xrecord(jj(2:end-1)+1)-Xrecord(jj(2:end-1)));
+		BshortStop = [true;dtGap(1:end-1)<minKeepBlockInterTime;true];
+			% short-stop is a quick help to avoid blocks extended with
+			% non-blocks a long time after the block)
+		%Bshort = lBlock<minDistBlock;
+		Bshort = lBlock<minDistBlock & BshortStop;
 		jj0 = jj;	% if last part has to be removed
 		jj(Bshort) = [];
 		if isempty(jj)
@@ -304,12 +310,17 @@ if bProcess
 			jjEnd = jj(2:end);
 			nBlock = length(jjStart);
 			for ix = 1:nBlock
-				%(!!)assuming no long logs with only very low speed!!
-				while any(Xrecord(jjStart(ix)+[0 1],iX_V)<minVedges)
-					jjStart(ix) = jjStart(ix)+1;
-				end
-				while any(Xrecord(jjEnd(ix)+[-1 0],iX_V)<minVedges)
-					jjEnd(ix) = jjEnd(ix)-1;
+				BlowSpeed = Xrecord(jjStart(ix):jjEnd(ix),iX_V)<minVedges;
+				if all(BlowSpeed(1:end-1)|BlowSpeed(2:end))
+					% block with only very low speed!!
+					% just keep the block...
+				else
+					while any(Xrecord(jjStart(ix)+[0 1],iX_V)<minVedges)
+						jjStart(ix) = jjStart(ix)+1;
+					end
+					while any(Xrecord(jjEnd(ix)+[-1 0],iX_V)<minVedges)
+						jjEnd(ix) = jjEnd(ix)-1;
+					end
 				end
 			end
 			lBlock = cumD(jjEnd)-cumD(jjStart);
@@ -379,18 +390,24 @@ if bPlot
 	tFigs = [fig2,fig3];
 	volglijn(tFigs,ancestor(ax1,'figure'))
 	set([ancestor(ax1,'figure'),tFigs],'UserData',var2struct(Xrecord,nX,NE,V,G))
-	if bAnalyse
+	if bAnalyse		% put markers (start/stop) on the three axes
 		line(D.Tblock(:,1),VH(jj(1:end-1)+1,2),'Color',[0 0.75 0]	...
+			,'HitTest','off','PickableParts','none'		...
 			,'Linestyle','none','Marker','o','Tag','blockData','Parent',ax3(1))
 		line(D.Tblock(:,2),VH(jj(2:end),2),'Color',[1 0 0]	...
+			,'HitTest','off','PickableParts','none'		...
 			,'Linestyle','none','Marker','x','Tag','blockData','Parent',ax3(1))
 		line(D.Tblock(:,1),VH(jj(1:end-1)+1,3),'Color',[0 0.75 0]	...
+			,'HitTest','off','PickableParts','none'		...
 			,'Linestyle','none','Marker','o','Tag','blockData','Parent',ax3(2))
 		line(D.Tblock(:,2),VH(jj(2:end),3),'Color',[1 0 0]	...
+			,'HitTest','off','PickableParts','none'		...
 			,'Linestyle','none','Marker','x','Tag','blockData','Parent',ax3(2))
 		line(D.Tblock(:,1),cumD(jj(1:end-1)+1)/1000,'Color',[0 0.75 0]	...
+			,'HitTest','off','PickableParts','none'		...
 			,'Linestyle','none','Marker','o','Tag','blockData','Parent',ax3(3))
 		line(D.Tblock(:,2),cumD(jj(2:end))/1000,'Color',[1 0 0]	...
+			,'HitTest','off','PickableParts','none'		...
 			,'Linestyle','none','Marker','x','Tag','blockData','Parent',ax3(3))
 	end
 	navfig('link',tFigs)

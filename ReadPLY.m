@@ -20,7 +20,7 @@ bLoop=true;
 v=[];
 while iErr==0&&bLoop
 	i1=ix;
-	while x(ix)~=10
+	while x(ix)~=10 && x(ix)~=13
 		ix=ix+1;
 		if x(ix)==0	% shouldn't happen!
 			iErr=1;
@@ -29,6 +29,9 @@ while iErr==0&&bLoop
 		end
 	end
 	l=char(x(i1:ix-1));
+	if ix<length(x) && x(ix)==13 && x(ix+1)==10
+		ix = ix+1;
+	end
 	nC=nC+1;
 	C{nC}=l;
 	if nC==1
@@ -199,7 +202,7 @@ switch sTyp
 	case 'uint'
 		nB=4;
 		typ='uint32';
-	case 'float'
+	case {'float','float32'}
 		nB=4;
 		typ='single';
 	case 'double'

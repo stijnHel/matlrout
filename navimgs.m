@@ -484,6 +484,7 @@ axlim=getappdata(f,'NAVIMGSaxlim');
 bConvColor=getappdata(f,'NVrawcolor');
 imgPixScale=getappdata(f,'imgPixScale');
 bUsePCOLOR=getappdata(f,'bUsePCOLOR');
+ImgTranformData = getappdata(f,'ImgTranformData');
 if isempty(bConvColor)
     bConvColor=false;
 end
@@ -532,6 +533,10 @@ end
 if ~isempty(imgPixScale)
     X=X*imgPixScale;
 end
+if ~isempty(ImgTranformData)
+	X = ImgTranformData.Transform(X);
+end
+
 if bInit
 	if bUsePCOLOR
 		h=pcolor((1:size(X,2))-0.5,(1:size(X,1))-0.5,X);

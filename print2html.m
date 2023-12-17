@@ -178,6 +178,7 @@ stroptions=struct('maxcolarray',6,'maxrowarray',10,'maxel',20	...
 	,'bExpandLink',false	... create a link for "collapsed data"
 	,'webArguments',{{}}	... arguments "forwarded" to web-call
 	,'figure',[]	... figure if matlab figure browser is requested
+	,'useUIfigure',true	...
 	);
 
 if ~exist('nrecurs','var')||isempty(nrecurs)
@@ -917,16 +918,27 @@ if isempty(options.figure)
 	f = nfigure;
 elseif ischar(options.figure)
 	f = getmakefig(options.figure);
+elseif iscell(options.figure)
+	f = getmakefig(options.figure{:});
 else
 	f = options.figure;
 end
 browser = getappdata(f,'browser');
 
-if isempty(browser)
-	% Add the browser object on the right
-	jObject = com.mathworks.mlwidgets.html.HTMLBrowserPanel;
-	[browser,container] = javacomponent(jObject, [], f);
-	set(container, 'Units','norm', 'Pos',[0.05,0.05,0.9,0.9]);
-	setappdata(f,'browser',browser)
+if options.useUIfigure
+	if isempty(browser)
+		browser = uihtml(f,'Position',[10 10 f.Position([3 4])-20],"HTMLSource",S);
+		setappdata(f,'browser',browser)
+	else
+		browser.HTMLSource = S;
+	end
+else
+	if isempty(browser)
+		% Add the browser object on the right
+		jObject = com.mathworks.mlwidgets.html.HTMLBrowserPanel;
+		[browser,container] = javacomponent(jObject, [], f);
+		set(container, 'Units','norm', 'Pos',[0.05,0.05,0.9,0.9]);
+		setappdata(f,'browser',browser)
+	end
+	browser.setHtmlText(S)
 end
-browser.setHtmlText(S)

@@ -78,7 +78,7 @@ if isempty(f)
 end
 if length(f)==1
 	if strcmp(get(f,'type'),'figure')
-		figure(f)
+		%figure(f)
 	end
 end
 

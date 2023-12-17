@@ -240,7 +240,7 @@ if ischar(c)&&length(c)>1
 			end
 		case {'updateaxes','addupdateaxes'}
 			if ninput<2
-				error('navfig(''updateAxes'') must have an update function as second argumen!')
+				error('navfig(''updateAxes'') must have an update function as second argument!')
 			end
 			if isempty(get(f,'KeyPressFcn'))
 				navfig(f)	% start navfig-functionality
@@ -541,8 +541,9 @@ else
 	error('Multiple NAVFIG-selection display lines available?!')
 end
 
-function [D,oneX]=getaxdataX(ax,pt)
+function [D,oneX,ptV]=getaxdataX(ax,pt)
 % GETAXDATA - Geeft datapunten van lijnen (enkel kijkend volgens X)
+ptV = pt;
 if isappdata(get(ax,'parent'),'navfigX')
 	X=getappdata(get(ax,'parent'),'navfigX');
 elseif isappdata(ax,'navfigX')
@@ -565,11 +566,16 @@ for i=1:length(ll)
 		lNOK(i)=true;	% don't use pointer line as "line"
 	end
 end
+BxyRuler = false(1,2);
 if isempty(X)
 	for i=1:length(ll)
 		X=get(ll(i),'XData');
 		if ~isvector(X)
 			X=X(1,:);	%!!!!!!
+		end
+		if ~isnumeric(X)
+			X = ruler2num(X,get(ax,'XAxis'));
+			BxyRuler(1) = true;
 		end
 		if isempty(X) || min(X)>pt(1) || max(X)<pt(1)
 			lNOK(i)=1;
@@ -582,9 +588,24 @@ if isempty(X)
 					Y=max(Y);	%!!!!!!!!!
 				end
 			end
+			if ~isnumeric(Y)
+				Y = ruler2num(Y,get(ax,'YAxis'));
+				BxyRuler(2) = true;
+			end
 			[~,j]=min(abs(X-pt(1)));
 			D(i+1,:)=[double(X(j)) double(Y(j))];
 		end
+	end
+	if any(BxyRuler)
+		ptV = num2cell(pt);
+		if BxyRuler(1)
+			ptV{1} = num2ruler(pt(1),get(ax,'XAxis'));
+		end
+		if BxyRuler(1)
+			ptV{2} = num2ruler(pt(2),get(ax,'YAxis'));
+		end
+		ptV{1} = string(ptV{1});
+		ptV{2} = string(ptV{2});
 	end
 else
 	[~,j]=min(abs(X-pt(1)));
@@ -631,7 +652,7 @@ if isempty(l)
 			if xislog
 				bxPos=S.XData(:)>0;
 				xl1=[min(S.XData(bxPos)) max(S.XData(bxPos))];
-			elseif strcmp(S.Type,'image') && length(S.XData)>1  && all(diff(S.XData)>0)
+			elseif strcmp(S.Type,'image') && length(S.XData)>2  && all(diff(S.XData)>0)
 				xl1 = [1.5*S.XData(1)-0.5*S.XData(2) 1.5*S.XData(end)-0.5*S.XData(end-1)];
 			else
 				xl1=[min(S.XData(:)) max(S.XData(:))];
@@ -746,6 +767,23 @@ end
 if nargout>2
 	j=find(b);
 end
+
+function b = IsPtInRange(pt,ax)
+%IsPtInRange - is a point (x,y) in axis-range
+%     taking into account non-numeric possibilities of xl and yl
+%         b = IsPtInRange(pt,ax)
+%            pt assumed to be numeric
+
+xl = get(ax,'XLim');
+if ~isnumeric(xl)
+	xl = ruler2num(xl,get(ax,'XAxis'));
+end
+yl = get(ax,'YLim');
+if ~isnumeric(yl)
+	yl = ruler2num(yl,get(ax,'YAxis'));
+end
+b = pt(1)>=xl(1) && pt(1)<=xl(2) && pt(2)>=yl(1) && pt(2)<=yl(2);
+
 
 function x=doezoom(f,x,dx,xislog)
 zoomtype=getappdata(f,'zoomtype');
@@ -1132,27 +1170,18 @@ if ~reedsverwerkt
 				getPtFcn(ax,pt);
 			end
 			if strcmp(get(gco,'type'),'image')
-				hImg=gco;
-				Ximg=get(hImg,'XData');
-				Yimg=get(hImg,'YData');
-				Cimg=get(hImg,'CData');
-				if length(Ximg)==2&&size(Cimg,2)~=2
-					Ximg=linspace(Ximg(1),Ximg(2),size(Cimg,2));
-				end
-				if length(Yimg)==2&&size(Cimg,1)~=2
-					Yimg=linspace(Yimg(1),Yimg(2),size(Cimg,1));
-				end
-				v=interp2(Ximg,Yimg,Cimg,pt(1),pt(2));
+				[v,pt] = GetImgValue(gco,pt);
 				fprintf('(%5g,%5g) - img: %g\n',pt,v);
+				setappdata(ax,'navfigLastData',struct('type','image','pt',pt,'v',v));
 				return
 			end
-			xlim=get(ax,'XLim');
-			yl=get(ax,'YLim');
-			if pt(1)<xlim(1)||pt(1)>xlim(2)||pt(2)<yl(1)||pt(2)>yl(2)
+			if ~IsPtInRange(pt,ax)
 				return
 			end
-			[D,oneX]=getaxdataX(ax,pt);
-			if isequal(getappdata(as(1),'updateAxes'),@axtick2date)
+			[D,oneX,ptV]=getaxdataX(ax,pt);
+			if iscell(ptV)
+				fprintf('(%s,%s) - ',ptV{:});
+			elseif isequal(getappdata(as(1),'updateAxes'),@axtick2date)
 				t=Tim2MLtime(pt(1));
 				fprintf('(%5g,%5g - %s) - ',pt,datestr(t));
 			else
@@ -1187,17 +1216,31 @@ if ~reedsverwerkt
 		case {'d','D'}
 			ax=get(f,'CurrentAxes');
 			D=getappdata(ax,'navfigLastData');
+			pt=get(ax,'CurrentPoint');pt=pt(1,1:2);
 			if isempty(D)
 				return
-			end
-			pt=get(ax,'CurrentPoint');pt=pt(1,1:2);
-			NAVFIGlogs.pt(end+1,:)=[now double(f),double(ax) 1 pt];
-			xlim=get(ax,'XLim');
-			yl=get(ax,'YLim');
-			if pt(1)<xlim(1)||pt(1)>xlim(2)||pt(2)<yl(1)||pt(2)>yl(2)
+			elseif isstruct(D)
+				switch D.type
+					case 'image'
+						[v,pt] = GetImgValue(gco,pt);
+						dPt = pt-D.pt;
+						dv = v-D.v;
+						fprintf('(%5g,%5g) d(%5g,%5g) - %g d(%g)\n',pt,dPt,v,dv);
+						if c=='D'
+							D.pt = pt;
+							D.v = v;
+							setappdata(ax,'navfigLastData',D);
+						end
+					otherwise
+						warning('Unknown type?!')
+				end
 				return
 			end
-			[D1,oneX]=getaxdataX(ax,pt);
+			NAVFIGlogs.pt(end+1,:)=[now double(f),double(ax) 1 pt];
+			if ~IsPtInRange(pt,ax)
+				return
+			end
+			[D1,oneX,ptV]=getaxdataX(ax,pt);
 			if size(D1,1)~=size(D,1)
 				warning('New point not compatible with previous point?!')
 			end
@@ -1205,7 +1248,11 @@ if ~reedsverwerkt
 				D(1,:)=pt;
 			end
 			D2=[pt;D1(2:end,:)-D(2:end,:)];
-			fprintf('(%5g,%5g) - ',pt);
+			if iscell(ptV)
+				fprintf('(%s,%s) - ',ptV{:});
+			else
+				fprintf('(%5g,%5g) - ',pt);
+			end
 			if isempty(oneX)
 				fprintf('%g,%g',D2-D);
 			elseif oneX
@@ -1348,16 +1395,20 @@ if ~reedsverwerkt
 				end
 				[X,Y]=GetXY(l);
 				nFFT=min(length(Y),NAVFIGsets.SG_nFFT);
-				specgram(Y-mean(Y),nFFT,1/median(diff(X)))
+				m_dx = median(diff(X));
+				if m_dx<=0
+					error('Negative timesteps are not allowed')
+				elseif max(diff(X))/m_dx>1.5 || min(diff(X))/m_dx<0.5
+					warning('Large variation in timestep?! (%g - %g, median: %g)'	...
+						, min(diff(X)), max(diff(X)), m_dx)
+				end
+				[Z,F,T] = specgram(Y-mean(Y),nFFT,1/m_dx);
+				newplot()
+				imagesc(T+X(1),F,20*log10(abs(Z)+eps));axis xy; colormap(jet);
 				navfig
 				axT=get(ax(i),'Title');
 				set(get(ax1,'Title'),'String',get(axT,'String')	...
 					,'Interpreter',get(axT,'Interpreter'))
-				if X(1)~=0
-					h=get(ax1,'children');
-					set(h,'XData',get(h,'XData')+X(1))
-					set(ax1,'XLim',get(ax1,'XLim')+X(1))
-				end
 			end
 		case {'t','T','v','V'}	% fitSine
 			l=FindLines(f);
@@ -1844,4 +1895,23 @@ for i=1:length(assen)
 			fcn(assen(i),fcnArgs{:})
 		end
 	end
+end
+
+function [v,pt] = GetImgValue(hImg,pt)
+Ximg = get(hImg,'XData');
+Yimg = get(hImg,'YData');
+Cimg = get(hImg,'CData');
+if length(Ximg)==2&&size(Cimg,2)~=2
+	Ximg = linspace(Ximg(1),Ximg(2),size(Cimg,2));
+end
+if length(Yimg)==2&&size(Cimg,1)~=2
+	Yimg = linspace(Yimg(1),Yimg(2),size(Cimg,1));
+end
+if Ximg(1)==1 && all(diff(Ximg)==1) && Yimg(1)==1 && all(diff(Yimg)==1)
+	pt = round(pt);
+	v = Cimg(max(1,min(end,pt(2))),max(1,min(end,pt(1))));
+else
+	x = max(Ximg(end),min(Ximg(1),pt(1)));	% allow out of range values
+	y = max(Yimg(end),min(Yimg(1),pt(2)));	% allow out of range values
+	v = interp2(Ximg,Yimg,Cimg,x,y);
 end
