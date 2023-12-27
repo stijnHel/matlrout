@@ -7,7 +7,7 @@ function [D,Xrecord,nX,NE,V,G]=ReadFIT(fName,varargin)
 %
 %  see also ProjGPS2XY
 
-if nargin && ischar(fName)
+if ischar(fName)
 	switch lower(fName)
 		case 'get'
 			Dall = get(gcf,'UserData');
@@ -51,41 +51,27 @@ if nargin && ischar(fName)
 	end
 end
 
-bInterpret=nargout>1;
+[bInterpret] = true;
 bGPX=false;
 fileGPX=[];
 bProcess=nargout>1;
 [bRelTime] = false;
 [bRemoveNaNs] = true;
 [bPlot] = nargout==0;
-[bAnalyse] = false;	% Find blocks of movement
-[bDispAnal] = true;	% display analysis-results (if analysed)
-[bRemoveNonBlocks] = true;	% remove "non-blocks" - too short blocks (currently only start and end)
-maxStandStillTime = 5/1440;
-minKeepBlockInterTime = 3/24;
-minDistBlock = 500;
-minVedges = 0.1;
-Z1 = [];
-[bBelgiPlot] = false;
-[bFixedFigures] = false;
-figTagNEtime = [];
-figTagVHD = [];
-figTagNE = [];
+[bStdOut] = false;	% output arguments compatible with "lees-routines"
+[bAnalyse] = false;	% kept for compatibility - but not used anymore (copied to bProcess)
 if nargin>1
-	setoptions({'bInterpret','bGPX','fileGPX','Z1','bRelTime','bRemoveNaNs'	...
-		,'bPlot','bAnalyse','maxStandStillTime','minKeepBlockInterTime','minDistBlock','minVedges','bBelgiPlot'	...
-		,'bDispAnal','bRemoveNonBlocks','bFixedFigures'	...
-		,'figTagNEtime','figTagVHD','figTagNE'	...
-		},varargin{:})
+	[~,~,Oextra] = setoptions([2,0],{'bInterpret','bGPX','fileGPX','bRelTime','bRemoveNaNs'	...
+		,'bPlot','bAnalyse'	...
+		,'bStdOut'	...
+		},varargin{:});
+else
+	Oextra = cell(2,0);
 end
 bGPX=bGPX||ischar(fileGPX);
-bProcess=bProcess||bGPX||bPlot||bAnalyse;
+bProcess=bProcess||bGPX||bPlot||bAnalyse||bStdOut;
+bProject = nargout>3 || bProcess;
 bInterpret=bInterpret||bGPX;
-if bFixedFigures
-	figTagNEtime = 'NEtimePlot';
-	figTagVHD = 'VHDplot';
-	figTagNE = 'NEplot';
-end
 
 BE16=[1;256];
 BE32=[1;256;65536;16777216];
@@ -157,10 +143,14 @@ else
 end
 file_id=0;
 file_idTxt=[];
+bErr = false;
 while ix<ixMax
 	nR=nR+1;
 	[R1,ix]=ReadRecord(x,ix);
-	if isempty(R)
+	if ix==0	% error
+		bErr = true;
+		break
+	elseif isempty(R)
 		R=R1(1,ones(1,1000));
 	else
 		if nR>length(R)
@@ -174,7 +164,13 @@ D=struct('file_id',file_id,'file_idTxt',file_idTxt	...
 	,'H',H	...
 	,'R',R);
 
-if bProcess
+if bErr
+	Xrecord = [];
+	nX = [];
+	NE = [];
+	V = [];
+	G = [];
+elseif bProcess
 	DF=[R.DEF];
 	iRecord=find([R.msgTyp]==0&[DF.globalMsgNr]==20);
 	N=cellfun('length',{R(iRecord).data});
@@ -209,21 +205,7 @@ if bProcess
 			end
 		end
 	end
-	if bPlot && bBelgiPlot	% (put here to have Z1)
-		if isempty(figTagNE)
-			nfigure
-		else
-			getmakefig(figTagNE)
-		end
-		[l,~,Z1]=PlotGemeentes();
-		set(l,'Hittest','off')
-		Z1 = Z1([2 1]);
-	end
-	if nargout>3
-		[NE,V,~,Z1]=ProjGPS2XY(Xrecord(:,1:3),'Z1',Z1);
-		dPts = sqrt(sum(diff(NE).^2,2));
-		Dtot=sum(dPts(~isnan(dPts)));
-	end
+	[~,fTitle] = fileparts(fName);
 	if ischar(fileGPX)
 		if isempty(fileGPX)
 			[fPath,fileGPX]=fileparts(fName);
@@ -250,7 +232,6 @@ if bProcess
 	t0Data = datenum(1989,12,31,1,0,0);
 	t0 = t0X/86400+t0Data;
 	if isDST(t0)
-		t0 = t0+1/24;
 		t0Data = t0Data+1/24;
 	end
 	if bRelTime
@@ -258,159 +239,36 @@ if bProcess
 	else
 		Xrecord(:,1) = Xrecord(:,1)/86400+t0Data;
 	end
-	dD = dPts;
-	dD(isnan(dD)) = 0;
-	cumD = [0;cumsum(dD)];
 	
 	iX_V = find(strcmp(nX,'enhanced_speed'));
 	iX_H = find(strcmp(nX,'enhanced_altitude'));
-	
-	if bAnalyse
-		% Short blocks in the file (not start/end) result in extension of
-		% blocks of data.  This is not "expected behaviour".
-		% Better to extend removing first/last block to remove all
-		% "nonblocks" (with a larger standstill-time than
-		% maxStandStillTime).
-		% Now the "internal non-blocks" are kept.
-		jj = [0;find(diff(Xrecord(:,1))>maxStandStillTime);size(Xrecord,1)];
-		lBlock = cumD(jj(2:end))-cumD(jj(1:end-1)+1);
-		dtGap = (Xrecord(jj(2:end-1)+1)-Xrecord(jj(2:end-1)));
-		BshortStop = [true;dtGap(1:end-1)<minKeepBlockInterTime;true];
-			% short-stop is a quick help to avoid blocks extended with
-			% non-blocks a long time after the block)
-		%Bshort = lBlock<minDistBlock;
-		Bshort = lBlock<minDistBlock & BshortStop;
-		jj0 = jj;	% if last part has to be removed
-		jj(Bshort) = [];
-		if isempty(jj)
-			warning('No valid block?!')
-		else
-			if bRemoveNonBlocks && ~isempty(jj)
-				if Bshort(1)	% remove starting samples
-					Xrecord(1:jj(1),:) = [];
-					NE(1:jj(1),:) = [];
-					V(1:jj(1)) = [];
-					dPts(1:jj(1)) = [];
-					cumD = cumD(jj(1)+1:end)-cumD(jj(1)+1);
-					jj0 = jj0-jj(1);
-					jj = jj-jj(1);
-				end
-				if Bshort(end)
-					jEnd = jj0(find(~Bshort,1,'last')+1);
-					jj(end) = jEnd;
-					Xrecord(jEnd+1:end,:) = [];
-					NE(jEnd+1:end,:) = [];
-					V(jEnd:end) = [];
-					dPts(jEnd:end) = [];
-					cumD(jEnd+1:end) = [];
-				end
-				Dtot = cumD(end);
-			end
-			jjStart = jj(1:end-1)+1;
-			jjEnd = jj(2:end);
-			nBlock = length(jjStart);
-			for ix = 1:nBlock
-				BlowSpeed = Xrecord(jjStart(ix):jjEnd(ix),iX_V)<minVedges;
-				if all(BlowSpeed(1:end-1)|BlowSpeed(2:end))
-					% block with only very low speed!!
-					% just keep the block...
-				else
-					while any(Xrecord(jjStart(ix)+[0 1],iX_V)<minVedges)
-						jjStart(ix) = jjStart(ix)+1;
-					end
-					while any(Xrecord(jjEnd(ix)+[-1 0],iX_V)<minVedges)
-						jjEnd(ix) = jjEnd(ix)-1;
-					end
-				end
-			end
-			lBlock = cumD(jjEnd)-cumD(jjStart);
-			dtBlock = (Xrecord(jjEnd)-Xrecord(jjStart))*86400;
-			Vblock = lBlock./dtBlock*3.6;	% (!) km/h
-			DH = diff(Xrecord(:,iX_H));
-			dH = Xrecord(jjEnd,iX_H)-Xrecord(jjStart,iX_H);
-			dHasc = zeros(1,nBlock);
-			dHdesc = zeros(1,nBlock);
-			for ix=1:nBlock
-				DH_i = DH(jjStart(ix):jjEnd(ix)-1);
-				dHasc(ix) = sum(max(0,DH_i));
-				dHdesc(ix) = -sum(min(0,DH_i));
-			end
-
-			D.Tblock = [Xrecord(jjStart,1),Xrecord(jjEnd,1)];
-			D.lBlock = lBlock';
-			D.dtBlock = dtBlock';
-			D.Vblock = Vblock';
-			D.dH = dH';
-			D.dHasc = dHasc;
-			D.dHdesc = dHdesc;
-			if bDispAnal
-				for ix=1:nBlock
-					fprintf('%s..%s - %5.1f km, %5.2f hr, %6.2f km/h\n'	...
-						,datestr(D.Tblock(ix)),datestr(D.Tblock(ix,2))	...
-						,lBlock(ix)/1000,dtBlock(ix)/3600,Vblock(ix)	...
-						)
-				end
-			end
-		end
-	end
-	G = var2struct(Dtot,Z1,t0,dPts,cumD);
+	[D,NE,V,G,Xrecord] = AnalyseGPSdata(Xrecord,'iVgps',iX_V,'iAltitude',iX_H	...
+		,'fTitle',fTitle,'bPlot',bPlot,Oextra{1:2,:});
 end		% if bProcess
-[~,fTitle] = fileparts(fName);
-if bPlot
-	if bBelgiPlot
-		line(NE(:,2),NE(:,1),'Color',[1 0 0],'LineWidth',1.5)
-		ax1 = gca;
-		ax1.ButtonDownFcn = @PointClicked;
-		G.cGEO = CreateGeography('country','Belgium','-bStoreCoors');
+if bStdOut	% 
+	% D,	Xrecord,	nX,	NE,	V,	G
+	% e,	ne,			de,	e2,	gegs
+	% e(Xrecord),ne(nX),de(new),e2(V),gegs(G)
+	if length(nX)==14
+		dX = {'days','deg','deg','m','-','-','m/s','m','m','m/s','bpm','-','degC','-'};
 	else
-		ax1 = plotmat(NE,1,2,[],[],'fig',figTagNE);
+		dX = {'-'};
+		dX = dX(1,ones(length(nX)));
 	end
-	title(fTitle,'Interpreter','none')
-	axis equal;
-	ax2=plotmat(NE/1000,[],Xrecord(:,1),{'North','East'},{'km','km'}	...
-		,'-btna','fig',figTagNEtime);
-	xlabel(fTitle,'Interpreter','none')
-	fig2 = ancestor(ax2(1),'figure');
-	VH = Xrecord(:,[1,iX_V,iX_H]).*[1 3.6 1];
-	ax3=plotmat(VH,[2;3;0],1,nX([1,iX_V,iX_H]),{'','km/h','m'}	...
-		,'fig',figTagVHD);
-	fig3 = ancestor(ax3(1),'figure');
-	plot(Xrecord(:,1),cumD/1000);grid
-	title 'Cumulative distance'
-	xlabel(fTitle,'Interpreter','none')
-	ylabel '[km]'
-	navfig
-	navfig(char(4))
-	if bAnalyse
-		for ix=1:min(10,length(dH))
-			navfig(fig2,'addkey',num2str(rem(ix,10)),1,{1,D.Tblock(ix,:)})
-			navfig(fig3,'addkey',num2str(rem(ix,10)),1,{1,D.Tblock(ix,:)})
+	if bProject
+		Xrecord = [Xrecord,NE];
+		nX = [nX,{'north','east'}];
+		dX = [dX,{'m','m'}];
+		if bAnalyse
+			flds = fieldnames(D);
+			for ix=1:length(flds)
+				G.(flds{ix}) = D.(flds{ix});
+			end
 		end
+	else
+		G = D;
 	end
-	tFigs = [fig2,fig3];
-	volglijn(tFigs,ancestor(ax1,'figure'))
-	set([ancestor(ax1,'figure'),tFigs],'UserData',var2struct(Xrecord,nX,NE,V,G))
-	if bAnalyse		% put markers (start/stop) on the three axes
-		line(D.Tblock(:,1),VH(jj(1:end-1)+1,2),'Color',[0 0.75 0]	...
-			,'HitTest','off','PickableParts','none'		...
-			,'Linestyle','none','Marker','o','Tag','blockData','Parent',ax3(1))
-		line(D.Tblock(:,2),VH(jj(2:end),2),'Color',[1 0 0]	...
-			,'HitTest','off','PickableParts','none'		...
-			,'Linestyle','none','Marker','x','Tag','blockData','Parent',ax3(1))
-		line(D.Tblock(:,1),VH(jj(1:end-1)+1,3),'Color',[0 0.75 0]	...
-			,'HitTest','off','PickableParts','none'		...
-			,'Linestyle','none','Marker','o','Tag','blockData','Parent',ax3(2))
-		line(D.Tblock(:,2),VH(jj(2:end),3),'Color',[1 0 0]	...
-			,'HitTest','off','PickableParts','none'		...
-			,'Linestyle','none','Marker','x','Tag','blockData','Parent',ax3(2))
-		line(D.Tblock(:,1),cumD(jj(1:end-1)+1)/1000,'Color',[0 0.75 0]	...
-			,'HitTest','off','PickableParts','none'		...
-			,'Linestyle','none','Marker','o','Tag','blockData','Parent',ax3(3))
-		line(D.Tblock(:,2),cumD(jj(2:end))/1000,'Color',[1 0 0]	...
-			,'HitTest','off','PickableParts','none'		...
-			,'Linestyle','none','Marker','x','Tag','blockData','Parent',ax3(3))
-	end
-	navfig('link',tFigs)
+	[D,Xrecord,nX,NE,V] = deal(Xrecord,nX,dX,V,G);
 end
 
 	function crc=CalcCRC(x)
@@ -478,10 +336,12 @@ end
 				devFldData=[];
 			end
 			DEF=var2struct(archType,globalMsgNr,fldData,devFldData);
+			bError = false;
 			if bInterpret
 				k=find([msgNames{:,2}]==globalMsgNr);
 				if isempty(k)
 					warning('Message number %d not known?!',globalMsgNr)
+					bError = true;
 				else
 					DEF.msgName=msgNames{k};
 					DEF.fields=GetMessage(DEF.msgName);
@@ -516,7 +376,9 @@ end
 					end		% for j
 				end
 			end		% if bInterpret
-			if isempty(MSGs)
+			if bError
+				ix = 0;
+			elseif isempty(MSGs)
 				MSGs=DEF(1,ones(1,localTyp+1));
 			else
 				try
@@ -554,7 +416,7 @@ end
 							end
 						end
 					end		% if file type
-					if bValid&&isnumeric(X)
+					if bValid&&isnumeric(X)&&isscalar(X)
 						dataScaled(i)=double(X)/DEF.scale(i)-DEF.offset(i);
 					else
 						dataScaled(i)=NaN;
@@ -776,16 +638,3 @@ if bPlot
 	setappdata(gcf,'FITnr',nr)
 end
 end		% MyKeyActions
-
-function PointClicked(ax,ev)
-f = ancestor(ax,'figure');
-D = f.UserData;
-p = ProjGPS2XY(ev.IntersectionPoint([2 1]),'Z1',D.G.Z1,'-bInverse');
-[name,cntry] = D.G.cGEO.FindCommunity(p);
-if ~isempty(name)
-	if ~strcmpi(cntry,'BEL')
-		name = [cntry,':',name];
-	end
-end
-xlabel(name)
-end		% PointClicked

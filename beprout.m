@@ -121,6 +121,10 @@ elseif strcmp(x,'LabV')
 	rout='leeslvtxt';
 elseif strcmp(ext,'TXT')&&strcmpi(x,'SAMP')
 	rout='leeslvsvdp';
+elseif strcmp(ext,'FIT')
+	rout = @(varargin) ReadFIT(varargin{:},'-bStdOut','--bDisp');
+elseif strcmp(ext,'GPX')
+	rout = @(varargin) ReadGPX(varargin{:},'-bStdOut','--bDisp');
 elseif nargout>1
 	if strcmp(ext,'M')||strcmp(ext,'MDL')
 		extern='matlab';

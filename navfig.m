@@ -1169,9 +1169,15 @@ if ~reedsverwerkt
 			if ~isempty(getPtFcn)
 				getPtFcn(ax,pt);
 			end
+			if isequal(getappdata(as(1),'updateAxes'),@axtick2date)
+				t = Tim2MLtime(pt(1));
+				sPt = sprintf('(%5g,%5g - %s) - ',pt,datestr(t));
+			else
+				sPt = sprintf('(%5g,%5g) - ',pt);
+			end
 			if strcmp(get(gco,'type'),'image')
 				[v,pt] = GetImgValue(gco,pt);
-				fprintf('(%5g,%5g) - img: %g\n',pt,v);
+				fprintf('%simg: %g\n',sPt,v);
 				setappdata(ax,'navfigLastData',struct('type','image','pt',pt,'v',v));
 				return
 			end
@@ -1181,11 +1187,8 @@ if ~reedsverwerkt
 			[D,oneX,ptV]=getaxdataX(ax,pt);
 			if iscell(ptV)
 				fprintf('(%s,%s) - ',ptV{:});
-			elseif isequal(getappdata(as(1),'updateAxes'),@axtick2date)
-				t=Tim2MLtime(pt(1));
-				fprintf('(%5g,%5g - %s) - ',pt,datestr(t));
 			else
-				fprintf('(%5g,%5g) - ',pt);
+				fprintf('%s',sPt);
 			end
 			if isempty(oneX)
 			elseif oneX
@@ -1217,15 +1220,30 @@ if ~reedsverwerkt
 			ax=get(f,'CurrentAxes');
 			D=getappdata(ax,'navfigLastData');
 			pt=get(ax,'CurrentPoint');pt=pt(1,1:2);
+			if isequal(getappdata(as(1),'updateAxes'),@axtick2date)
+				t = Tim2MLtime(pt(1));
+				sPt = sprintf('(%5g,%5g - %s) ',pt,datestr(t));
+			else
+				sPt = sprintf('(%5g,%5g) ',pt);
+			end
 			if isempty(D)
 				return
 			elseif isstruct(D)
 				switch D.type
 					case 'image'
-						[v,pt] = GetImgValue(gco,pt);
+						h = gco;
+						if ~strcmp(h.Type,'image')
+							if strcmp(h.Type,'axes')
+								h = findobj(h,'Type','image');
+							end
+							if ~isscalar(h)
+								error('Sorry, but no image clicked!')
+							end
+						end
+						[v,pt] = GetImgValue(h,pt);
 						dPt = pt-D.pt;
 						dv = v-D.v;
-						fprintf('(%5g,%5g) d(%5g,%5g) - %g d(%g)\n',pt,dPt,v,dv);
+						fprintf('%sd(%5g,%5g) - %g d(%g)\n',sPt,dPt,v,dv);
 						if c=='D'
 							D.pt = pt;
 							D.v = v;
@@ -1251,7 +1269,7 @@ if ~reedsverwerkt
 			if iscell(ptV)
 				fprintf('(%s,%s) - ',ptV{:});
 			else
-				fprintf('(%5g,%5g) - ',pt);
+				fprintf('%s- ',sPt);
 			end
 			if isempty(oneX)
 				fprintf('%g,%g',D2-D);
@@ -1911,7 +1929,7 @@ if Ximg(1)==1 && all(diff(Ximg)==1) && Yimg(1)==1 && all(diff(Yimg)==1)
 	pt = round(pt);
 	v = Cimg(max(1,min(end,pt(2))),max(1,min(end,pt(1))));
 else
-	x = max(Ximg(end),min(Ximg(1),pt(1)));	% allow out of range values
-	y = max(Yimg(end),min(Yimg(1),pt(2)));	% allow out of range values
+	x = min(Ximg(end),max(Ximg(1),pt(1)));	% allow out of range values
+	y = min(Yimg(end),max(Yimg(1),pt(2)));	% allow out of range values
 	v = interp2(Ximg,Yimg,Cimg,x,y);
 end

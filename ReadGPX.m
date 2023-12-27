@@ -1,4 +1,4 @@
-function [Dgpx,Z1]=ReadGPX(fn,varargin)
+function [Dgpx,Z1,varargout]=ReadGPX(fn,varargin)
 %ReadGPX  - Reads GPX format (GPS-exchange)
 %   D=ReadGPX(fn)
 
@@ -13,8 +13,14 @@ end
 
 bPlot = nargout==0;
 Z1 = [];
+[bStdOut] = false;	% output arguments compatible with "lees-routines"
+[bAnalyse] = false;
+[bCombineTracks] = false;
 if nargin>1
-	setoptions({'bPlot','Z1'},varargin{:})
+	[~,~,Oextra] = setoptions([2,0],{'bPlot','Z1','bStdOut','bAnalyse','bCombineTracks'}	...
+		,varargin{:});
+else
+	Oextra = cell(2,0);
 end
 
 fn = fFullPath(fn,false,'.gpx');
@@ -30,8 +36,39 @@ for i=1:length(Dxml.children)
 		end
 	end
 end
-if bPlot
+bTrack = ~isempty(Dgpx.trk);
+S = [];
+if bAnalyse && bTrack
+	S = CombineTracks(Dgpx.trk);
+	Dana = AnalyseGPSdata([S.t,S.coor(:,[2 1])],'Altitude',S.H,'bPlot',bPlot,Oextra{1:2,:});
+	flds = fieldnames(Dana);
+	for i=1:length(flds)
+		Dgpx.(flds{i}) = Dana.(flds{i});
+	end
+elseif bPlot && bTrack
 	Plot(Dgpx)
+end
+if bStdOut
+	if bTrack
+		Dgpx = [];
+		varargout = cell(1,max(0,nargout-2));
+		return
+	end
+	if isempty(S)
+		S = CombineTracks(Dgpx.trk);
+	end
+	gegs = Dgpx;
+	Dgpx = [S.t,S.coor(:,[2 1]),S.NE,S.dCum,S.H];
+	gegs.Z1 = Z1;
+	Z1 = {'t','latitude','longitude','north','east','dCum','H'};	% ne
+	de = {'d','deg','deg','m','m','m','m'};
+	e2 = S.tV;
+	varargout = {de,e2,gegs};
+elseif bCombineTracks
+	if isempty(S)
+		S = CombineTracks(Dgpx.trk);
+	end
+	Dgpx = S;
 end
 
 function [D,Z1] = GetGPX(Dgpx,Z1)
@@ -330,4 +367,28 @@ for i=1:length(X.trk)
 		trkseg = trk.trkseg(j).NE;
 		line(trkseg(:,2),trkseg(:,1),'color',col)
 	end
+end
+
+function S = CombineTracks(T)
+T = [T.trkseg];
+if length(T)>1
+	for i=1:length(T)
+		if ~isnan(T(i).coor(end)) && i<length(T)
+			T(i).t(end+1,1) = NaN;
+			T(i).coor(end+1,:) = [NaN,NaN];
+			T(i).NE(end+1,:) = [NaN,NaN];
+			T(i).V(end+1,1) = NaN;
+			T(i).dCum(end+1) = T(i).dCum(end);
+			T(i).H(end+1,1) = NaN;
+		end
+		T(i).tV = [middlepoints(T(i).t),T(i).V];
+	end
+	flds = {'t','coor','NE','V','dCum','H','tV'};
+	S = struct();
+	for i=1:length(flds)
+		S.(flds{i}) = cat(1,T.(flds{i}));
+	end
+else
+	S = T;
+	S.tV = [middlepoints(T.t),T.V];
 end

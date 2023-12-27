@@ -44,31 +44,22 @@ function [e,varargout]=leesTDMS(fname,varargin)
 %         that reading the file takes time and memory like reading the full
 %         file!
 
-iStart=[];
-maxLen=[];
-bConvBlockTime=true;
-bConvert=false;
-bCData=false;
-bCProps=false;
-bReadIndex=false;
-bLinChans=false;
-bRawBlocks=false;
-bStructured=[];
-iDecimateData=1;
-decimMethod={};
-nMaxD=1e9;
-nDStartData=0;
-nDStopData=1e9;
-maxRawData=1e12;
-nMaxObjects=500;
-bOpenInBE=false;
-bReadAllNonChanData=false;
-bDontStoreData=false;
-bAutoChannel=nargout>1;
-bScaleChans=true;
-bTruncBlocks=false;
-bReadBrokenBlocks=false;
-fDataFunc=[];
+iStart = [];
+maxLen = [];
+[bConvBlockTime, bScaleChans, bReadData] = deal(true);
+[bConvert, bCData, bCProps, bReadIndex, bLinChans, bRawBlocks] = deal(false);
+[bReadAllNonChanData, bDontStoreData, bOpenInBE, bTruncBlocks] = deal(false);
+[bReadBrokenBlocks] = false;
+[bStructured] = [];
+iDecimateData = 1;
+decimMethod = {};
+nMaxD = 1e9;
+nDStartData = 0;
+nDStopData = 1e9;
+maxRawData = 1e12;
+nMaxObjects = 500;
+[bAutoChannel] = nargout>1;
+fDataFunc = [];
 if nargin>1
 	options=varargin;
 	if isnumeric(options{1})
@@ -86,9 +77,9 @@ if nargin>1
 				,'nMaxD','nDStartData','nDStopData','nMaxObjects'	...
 				,'bDontStoreData','bStructured','bAutoChannel'	...
 				,'bReadAllNonChanData','bScaleChans','fDataFunc'	...
-				,'maxRawData','bTruncBlocks','bReadBrokenBlocks'}	...
+				,'maxRawData','bTruncBlocks','bReadBrokenBlocks','bReadData'}	...
 			,options{:})
-		if ~isempty(bStructured)&&bStructured %#ok<BDSCI,BDLGI>
+		if ~isempty(bStructured)&&bStructured
 			% do nothing
 		elseif bRawBlocks<0
 			bStructured=true;
@@ -96,7 +87,7 @@ if nargin>1
 	end
 end
 if bConvert
-	bCData=true; %#ok<UNRCH>
+	bCData=true;
 	bCProps=true;
 end
 if isempty(iStart)
@@ -509,47 +500,49 @@ while ~feof(fid)
 	if cCur~=fDataPos
 		fseek(fid,fDataPos,'bof');
 	end
-	if bRawData&&bDAQmxData	% rawData
+	if bRawData&&bDAQmxData	% rawData - DAQmx
 		if fNextPos>fDataPos&&sum(numVlist)>0
 			D(nD).type=[IDX.tdsDataType];
-			%if bInterleaved	---- not used anymore!!!!
 			nB1=IDX(1).DAQmx.size;
 			nPt=floor((fNextPos-fDataPos)/nB1);
-			D1=fread(fid,[nB1 nPt],'*uint8');
-			%D(nD).D=zeros(nPt,length(numVlist));
-			D(nD).D=cell(1,length(numVlist));
-			%!!!!!!!!!!not correct in case of multiple signals for one channel!!!
-			for iChan=1:length(numVlist)
-				nSig=length(IDX(iChan).tdsDataType);
-				D2=zeros(nPt,nSig);
-				for iS=1:nSig
-					switch IDX(iChan).tdsDataType(iS)
-						case 2
-							nB=2;
-							sType='uint16';
-						case 3
-							nB=2;
-							sType='int16';
-						case 4	% guess!!!!
-							nB = 4;
-							sType='uint32';
-						case 5
-							nB=4;
-							sType='int32';
-						otherwise
-							fclose(fid);
-							error('Unknown type (%d) in DAQmx data',D(nD).type(iChan))
+			if bReadData
+				D1=fread(fid,[nB1 nPt],'*uint8');
+				D(nD).D=cell(1,length(numVlist));
+				%!!!!!!!!!!not correct in case of multiple signals for one channel!!!
+				for iChan=1:length(numVlist)
+					nSig=length(IDX(iChan).tdsDataType);
+					D2=zeros(nPt,nSig);
+					for iS=1:nSig
+						switch IDX(iChan).tdsDataType(iS)
+							case 2
+								nB=2;
+								sType='uint16';
+							case 3
+								nB=2;
+								sType='int16';
+							case 4	% guess!!!!
+								nB = 4;
+								sType='uint32';
+							case 5
+								nB=4;
+								sType='int32';
+							otherwise
+								fclose(fid);
+								error('Unknown type (%d) in DAQmx data',D(nD).type(iChan))
+						end
+						D2(:,iS)=typecast(reshape(	...
+							D1(IDX(iChan).DAQmx.idx(iS)+(1:nB),:),nPt*nB,1),sType);
 					end
-					D2(:,iS)=typecast(reshape(	...
-						D1(IDX(iChan).DAQmx.idx(iS)+(1:nB),:),nPt*nB,1),sType);
+					D(nD).D{iChan}=D2;
 				end
-				D(nD).D{iChan}=D2;
-			end
-			if bDataProcess
-				fDataFunc('data',D(nD).D,nD,Objects);
-			end
-			if bDontStoreData
-				D(nD).D=[];
+				if bDataProcess
+					fDataFunc('data',D(nD).D,nD,Objects);
+				end
+				if bDontStoreData
+					D(nD).D=[];
+				end
+			else	% don't read data
+				D(nD).D = struct('nB',nB1,'nPt',nPt,'numV',num2cell(numVlist));	% store data size
 			end
 		end
 		cCur=ftell(fid);
@@ -565,180 +558,188 @@ while ~feof(fid)
 		end
 		tdsDataType=[tdsDataType{:}];
 		D(nD).type=tdsDataType;
-		if ~all(tdsDataType==tdsDataType(1))
-			D(nD).D=cell(1,length(tdsDataType));
-			for iC=1:length(tdsDataType)
-				D(nD).D{iC}=ReadData(fid,[numVlist(iC) 1],tdsDataType(iC),bCData);
-			end
-			cCur=ftell(fid);
-			if fNextPos~=cCur
-				warning('Multiple blocks not yet implemented in case of multiple types')
-				fseek(fid,fNextPos,'bof');
-			end
-		else
-			bLinData=false;
-			if length(numVlist)>1
-				if all(numVlist==numVlist(1))
-					if bInterleaved
-						%!!!!!not tested!!!!
-						valSize=[length(numVlist) numVlist(1)];
-					else
-						valSize=[numVlist(1) length(numVlist)];
-					end
-				else
-					bLinData=true;
-					valSize=[sum(numVlist),1];
+		if bReadData
+			if ~all(tdsDataType==tdsDataType(1))
+				D(nD).D=cell(1,length(tdsDataType));
+				for iC=1:length(tdsDataType)
+					D(nD).D{iC}=ReadData(fid,[numVlist(iC) 1],tdsDataType(iC),bCData);
 				end
-			else
-				valSize=numVlist;
-			end
-			nValTot=sum(numVlist);
-			NdataTot=NdataTot+nValTot;
-			if (NchanDataTot>=maxLen*nChan&&dataTypeSizes(tdsDataType(1))>0	...
-					&&(~bReadAllNonChanData||D(nD).isChanData))	...
-					||NdataTot>=maxRawData
-				fseek(fid,dataTypeSizes(tdsDataType(1))*nValTot,'cof');
-			else
-				D(nD).D=ReadData(fid,valSize,tdsDataType(1),bCData);
-			end
-			if D(nD).isChanData
-				NchanDataTot=NchanDataTot+nValTot;
-			end
-			if bInterleaved&&~isempty(D(nD).D)		% OK?
-				D(nD).D=D(nD).D';
-			end
-			if bDataProcess
-				fDataFunc('data',D(nD).D,nD,Objects);
-			end
-			if bDontStoreData
-				D(nD).D=[]; %#ok<UNRCH>
-			end
-			cCur=ftell(fid);
-			if fNextPos~=cCur
-				nBlocks=(fNextPos-cCur)/(cCur-fDataPos)+1;
-				bSeek=false;
-				bReadPart=false;
-				if bTruncBlocks&&floor(nBlocks)<nBlocks
-					if ~bReadBrokenBlocks
-						warning('#blocks truncated! (%.3f --> %d)',nBlocks,floor(nBlocks))
-					end
-					nBlocks=floor(nBlocks);
-					bSeek=true;
-					bReadPart=bReadBrokenBlocks;
-					%(!) in case of bInterleaved ==> still readable blocks!
-				end
-				if nBlocks<=1||round(nBlocks)~=nBlocks
-					warning('LEESTDMS:MISSEDdata','!!?missed data - wrong position in file : %d <-> %d (%d)'	...
-						,cCur,fNextPos,fNextPos-cCur)
-					bSeek=true;
-				elseif nValTot>0	%&&~bInterleaved
-					if (nChan>0&&NchanDataTot>=maxLen*nChan&&dataTypeSizes(tdsDataType(1))>0)	...
-							||NdataTot>=maxRawData	% skip data
-						if D(nD).isChanData
-							NchanDataTot=NchanDataTot+(nBlocks-1)*nValTot;
-						end
-						NdataTot=NdataTot+(nBlocks-1)*nValTot;
-						fseek(fid,(nBlocks-1)*dataTypeSizes(tdsDataType(1))*nValTot,'cof');
-					else	% don't skip data
-						if ~bDontStoreData
-							% reserve memory
-							if bLinData
-								D(nD).D(1,min([nBlocks,maxRawData,maxLen]))=0;
-							else
-								D(nD).D(min([numVlist(1)*nBlocks,maxRawData,maxLen]),1)=0;
-							end
-						end
-						for iB=2:nBlocks
-							iBi=(iB-1)*numVlist(1)+1:iB*numVlist(1);
-							D1=ReadData(fid,valSize,tdsDataType(1),bCData);
-							if bInterleaved
-								D1=D1';
-							end
-							if ~bDontStoreData&&iBi(end)<=size(D(nD).D,1)
-								if numel(D1)<prod(valSize)
-									warning('??!broken TDMS-file??!')
-									D1(valSize(1),1)=0;
-								end
-								if bLinData
-									D(nD).D(:,iBi)=D1;
-								else
-									D(nD).D(iBi,:)=D1;
-								end
-							end
-							if bDataProcess
-								fDataFunc('data',D1,nD,Objects);
-							end
-						end		% for iB
-					end		% not if skip data
-				end		% if nBlocks>1
-				if bReadPart
-					warning('Part of block is read, but with very temporary solution!!!!!!')
-					valSize(2)=(fNextPos-ftell(fid))/8/valSize(1);	%!!!!!!!!!!!
-					D1=ReadData(fid,valSize,tdsDataType(1),bCData);
-					if bInterleaved
-						D1=D1';
-					end
-					%iBi=nBlocks*valSize(2)+1:nBlocks*valSize(2)+size(D1,2);
-					D(nD).D=[D(nD).D;D1];
-				end
-				if bSeek
+				cCur=ftell(fid);
+				if fNextPos~=cCur
+					warning('Multiple blocks not yet implemented in case of multiple types')
 					fseek(fid,fNextPos,'bof');
 				end
-			end		% if multiple data blocks
-			if bLinData		% restructure data(?!)
-			end
-			if nD>nDStopData||nD<nDStartData
-				D(nD).D=[];
 			else
-				if iDecimateData>1&&bIsChan
-					DD=D(nD).D;
-					nC=size(DD,2);
-					if iscell(decimMethod)
-						if ~isa(DD,'double')
-							DD=double(DD);
-						end
-						D(nD).D=decimate(DD(:,1),iDecimateData,decimMethod{:});
-						if nC>1
-							D(nD).D(1,nC)=0;
-							for ii=2:nC
-								D(nD).D(:,ii)=decimate(DD(:,ii),iDecimateData,decimMethod{:});
-							end
+				bLinData=false;
+				if length(numVlist)>1
+					if all(numVlist==numVlist(1))
+						if bInterleaved
+							%!!!!!not tested!!!!
+							valSize=[length(numVlist) numVlist(1)];
+						else
+							valSize=[numVlist(1) length(numVlist)];
 						end
 					else
-						fclose(fid);
-						error('unknown (or not-yet-implemented) decimation method')
+						bLinData=true;
+						valSize=[sum(numVlist),1];
 					end
+				else
+					valSize=numVlist;
 				end
-				if tdsDataType(1)==68&&numVlist(1)>0	% timestamp
-					if isempty(t0)
-						if D(nD).isChanData
-							itChan=chanNr;
+				nValTot=sum(numVlist);
+				NdataTot=NdataTot+nValTot;
+				if (NchanDataTot>=maxLen*nChan&&dataTypeSizes(tdsDataType(1))>0	...
+						&&(~bReadAllNonChanData||D(nD).isChanData))	...
+						||NdataTot>=maxRawData
+					fseek(fid,dataTypeSizes(tdsDataType(1))*nValTot,'cof');
+				else
+					D(nD).D=ReadData(fid,valSize,tdsDataType(1),bCData);
+				end
+				if D(nD).isChanData
+					NchanDataTot=NchanDataTot+nValTot;
+				end
+				if bInterleaved&&~isempty(D(nD).D)		% OK?
+					D(nD).D=D(nD).D';
+				end
+				if bDataProcess
+					fDataFunc('data',D(nD).D,nD,Objects);
+				end
+				if bDontStoreData
+					D(nD).D=[];
+				end
+				cCur=ftell(fid);
+				if fNextPos~=cCur
+					nBlocks=(fNextPos-cCur)/(cCur-fDataPos)+1;
+					bSeek=false;
+					bReadPart=false;
+					if bTruncBlocks&&floor(nBlocks)<nBlocks
+						if ~bReadBrokenBlocks
+							warning('#blocks truncated! (%.3f --> %d)',nBlocks,floor(nBlocks))
+						end
+						nBlocks=floor(nBlocks);
+						bSeek=true;
+						bReadPart=bReadBrokenBlocks;
+						%(!) in case of bInterleaved ==> still readable blocks!
+					end
+					if nBlocks<=1||round(nBlocks)~=nBlocks
+						warning('LEESTDMS:MISSEDdata','!!?missed data - wrong position in file : %d <-> %d (%d)'	...
+							,cCur,fNextPos,fNextPos-cCur)
+						bSeek=true;
+					elseif nValTot>0	%&&~bInterleaved
+						if (nChan>0&&NchanDataTot>=maxLen*nChan&&dataTypeSizes(tdsDataType(1))>0)	...
+								||NdataTot>=maxRawData	% skip data
+							if D(nD).isChanData
+								NchanDataTot=NchanDataTot+(nBlocks-1)*nValTot;
+							end
+							NdataTot=NdataTot+(nBlocks-1)*nValTot;
+							fseek(fid,(nBlocks-1)*dataTypeSizes(tdsDataType(1))*nValTot,'cof');
+						else	% don't skip data
+							if ~bDontStoreData
+								% reserve memory
+								if bLinData
+									D(nD).D(1,min([nBlocks,maxRawData,maxLen]))=0;
+								else
+									D(nD).D(min([numVlist(1)*nBlocks,maxRawData,maxLen]),1)=0;
+								end
+							end
+							for iB=2:nBlocks
+								iBi=(iB-1)*numVlist(1)+1:iB*numVlist(1);
+								D1=ReadData(fid,valSize,tdsDataType(1),bCData);
+								if bInterleaved
+									D1=D1';
+								end
+								if ~bDontStoreData&&iBi(end)<=size(D(nD).D,1)
+									if numel(D1)<prod(valSize)
+										warning('??!broken TDMS-file??!')
+										D1(valSize(1),1)=0;
+									end
+									if bLinData
+										D(nD).D(:,iBi)=D1;
+									else
+										D(nD).D(iBi,:)=D1;
+									end
+								end
+								if bDataProcess
+									fDataFunc('data',D1,nD,Objects);
+								end
+							end		% for iB
+						end		% not if skip data
+					end		% if nBlocks>1
+					if bReadPart
+						warning('Part of block is read, but with very temporary solution!!!!!!')
+						valSize(2)=(fNextPos-ftell(fid))/8/valSize(1);	%!!!!!!!!!!!
+						D1=ReadData(fid,valSize,tdsDataType(1),bCData);
+						if bInterleaved
+							D1=D1';
+						end
+						%iBi=nBlocks*valSize(2)+1:nBlocks*valSize(2)+size(D1,2);
+						D(nD).D=[D(nD).D;D1];
+					end
+					if bSeek
+						fseek(fid,fNextPos,'bof');
+					end
+				end		% if multiple data blocks
+				if bLinData		% restructure data(?!)
+				end
+				if nD>nDStopData||nD<nDStartData
+					D(nD).D=[];
+				else
+					if iDecimateData>1&&bIsChan
+						DD=D(nD).D;
+						nC=size(DD,2);
+						if iscell(decimMethod)
+							if ~isa(DD,'double')
+								DD=double(DD);
+							end
+							D(nD).D=decimate(DD(:,1),iDecimateData,decimMethod{:});
+							if nC>1
+								D(nD).D(1,nC)=0;
+								for ii=2:nC
+									D(nD).D(:,ii)=decimate(DD(:,ii),iDecimateData,decimMethod{:});
+								end
+							end
 						else
-							itChan=-nD;
+							fclose(fid);
+							error('unknown (or not-yet-implemented) decimation method')
+						end
+					end
+					if tdsDataType(1)==68&&numVlist(1)>0	% timestamp
+						if isempty(t0)
+							if D(nD).isChanData
+								itChan=chanNr;
+							else
+								itChan=-nD;
+							end
+							if isnumeric(D(nD).D)
+								t0=D(nD).D(1,:);
+								if ~isa(t0,'double')
+									t0=double(t0);
+								end
+							else
+								t0=lvtime(D(nD).D(1));
+							end
 						end
 						if isnumeric(D(nD).D)
-							t0=D(nD).D(1,:);
-							if ~isa(t0,'double')
-								t0=double(t0);
+							D1=D(nD).D;
+							nD1=size(D1,1);
+							if ~isa(D1,'double')
+								D1=double(D1);
 							end
+							D1=D1-t0(ones(1,nD1),:);
+							D(nD).D=D1*tFactor;
 						else
-							t0=lvtime(D(nD).D(1));
+							D(nD).D=D(nD).D-t0;
 						end
 					end
-					if isnumeric(D(nD).D)
-						D1=D(nD).D;
-						nD1=size(D1,1);
-						if ~isa(D1,'double')
-							D1=double(D1);
-						end
-						D1=D1-t0(ones(1,nD1),:);
-						D(nD).D=D1*tFactor;
-					else
-						D(nD).D=D(nD).D-t0;
-					end
-				end
-			end		% hold data
-		end		% single data type
+				end		% hold data
+			end		% single data type
+		else	% don't read data
+			szBlock = BlockSize(numVlist,tdsDataType);
+			nBlocks = floor((fNextPos-cCur)/szBlock);
+			nPt = numVlist*nBlocks;
+			D(nD).D = struct('numV',num2cell(numVlist),'nPt',num2cell(nPt));
+			fseek(fid,fNextPos,'bof');
+		end
 	end		% if rawData
 	if ~isempty(cStat)
 		cStat.status(cCur/lFile)
@@ -773,6 +774,11 @@ for iD=1:nD
 		if D(iD).nVals(iS)
 			if iscell(D(iD).D)
 				D1=D(iD).D{iS};
+			elseif isstruct(D(iD).D)	% (currently) only if ~bReadData
+				D1 = D(iD).D;
+				if ~isscalar(D1) && iS<=length(D1)
+					D1 = D1(iS);
+				end
 			elseif size(D(iD).D,2)>1||nChan==1	%!!nChan==1 added!!
 				D1=D(iD).D(:,iS);
 			else
@@ -784,27 +790,37 @@ for iD=1:nD
 				D1=D(iD).D(id+1:idn);
 				id=idn;
 			end
-			groups(iG).channel(iC).data{iB}=D1;
+			groups(iG).channel(iC).data{iB} = D1;
 		end
 	end		% for iC
 end		% for iG
 for iG=1:nGroups
 	channels=groups(iG).channel;
 	for iC=1:length(channels)
-		channels(iC).nData=cellfun('size',channels(iC).data,1);
-		channels(iC).data=cat(1,channels(iC).data{:});
-		if bScaleChans&&isfield(channels,'properties')	...
-				&&isfield(channels(iC).properties,'NI_Scaling_Status')	...
-				&&strcmp(channels(iC).properties.NI_Scaling_Status,'unscaled')
-			try
-				channels(iC).data=ScaleNIdata(channels(iC));
-				channels(iC).properties.NI_Scaling_Status='scaled';
-			catch err
-				DispErr(err)
-				warning('LEESTDMS:scalingError','Error in scaling data!')
+		if bReadData
+			channels(iC).nData=cellfun('size',channels(iC).data,1);
+			channels(iC).data=cat(1,channels(iC).data{:});
+			if bScaleChans&&isfield(channels,'properties')	...
+					&&isfield(channels(iC).properties,'NI_Scaling_Status')	...
+					&&strcmp(channels(iC).properties.NI_Scaling_Status,'unscaled')
+				try
+					channels(iC).data=ScaleNIdata(channels(iC));
+					channels(iC).properties.NI_Scaling_Status='scaled';
+				catch err
+					DispErr(err)
+					warning('LEESTDMS:scalingError','Error in scaling data!')
+				end
 			end
-		end
-	end
+		else
+			nData = 0;
+			for i = 1:length(channels(iC).data)
+				if isstruct(channels(iC).data{i})
+					nData = nData+channels(iC).data{i}.nPt;
+				end
+			end		% for i
+			channels(iC).nData = nData;
+		end %	 don't read data
+	end		% for iC
 	Dstruct.group(iG).channel=channels;
 	groups(iG).channel=channels;
 end		% for iG
@@ -813,7 +829,7 @@ if bStructured
 	e=Dstruct;
 	return
 elseif bRawBlocks
-	e=D; %#ok<UNRCH>
+	e=D;
 	if nargout>1
 		varargout={groups,Dstruct};
 		if nargout>3
@@ -854,7 +870,7 @@ else	% get measurement data from channels
 		chanNames={channels.name};
 		nChan=length(channels);
 		if bLinChans
-			uChanNames=unique(chanNames); %#ok<UNRCH>
+			uChanNames=unique(chanNames);
 			if length(uChanNames)<nChan
 				nChan=length(uChanNames);
 				iChan=zeros(1,nChan);
@@ -881,7 +897,9 @@ if nargout>7
 end
 varargout=cell(1,nargout-1);
 unData=unique(nData);
-if any([D.bDAQmxData])
+if ~bReadData
+	e = [];
+elseif any([D.bDAQmxData])
 	% only DAQmx channels!
 	iG=find(strcmp(DAQmxGroup,{Dstruct.group.name}));
 	if length(iG)~=1
@@ -942,7 +960,7 @@ if nargout>1
 			if bConvBlockTime
 				T=gettimes(D);
 			else
-				T=[]; %#ok<UNRCH>
+				T=[];
 			end
 			if isempty(t0)&&~isempty(T)
 				t0=T(1);
@@ -1125,6 +1143,38 @@ end
 if bToDouble&&numel(value)<5
 	value=double(value);
 end
+
+function sz = BlockSize(siz,dTypes)
+% Calculate the size of one block (to determine number of blocks saved
+%   without reading the data)
+
+S = zeros(1,length(dTypes));
+for i=1:length(dTypes)
+	dType = dTypes(i);
+	if dType>255
+		% is 3rd byte the size (in bytes) of one element?
+		%warning('Type $%08x?!',dType)
+		dType=bitand(dType,255);
+	end
+	switch dType
+		case {0}
+			S(i) = 0;
+		case {1,5,33}		% (u)int8, boolean
+			S(i) = 1;
+		case {2,6}		% (u)int16
+			S(i) = 2;
+		case {3,7,9}	% (u)int32, single
+			S(i) = 4;
+		case {4,8,10,12,25}	% (u)int64, double, single complex
+			S(i) = 8;
+		case {11,13,68}	% extended, double complex, timestamp
+			S(i) = 16;
+		case 14		% extended complex
+			S(i) = 32;
+	end
+	S(i) = S(i)*siz(i);
+end
+sz = sum(S);
 
 function t=gettimes(D)
 % function to retrieve times of TDMS-blocks
