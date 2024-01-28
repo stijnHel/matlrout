@@ -10,14 +10,36 @@ function out=legtitel(maxn,varargin)
 %             e.g. for {'location','northwest'}
 %   legtitel({[maxn,]...})
 %       options: totstring, nastring, bAll, ax
+%   legtitel(h,...) with h a graphics handle
+%         find axes in h (can be directly an axes)
+
+%!!!! The following is added without knowing well what's done further with
+%input argument handling!!!!!!
+args = varargin;
+h = [];
+ax = [];
+if nargin==0
+	maxn = [];
+elseif ~isnumeric(maxn) && ~iscell(maxn)
+	h = maxn;
+	if nargin>1
+		maxn = args{1};
+		args(1) = [];
+	else
+		maxn = [];
+	end
+end
+
+if ~isempty(h) && ~isnumeric(h) && ishandle(h)
+	ax = GetNormalAxes(h);
+end
 
 doout=0;
 totstring='';
 nastring='';
-ax=[];
 lines=[];
 bSingles=true;
-if nargin==0||isempty(maxn)
+if isempty(maxn)
 	maxn=256;
 elseif iscell(maxn)
 	in=maxn;
@@ -38,13 +60,6 @@ elseif iscell(maxn)
 	if bAll
 		ax=GetNormalAxes(gcf); %#ok<UNRCH>
 	end
-	if length(ax)>1
-		for i=1:length(ax)
-			legtitel({maxn,'totstring',totstring,'nastring',nastring	...
-				,'ax',ax(i),'bSingles',bSingles})
-		end
-		return
-	end
 elseif ischar(maxn)
 	if maxn(1)=='&'
 		nastring=maxn(2:end);
@@ -58,6 +73,12 @@ elseif maxn==0
 end
 if isempty(ax)
 	ax=gca;
+elseif length(ax)>1
+	for i=1:length(ax)
+		legtitel({maxn,'totstring',totstring,'nastring',nastring	...
+			,'ax',ax(i),'bSingles',bSingles})
+	end
+	return
 end
 s=get(get(ax,'title'),'string');
 icomma=[0 find(s==',') length(s)+1];
@@ -88,11 +109,11 @@ if doout
 	return
 end
 pars={};
-if nargin>1
-	if ischar(varargin{1})
-		pars=varargin;
+if ~isempty(args)
+	if ischar(args{1})
+		pars=args;
 	else
-		pars=varargin(2:end);
+		pars=args(2:end);
 	end
 end
 if bSingles||length(namen)>1

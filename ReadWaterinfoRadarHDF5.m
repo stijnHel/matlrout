@@ -72,9 +72,14 @@ if ischar(fName)	% some extra possibilities - not wanting the use of setoptions
 		end
 		return
 	elseif strcmpi(fName,'set')
-		[f,D] = GetRadarFigure(ischar(varargin{1}));
-		if isnumeric(varargin{1})
-			iSet = varargin{1};
+		if isempty(varargin)
+			s = 0;
+		else
+			s = varargin{1};
+		end
+		[f,D] = GetRadarFigure(ischar(s));
+		if isnumeric(s)
+			iSet = s;
 			if isempty(f)
 				Sets = [];
 			else
@@ -90,7 +95,7 @@ if ischar(fName)	% some extra possibilities - not wanting the use of setoptions
 			return
 		end
 		ax = D.hI.Parent;
-		switch varargin{1}
+		switch s
 			case 'pos'
 				if isscalar(varargin)
 					if isappdata(ax,'Range')
@@ -123,7 +128,7 @@ if ischar(fName)	% some extra possibilities - not wanting the use of setoptions
 	elseif strcmpi(fName,'normal')
 		SetNormal()
 		return
-	elseif strcmpi(fName,'findsets')
+	elseif strcmpi(fName,'FindSets')
 		[~,d,T] = DefaultPath();
 		Bok = T(:,2)>0;
 		Bsucc = Bok(2:end) & T(2:end,1)<=T(1:end-1,2)+30/1440;	% successor if starting at most 1/2 hr after the end of previous
@@ -267,7 +272,7 @@ if ~ischar(fName) && length(fName)>1
 	t = 0;
 	for i=1:length(fName)
 		[X{i,:}] = ReadWaterinfoRadarHDF5(fName{i});
-		if X{i,2}.t(1)<t
+		if X{i,2}.t(1)<=t
 			B = X{i,2}.t>t;
 			X{i,2}.t = X{i,2}.t(B);
 			X{i} = X{i}(:,:,B);
@@ -532,6 +537,9 @@ else	% normal case
 		cEnd = [];
 	end
 	cTicks = [cStart,reshape([1;2;5].*pMin.*10.^(0:round(log10(pMax)-log10(pMin))-1),1,[]),pMax,cEnd];
+	if any(diff(cTicks)<=0)	% shouldn't be possible, but it is...
+		cTicks(diff(cTicks)<=0) = [];
+	end
 end
 sTicks = cell(1,length(cTicks));
 for i=1:length(cTicks)
@@ -611,7 +619,7 @@ nr = getappdata(f,'nr');
 ax = D.hI.Parent;
 bUpdate = false;
 switch ev.Character
-	case {' ','n'}
+	case {' ','n','1'}
 		nr = nr+1;
 		bUpdate = nr<=size(D.Xs,3);
 	case {'N','p'}
@@ -620,9 +628,27 @@ switch ev.Character
 	case '0'
 		nr = 1;
 		bUpdate = true;
+	case '2'
+		bUpdate = nr<=size(D.Xs,3);
+		nr = min(nr+10,size(D.Xs,3));
+	case '3'
+		bUpdate = nr<=size(D.Xs,3);
+		nr = min(nr+100,size(D.Xs,3));
+	case '4'
+		bUpdate = nr<=size(D.Xs,3);
+		nr = min(nr+1000,size(D.Xs,3));
+	case '6'
+		bUpdate = nr>1;
+		nr = max(1,nr-1000);
+	case '7'
+		bUpdate = nr>1;
+		nr = max(1,nr-100);
+	case '8'
+		bUpdate = nr>1;
+		nr = max(1,nr-10);
 	case '9'
-		nr = size(D.Xs,3);
-		bUpdate = true;
+		bUpdate = nr>1;
+		nr = max(1,nr-1);
 	otherwise
 		switch ev.Key
 			case 'leftarrow'
@@ -640,6 +666,16 @@ switch ev.Character
 				if nr<size(D.Xs,3)
 					bUpdate = true;
 					nr = min(size(D.Xs,3),nr+10);
+				end
+			case 'pageup'
+				if nr>1
+					bUpdate = true;
+					nr = max(1,nr-100);
+				end
+			case 'pagedown'
+				if nr<size(D.Xs,3)
+					bUpdate = true;
+					nr = min(size(D.Xs,3),nr+100);
 				end
 			case 'home'
 				nr = 1;

@@ -1,6 +1,8 @@
 function [X,H,T]=ReadImage(fName,idx,bNoWarning)
 %ReadImage - Read Image (from CameraTest)
 %    [X,H,T]=ReadImage(fName,idx)
+%
+% see also ImgFileNavigater (reading the full file(!))
 
 %!!!!!!!if idx given, reading goes wrong
 %              ---> changes in "all" should be copied to range!!!!

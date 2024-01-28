@@ -225,7 +225,9 @@ if bPlot
 		title('Altitude')
 	end
 	ax3(1) = subplot(nP,1,1);
-	plot(middlepoints(X(:,1)),V*3.6);grid
+	plot([X(1);middlepoints(X(:,1))],V([1 1:end])*3.6);grid
+		% extended with one point, so that the link with volglijn works
+		% correctly
 	title 'Speed'
 	ylabel '[km/h'
 	ax3(nP) = subplot(nP,1,nP);

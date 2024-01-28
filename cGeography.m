@@ -4,6 +4,22 @@ classdef cGeography < handle
 	%
 	% see also CreateGeography (easy method to keep only one instance of this object)
 
+	% to be able to use this function, "border-data" must be retrieved.
+	%   in a directory "borders" (findable along the path where this
+	%   function is stored), a file "countries.txt" must exist.
+	%   That file should contain a list of countries, with a (relative) path
+	%   an code-reference (like "BEL") and one or more names of the country
+	%   (different languages) - tab-separated.
+	%      e.g.:
+	%         BEL_adm\BEL_adm4	BEL	Belgium	Belgie
+	%         ...
+	%              BEL_adm is a folder
+	%              BEL_adm4 is a filename (without extension)
+	%                       different files (dbf, ...) are required
+	%                ("4" is the level of detail)
+	%      see https://gadm.org/download_country_v3.html for information
+	%           --> choose "shapefile"
+
 	% NE --> P --> NE geeft niet het oorspronkelijke resultaat!
 	%   bij Long==0 ==> geen (belangrijke) fout
 	%   Bij long~=0 ==> fout op N (100 km --> 2.6 m)
@@ -35,12 +51,14 @@ classdef cGeography < handle
 	methods
 		function c = cGeography(varargin)
 			if isempty(c.Countries)
-				pth = FindFolder('borders',0,'-bAppend');
+				pth = FindFolder('borders',0,false,'-bAppend');
 				if ~exist(pth,'dir')
-					error('Can''t find necessary data! (borders)')
+					warning('Can''t find necessary data! (borders)')
+					c.countryTable = cell(0,2);
+				else
+					c.borderPath = pth;
+					c.countryTable = ReadTransTable(fullfile(pth,'countries.txt'),true);
 				end
-				c.borderPath = pth;
-				c.countryTable = ReadTransTable(fullfile(pth,'countries.txt'),true);
 				c.Countries = struct();
 			end
 			if nargin

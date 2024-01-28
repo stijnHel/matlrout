@@ -18,7 +18,7 @@ if nargin<2 || isempty(bUsePython)
 end
 
 if bUsePython
-	D = ReadPtPickle(fName);
+	D = ReadPtPickle(fFullPath(fName));
 	return
 end
 warning('This is just started!!!')
@@ -81,6 +81,7 @@ D = D(1:nD);
 
 function D = ReadPtPickle(fName)
 fN = replace(fFullPath(fName),'\','\\');
+pyrun('import pickle')
 pyrun(['f=open("',fN,'","rb")']);
 D = pyrun('D=pickle.load(f)','D');
 pyrun('f.close()')

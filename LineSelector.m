@@ -126,7 +126,7 @@ f = ancestor(ax,'figure');
 Wsel = getappdata(f,'Wsel');
 dName = l.DisplayName;
 if ~isempty(dName) && ~startsWith(dName,'\bf{')
-	l.DisplayName = ['\bf{',dName,'}'];
+	l.DisplayName = ['\bf{',dName,'}'];	%!!!!!!!this doesn't work anymore?!!!
 end
 set(l,'LineWidth',Wsel)
 

@@ -1,11 +1,12 @@
 function fOut=toonfigs(ff,varargin)
 %TOONFIGS - Zet alle aanwezige figuren op de voorgrond
 
-if ~exist('ff','var')||isempty(ff)
+[bOnlyReturn] = false;	% don't "show" them
+if nargin==0 || isempty(ff)
 	[bShowHidden] = true;
 	[bGetInvisible] = false;
 	if nargin>1
-		setoptions({'bShowHidden','bGetInvisible'},varargin{:})
+		setoptions({'bShowHidden','bGetInvisible','bOnlyReturn'},varargin{:})
 	end
 	props = {};
 	if ~bGetInvisible
@@ -20,9 +21,11 @@ if ~exist('ff','var')||isempty(ff)
 		set(0,'ShowHiddenHandles',shh)
 	end
 end
-for i=1:length(ff)
-	if strcmp(ff(i).Visible,'on')
-		figure(ff(i))
+if ~bOnlyReturn
+	for i=1:length(ff)
+		if strcmp(ff(i).Visible,'on')
+			figure(ff(i))
+		end
 	end
 end
 if nargout

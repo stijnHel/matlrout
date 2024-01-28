@@ -199,8 +199,8 @@ if isempty(f)||~isempty(varargin)
 			hoog=80;
 			breed=400;
 			nMaxHier=[];	% replace (possibly) 0 by []
-		elseif nMaxHier>6||nMaxHier~=round(nMaxHier)
-			error('nMaxHier must be an integer between 1 and 6')
+		elseif nMaxHier<0 || nMaxHier>10 || nMaxHier~=round(nMaxHier)
+			error('nMaxHier must be an integer between 0 and 10')
 		else
 			hoog=30+nMaxHier*30;
 			breed=600;
@@ -335,10 +335,6 @@ if isempty(sArg)
 		FIGwin=[];
 		return
 	end
-	n=size(s,1);
-	if n<length(l)
-		set(l(n+1),'visible','off')
-	end
 	s(1,:)=[];
 	set(l(2),'UserData',s);
 	prcLast=[prc(1,:) cpuNow tNow];
@@ -394,12 +390,6 @@ elseif ischar(sArg)
 		prc=[-1 cpuNow tNow;prc];
 	else
 		prc=[prcin cpuNow tNow;prc];
-	end
-	if ~IsHandle(l(1))
-		n=size(s,1);
-		if n+2<=length(l)
-			set(l(n+1),'visible','on')
-		end
 	end
 	level=size(prc,1);
 	STOPREQ=getappdata(f,'StatusStopRequests');

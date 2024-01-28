@@ -521,6 +521,7 @@ elseif x<=0
 		x=abs(x);
 	end
 	X = (0:size(e,1)-1)'*x;
+	bXvector = true;
 else
 	X = e(:,x);
 	if fx~=1 || dx~=0
@@ -745,6 +746,9 @@ for i=1:nkan
 			ePlot = e(:,k);
 			if istable(ePlot)
 				ePlot = table2array(ePlot);
+			end
+			if isempty(Xi)
+				Xi = (1:size(ePlot,1))';	% (!! starting from 1 <=> some other cases !!)
 			end
 			pl=plot(Xi,ePlot);
 		end
