@@ -335,6 +335,10 @@ if isempty(sArg)
 		FIGwin=[];
 		return
 	end
+	n=size(s,1);
+	if n<length(l)-1
+		set(l(n+1),'visible','off')
+	end
 	s(1,:)=[];
 	set(l(2),'UserData',s);
 	prcLast=[prc(1,:) cpuNow tNow];
@@ -390,6 +394,12 @@ elseif ischar(sArg)
 		prc=[-1 cpuNow tNow;prc];
 	else
 		prc=[prcin cpuNow tNow;prc];
+	end
+	if ~IsHandle(l(1))
+		n=size(s,1);
+		if n+2<=length(l)
+			set(l(n+1),'visible','on')
+		end
 	end
 	level=size(prc,1);
 	STOPREQ=getappdata(f,'StatusStopRequests');
@@ -488,7 +498,7 @@ elseif bUpdate
 		else
 			s=sprintf('%s (%5.1f %%)',sArg,prcin*100);
 		end
-		set(l(1+n),'String',s);
+		set(l(1+n),'String',s,'Visible','on');
 	end
 end
 set(l(end),'String',num2str(size(prc,1)));
