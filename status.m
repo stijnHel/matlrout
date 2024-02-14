@@ -498,7 +498,7 @@ elseif bUpdate
 		else
 			s=sprintf('%s (%5.1f %%)',sArg,prcin*100);
 		end
-		set(l(1+n),'String',s,'Visible','on');
+		set(l(1+n),'String',s);
 	end
 end
 set(l(end),'String',num2str(size(prc,1)));

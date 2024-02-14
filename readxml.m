@@ -29,11 +29,12 @@ if nargin>1 && ischar(bFlat)	% (better to work with all varargin's!)
 	elseif nargin>=4
 		options = [{bFlat,bSimplify,bStruct},varargin];
 	end
-	bFlat = [];
-	bSimplify = [];
-	bStruct = [];
+	[bFlat] = [];
+	[bSimplify] = [];
+	[bStruct] = [];
 	setoptions({'bFlat','bSimplify','bStruct','bWarning'},options{:})
-	if isempty(bFlat) && (bSimplify || bStruct)
+	if isempty(bFlat) && ((~isempty(bSimplify)&&bSimplify)	...
+			|| (~isempty(bStruct)&&bStruct))
 		bFlat = false;
 	end
 elseif nargin<4

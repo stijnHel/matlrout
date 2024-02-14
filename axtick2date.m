@@ -223,6 +223,9 @@ for i=1:length(xd)
 		warning('AXTICK2DATE:BadDate'	...
 			,'Onverwachte datum (%04d-%02d-%02d) - geen aanpassing van axtick'	...
 			,dd(1),dd(2),dd(3))
+		if isappdata(ax,'TIMEFORMAT')
+			rmappdata(ax,'TIMEFORMAT')
+		end
 		break;
 	end
 	if bTime
@@ -242,15 +245,6 @@ for i=1:length(xd)
 		xtl{i}=sprintf('%d/%d',dd([3 2]));
 	end
 end
-%----------------------------
-%related to unwanted ticks during printing
-if false
-	fig = ancestor(ax(1),'figure');
-	fprintf('axis pos: [%.2f %.2f %.2f %.2f]\n',axP)
-	fprintf('fig pos ("%s"): [%.2f %.2f %.2f %.2f]\n',fig.Units,fig.Position)
-	printstr(xtl)
-end
-%----------------------------
 
 set(ax,sXtick,(xd-tOffset)*tScale,sXtickL,xtl)
 
