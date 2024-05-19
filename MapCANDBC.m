@@ -13,6 +13,11 @@ function [D,IDundefined,Ilog]=MapCANDBC(Xlog,Cdbc,bReplaceFE_id,node_id,bDiscard
 %                Timestamp
 %                ID
 %                Data
+%             or:
+%                channel (TDMS data) with channels
+%                     Timestamp
+%                     Payload
+%                     Identifier
 
 D=[];
 IDundefined=[];
@@ -68,7 +73,7 @@ elseif isstruct(Xlog)&&isfield(Xlog,'properties')&&isfield(Xlog,'channel')
 	% CNH-TDMS-data (result from leesTDMS)
 	iTime=find(strcmpi('Timestamp',{Xlog.channel.name}));
 	iData=find(strcmpi('Payload'  ,{Xlog.channel.name}));
-	iID  =find(strcmpi('Id'       ,{Xlog.channel.name}));
+	iID = find(startsWith({Xlog.channel.name},'Id','IgnoreCase',true));
 	if isempty(iTime)||isempty(iData)||isempty(iID)
 		error('Wrong expectations about data!')
 	end

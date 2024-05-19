@@ -1,6 +1,5 @@
 function [D,NE,V,G,X] = AnalyseGPSdata(X,varargin)
 %AnalyseGPSdata - Analyse GPS data
-% this file is in development
 %   The goal is to separate analysis of GPS-data from ReadFIT-function
 %        to make it usable for other file types.
 %    [D,G] = AnalyseGPSdata(X,varargin)
@@ -21,6 +20,7 @@ Z1 = [];
 [bPlot] = nargout==0;
 [bBelgiPlot] = false;
 [bFixedFigures] = false;
+[bUseGeoaxes] = false;	% use geoaxes
 figTagNEtime = [];
 figTagVHD = [];
 figTagNE = [];
@@ -29,7 +29,7 @@ if nargin>1
 	setoptions({'Z1','bRemoveNaNs'	...
 		,'bPlot','maxStandStillTime','minKeepBlockInterTime','minDistBlock','minVedges','bBelgiPlot'	...
 		,'Vgps','iVgps','Altitude','iAltitude'	...
-		,'bDispAnal','bRemoveNonBlocks','bFixedFigures'	...
+		,'bDispAnal','bRemoveNonBlocks','bFixedFigures','bUseGeoaxes'	...
 		,'figTagNEtime','figTagVHD','figTagNE','fTitle'	...
 		},varargin{:})
 end
@@ -191,7 +191,8 @@ else
 		end
 	end
 end
-G = var2struct(Dtot,Z1,t0,dPts,cumD);
+t0_ts = datetime(t0,'ConvertFrom','datenum');
+G = var2struct(Dtot,Z1,t0,t0_ts,dPts,cumD);
 
 if bPlot
 	if bBelgiPlot
@@ -199,19 +200,33 @@ if bPlot
 		ax1 = gca;
 		ax1.ButtonDownFcn = @PointClicked;
 		G.cGEO = CreateGeography('country','Belgium','-bStoreCoors');
+		axis equal;
+	elseif bUseGeoaxes
+		if isempty(figTagNE)
+			nfigure;
+		else
+			[~,bN] = getmakefig(figTagNE);
+			if ~bN
+				clf;	% to make it easy... (and prevent multiple axes)
+			end
+		end
+		ax1 = geoaxes;
+		geobasemap streets
+		plot(ax1,X(:,2),X(:,3));
 	else
 		ax1 = plotmat(NE,1,2,[],[],'fig',figTagNE);
+		axis equal;
 	end
 	title(fTitle,'Interpreter','none')
-	axis equal;
 	ax2=plotmat(NE/1000,[],X(:,1),{'North','East'},{'km','km'}	...
 		,'-btna','fig',figTagNEtime);
 	xlabel(fTitle,'Interpreter','none')
 	fig2 = ancestor(ax2(1),'figure');
 	if isempty(figTagVHD)
 		fig3 = nfigure;
+		bNew3 = true;
 	else
-		fig3 = getmakefig(figTagVHD);
+		[fig3,bNew3] = getmakefig(figTagVHD);
 	end
 	if isempty(Altitude)
 		nP = 2;
@@ -237,8 +252,11 @@ if bPlot
 		xlabel(fTitle,'Interpreter','none')
 	end
 	ylabel '[km]'
-	navfig
-	navfig(char(4))
+	if bNew3
+		navfig
+		navfig(char(4))
+	end
+	navfig X
 	if ~isempty(Altitude)
 		for ix=1:min(10,length(dH))
 			navfig(fig2,'addkey',num2str(rem(ix,10)),1,{1,D.Tblock(ix,:)})
@@ -363,8 +381,15 @@ end		% GetStimeUTC
 
 function PointClicked(ax,ev)
 f = ancestor(ax,'figure');
+xl = xlim(ax);
+yl = ylim(ax);
+pt = ev.IntersectionPoint;
+if pt(1)<xl(1) || pt(1)>xl(2) || pt(2)<yl(1) || pt(2)>yl(2)
+	% do nothing if clicked outside the axes-space
+	return
+end
 D = f.UserData;
-p = ProjGPS2XY(ev.IntersectionPoint([2 1]),'Z1',D.G.Z1,'-bInverse');
+p = ProjGPS2XY(pt([2 1]),'Z1',D.G.Z1,'-bInverse');
 [name,cntry] = D.G.cGEO.FindCommunity(p);
 if ~isempty(name)
 	if ~strcmpi(cntry,'BEL')

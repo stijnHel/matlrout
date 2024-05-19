@@ -170,13 +170,13 @@ try
 		set(VLa(1),'Units','pixels')
 		p=get(VLa(1),'Position');
 		set(VLa(1),'Units',u);
-		xl=get(VLa(1),'XLim');
-		yl=get(VLa(1),'YLim');
+		[xl,yl] = GetAxLimits(VLa(1));
 		VLDy=diff(xl)/diff(yl)/p(3)*p(4);
 		if length(lvast)>1
 			VL1=cell(1,length(lvast));	% start with cell(!)
 			for i=1:length(lvast)
-				VL1{i}=get(lvast(i),'XData')+1i*get(lvast(i),'YData')*VLDy;
+				VL1{i}=get(lvast(i),'XData_I')+1i*get(lvast(i),'YData_I')*VLDy;	% XData_I always available? (maybe from Matlab Rxxxx?)
+					% XData_I to (try to) make geoaxes possible
 				VL1{i}=VL1{i}(:);
 			end
 			N=cellfun('length',VL1);
@@ -189,7 +189,7 @@ try
 			end
 			VL1=cat(2,VL1{:});
 		else
-			VL1=get(lvast,'XData')+1i*get(lvast,'YData')*VLDy;
+			VL1=get(lvast,'XData_I')+1i*get(lvast,'YData_I')*VLDy;
 			VL1=VL1(:); 
 		end
 		if isempty(lvolg)
@@ -444,8 +444,7 @@ try
 						close(S.fvar);
 					case {'I','U'}	% zoom in "vaste figuur" (XY-grafiek)
 						axC=get(VLcurl,'parent');
-						xlC=get(axC,'Xlim');
-						ylC=get(axC,'Ylim');
+						[xlC,ylC] = GetAxLimits(axC);
 						if c=='I'
 							dx=diff(xlC)/2;
 							dy=diff(ylC)/2;
@@ -454,9 +453,8 @@ try
 							dy=diff(ylC)*2;
 						end
 						if ~any(isnan(VL1(i)))
-							set(axC,'Xlim',real(VL1(i))+[-.5 .5]*dx	...
-								,'Ylim',imag(VL1(i))/VLDy+[-.5 .5]*dy	...
-								)
+							SetAxLimits(axC,real(VL1(i))+[-.5 .5]*dx	...
+								,imag(VL1(i))/VLDy+[-.5 .5]*dy)
 						end
 					case 't'	% toon punt
 						ShowPt(S,i)
@@ -469,8 +467,8 @@ try
 						LOGidx(1,end+1) = i;
 						setappdata(S.fvast,'LOGidx',LOGidx)
 					case 'X'
-						xl = [min(S.lvast.XData),max(S.lvast.XData)];
-						yl = [min(S.lvast.YData),max(S.lvast.YData)];
+						xl = [min(S.lvast.XData_I),max(S.lvast.XData_I)];
+						yl = [min(S.lvast.YData_I),max(S.lvast.YData_I)];
 						SetAxisLimits(S.VLa,xl,yl);
 					case 12	% ctrl-L
 						volglijn('ShowZoomed')
@@ -559,7 +557,7 @@ try
 				LOGidx = getappdata(S.fvast,'LOGidx');
 				LOG = struct('idx',LOGidx	...
 					,'t',S.VLvx(LOGidx)	...
-					,'X',S.lvast.XData(LOGidx),'Y',S.lvast.YData(LOGidx)	...
+					,'X',S.lvast.XData_I(LOGidx),'Y',S.lvast.YData_I(LOGidx)	...
 					);
 				varargout = {LOG};
 			case 'addlogpts'
@@ -570,7 +568,7 @@ try
 				else
 					L = [S.lvast;S.lvar(:)];
 					for i=1:length(L)
-						line(ancestor(L(i),'axes'),L(i).XData(LOGidx),L(i).YData(LOGidx)	...
+						line(ancestor(L(i),'axes'),L(i).XData_I(LOGidx),L(i).YData_I(LOGidx)	...
 							,'Color',[0 1 0],'Marker','o','Linestyle','none'	...
 							,'Tag','LOGmarker'	...
 							)
@@ -579,8 +577,8 @@ try
 			case 'matchzoom'	% match zoom of XY-plot with zoomed part in T-plots
 				xl = S.lvar(1).Parent.XLim;
 				B = S.lvar(1).XData>=xl(1) & S.lvar(1).XData<=xl(2);
-				Xmin = min(S.lvast.XData(B));
-				Xmax = max(S.lvast.XData(B));
+				Xmin = min(S.lvast.XData_I(B));
+				Xmax = max(S.lvast.XData_I(B));
 				Ymin = min(S.lvast.YData(B));
 				Ymax = max(S.lvast.YData(B));
 				SetAxisLimits(S.VLa,[Xmin,Xmax],[Ymin,Ymax]);
@@ -589,8 +587,8 @@ try
 				if isempty(l)
 					xl = S.lvar(1).Parent.XLim;
 					B = S.lvar(1).XData>=xl(1) & S.lvar(1).XData<=xl(2);
-					X = S.lvast.XData(B);
-					Y = S.lvast.YData(B);
+					X = S.lvast.XData_I(B);
+					Y = S.lvast.YData_I(B);
 					line(S.VLa,X,Y,'Color',[0 1 0],'Tag','partPlot','LineWidth',2)
 					for i=1:length(S.fvar)
 						navfig(S.fvar(i),'AddUpdateAxes',@UpdateZoomedPart)
@@ -608,8 +606,8 @@ try
 				end
 				ii = i1:i2;
 				t = S.VLvx(ii)';
-				X = S.lvast.XData(ii)';
-				Y = S.lvast.YData(ii)';
+				X = S.lvast.XData_I(ii)';
+				Y = S.lvast.YData_I(ii)';
 				varargout = {var2struct(i1,i2,t,X,Y),S};
 		end
 	else
@@ -618,6 +616,11 @@ try
 			return
 		end
 		p=get(VLa,'CurrentPoint');
+		[xl,yl] = GetAxLimits(VLa);
+		if p(1)<xl(1) || p(1)>xl(2) || p(1,2)<yl(1) || p(1,2)>yl(2)
+			% do nothing if clicked outside the axes-space
+			return
+		end
 		[~,i]=min(abs(VL1(:)-(p(1,1)+p(1,2)*1i*VLDy)));
 		if isempty(i)
 			i=1;	% breakpoint setting
@@ -693,8 +696,7 @@ end
 
 function OK=CheckPt(S,i)
 axC=get(S.VLcurl,'parent');
-xlC=get(axC,'Xlim');
-ylC=get(axC,'Ylim');
+[xlC,ylC] = GetAxLimits(axC);
 x=real(S.VL1(i));
 y=imag(S.VL1(i))/S.VLDy;
 OK=x>=xlC(1)&&x<=xlC(2)&&y>=ylC(1)&&y<=ylC(2);
@@ -702,10 +704,9 @@ OK=x>=xlC(1)&&x<=xlC(2)&&y>=ylC(1)&&y<=ylC(2);
 function ShowPt(S,i)
 if ~isnan(S.VL1(i))
 	axC=get(S.VLcurl,'parent');
-	xlC=get(axC,'Xlim');
-	ylC=get(axC,'Ylim');
-	set(axC,'Xlim',xlC-mean(xlC)+real(S.VL1(i))	...
-		,'Ylim',ylC-mean(ylC)+imag(S.VL1(i))/S.VLDy	...
+	[xlC,ylC] = GetAxLimits(axC);
+	SetAxLimits(axC,xlC-mean(xlC)+real(S.VL1(i))	...
+		,ylC-mean(ylC)+imag(S.VL1(i))/S.VLDy	...
 		)
 	fUpdate = getappdata(axC,'updateAxes');
 	if ~isempty(fUpdate)&&isa(fUpdate,'function_handle')
@@ -728,7 +729,11 @@ l=[findobj(ax,'type','line');findobj(ax,'type','stair')];
 if nargin>1
 	N=zeros(1,length(l));
 	for i=1:length(l)
-		N(i)=length(get(l(i),'xdata'));
+		if isprop(l,'XData_I')
+			N(i)=length(get(l(i),'XData_I'));
+		else
+			N(i)=length(get(l(i),'XData'));
+		end
 	end
 	if ~isempty(nMin)
 		B=N>=nMin;
@@ -746,8 +751,7 @@ if nargin>1
 end		% minimum or exact size requested
 
 function [xl,yl] = SetAxisLimits(ax,xl,yl)
-xl0 = get(ax,'XLim');
-yl0 = get(ax,'YLim');
+[xl0,yl0] = GetAxLimits(ax);
 if diff(xl)==0
 	xl = xl0+mean(xl)-mean(xl0);
 end
@@ -761,7 +765,7 @@ if yRatio>yRatio0
 elseif yRatio<yRatio0
 	yl = (yl0-mean(yl0))*diff(xl)/diff(xl0)+mean(yl);
 end
-axis(ax,[xl,yl])
+SetAxLimits(ax,xl,yl)
 
 function SetMarker(sTag,iMarker,S)
 lMarker = findobj([S.fvast;S.fvar(:)],'Tag',sTag);
@@ -819,7 +823,23 @@ l = findobj(S.VLa,'Tag','partPlot');
 if ~isempty(l)
 	xl = S.lvar(1).Parent.XLim;
 	B = S.lvar(1).XData>=xl(1) & S.lvar(1).XData<=xl(2);
-	X = S.lvast.XData(B);
-	Y = S.lvast.YData(B);
+	X = S.lvast.XData_I(B);
+	Y = S.lvast.YData_I(B);
 	set(l,'XData',X,'YData',Y)
+end
+
+function [xl,yl] = GetAxLimits(ax)
+if isprop(ax,'XLim')
+	xl=get(ax,'XLim');
+	yl=get(ax,'YLim');
+else	% assume geoaxes
+	%[yl,xl] = geolimits(ax);
+	[xl,yl] = geolimits(ax);
+end
+
+function SetAxLimits(ax,xl,yl)
+if isprop(ax,'XLim')
+	set(ax,'XLim',xl,'YLim',yl)
+else	% assume geoaxes
+	geolimits(ax,xl,yl)
 end

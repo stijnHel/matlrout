@@ -33,7 +33,7 @@ function varargout=navimgs(varargin)
 %         navimgs next	- optional output : is last
 %         navimgs previous - optional output : is first
 %         navimgs last
-%      press 'g' - current data is put in NVIimg
+%         navimgs('frame',idx) - go to frame number
 %      navimgs('addkeyimg',key,fcn) - adds functionality
 %              fcn will be called as : fcn(X), with X image data
 %      navimgs{'limit',{<limits>,...}
@@ -67,17 +67,27 @@ function varargout=navimgs(varargin)
 %      navimgs('axscale',[xmin xmax],[ymin ymax])
 %                     or navimgs('axscale',[xmin xmax ymin ymax])
 %      navimgs('fcnUpdate',fcn) - sets a function called after updating
-%                    extra input: 'NAVIMGSbUpdateX': true ==> X adapted
+%                    extra input: 'NAVIMGSbUpdateX': true ==> image (X) adapted
 %              without NAVIMGSbUpdateX:
 %                     function called: fcn(idx)
 %              with NAVIMGSbUpdateX
 %                     function called: X=fcn(idx,X)
+%      navimgs('otherKeyFcn',fcn) - add function for handling not handled keys
+%              fcn must be a function with normal key-callback signature
+%               !!!!!!!! see addkeyimg !!!!!!!!!!
+%               reason for new functionality: use of Key and Character...
+%               to be reviewed
 %
 %   Requirement IMGstream: (methods used)
 %         length() --> number of images
 %         getImage(idx) --> returns the image at index idx
 
 %  FMTC - Stijn Helsen - 2007
+
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+% *  Maybe extend AddKeyImg with "default action" as a replacement for
+%          otherKeyFcn?
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 D=varargin{1};
 if isstruct(D)||isobject(D)||iscell(D)||ischar(D)||(isnumeric(D)&&~ismatrix(D))
@@ -263,6 +273,24 @@ if isstruct(D)||isobject(D)||iscell(D)||ischar(D)||(isnumeric(D)&&~ismatrix(D))
 						varargout{2}=idx;
 					end
 				end
+			case 'frame'
+				h=getappdata(f,'NAVIMGShImg');
+				if isempty(h)
+					error('Something wrong!')
+				end
+				i=varargin{2};
+				n=getappdata(f,'NAVIMGSn');
+				if ischar(i)
+					if strcmpi(i,'last')
+						i=n;
+					else
+						error('Wrong input for navimgs get')
+					end
+				elseif ~isnumeric(i)||~isscalar(i)||i<1||i~=round(i)||i>n
+					error('Wrong index value')
+				end
+				setappdata(f,'NAVIMGSidx',i)
+				Update(f,0);
 			case 'previous'
 				ev=struct('Character','p','Modifier',{cell(1,0)}	...
 					,'Key','p');
@@ -413,6 +441,14 @@ if isstruct(D)||isobject(D)||iscell(D)||ischar(D)||(isnumeric(D)&&~ismatrix(D))
 				setappdata(f,'NAVIMGSfcnUpdate',varargin{2})
 				if length(varargin)>2
 					setappdata(f,'NAVIMGSbUpdateX',varargin{3})
+				end
+			case 'otherkeyfcn'
+				if isempty(varargin{2})
+					if isappdata(f,'otherKeyAction')
+						rmappdata(f,'otherKeyAction')
+					end
+				else
+					setappdata(f,'otherKeyAction',varargin{2})
 				end
 			case 'fcnclick'
 				set(getappdata(f,'NAVIMGShImg'),'ButtonDownFcn',varargin{2})
@@ -822,6 +858,11 @@ if ~bDone
 			if any(B(:))
 				LinkFigures(fLinked(~B));
 				warning('Figures relinked!')
+			end
+		otherwise
+			fcn = getappdata(f,'otherKeyAction');
+			if ~isempty(fcn)
+				fcn(f,ev)
 			end
 	end
 end

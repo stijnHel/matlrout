@@ -112,6 +112,9 @@ for i=1:length(l)
 				X = Xnew;
 			end
 			if n>1
+				if isinteger(Y)
+					Y = double(Y);
+				end
 				Y=decimate(Y-mnY,n)+mnY;
 				mn_dX=(X(end)-X(1))/(length(X)-1);
 				if mn_dX>0 && std(diff(X))/mn_dX<1e-6

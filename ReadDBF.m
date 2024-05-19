@@ -120,9 +120,15 @@ else
 				end
 				[X{:,j}]=deal(D{:});
 			case 'D'
-				d=x(iFields(j)+1:iFields(j+1),:)'-'0';
-				d=d*[1000 100 10 1 0 0 0 0;0 0 0 0 10 1 0 0;0 0 0 0 0 0 10 1]';
-				D=num2cell(datenum(d));
+				d = x(iFields(j)+1:iFields(j+1),:);
+				if any(d<'0' | d>'9','all')
+					D = num2cell(zeros(nRec,1));
+					warning('No valid date-data?! (%s)',recordDef(j).name)
+				else
+					d=d'-'0';
+					d=d*[1000 100 10 1 0 0 0 0;0 0 0 0 10 1 0 0;0 0 0 0 0 0 10 1]';
+					D=num2cell(datenum(d));
+				end
 				[X{:,j}]=deal(D{:});
 			otherwise	% not implemented(!) - just text
 				for i=1:nRec

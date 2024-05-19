@@ -51,6 +51,9 @@ for tp=notToInclude
 		h=setdiff(h,ll);
 	end
 end
+if isnumeric(ax) && isa(h(1).XLim,'datetime')	%(!!!)
+	ax = num2ruler(ax,h(1).XAxis);
+end
 set(h,'XLim',ax)
 B=false(1,length(h));
 for i=1:length(h)

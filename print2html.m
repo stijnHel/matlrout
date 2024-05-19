@@ -620,7 +620,7 @@ else
 			elseif sz(1)>1&&sz(2)==1	% transposed string?!
 				f.printf('"(')
 				printstring(f,d');
-				f.printf(')''"')
+				f.printf(')"')
 			else
 				for i=1:sz(1)-1
 					if options.bDirectString
@@ -646,6 +646,12 @@ else
 					end
 					f.printf('%s',char(d(i)))
 				end
+			end
+		case 'datetime'
+			if isscalar(d)
+				f.printf('%s',d)
+			else
+				f.printf('%s datetime',stringsize(sz))
 			end
 		case 'function_handle'
 			f.printf('%s',char(d))

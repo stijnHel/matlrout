@@ -193,7 +193,10 @@ end
 
 for i=1:length(F)
 	if strcmp(F{i},'%s')	% find length
-		if iscell(D{i})
+		if isdatetime(D{i})
+			D{i} = string(D{i});
+		end
+		if iscell(D{i}) || isa(D{i},'string')
 			Ns=cellfun('length',D{i});
 			n=max(Ns);
 		else

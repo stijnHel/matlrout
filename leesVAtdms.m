@@ -4,9 +4,35 @@ function [e,ne,de,e2,gegs,D,Ds]=leesVAtdms(fName,varargin)
 %
 %  Most is done by leesTDMS (see that function for in/out).
 %  Additions:
-%    Scale to the right units
+%    Scale to the "right units": (currently only for acceleration)
+%          units 'g','m/s^2','m/s2' are all converted to the default ('g')
+%
+% Possibility to change default units:
+%       ...leesVAtdms(fName,'defUnits',{<type>,<default unit>},...)
+%             <type>: name of "type of unit", currently only 'acc' (for acceleration)
+%             <default unit>: (currently 'g' for 'acc')
+% It's also possible to disable the conversion to "default units":
+%       ...leesVAtdms(fName,'useDefaultUnits',false,...)
 
-[e,ne,~,e2,gegs,~,Ds]=leesTDMS(fName,varargin{:});
+useDefaultUnits = true;
+units = struct('name','acc','default','g','units',{{'g',9.80665;'m/s^2',1;'m/s2',1}});
+defUnits = [];	% can overrule default in units (to allow change of
+			% default without needing to give the full units-data
+
+[~,~,options] = setoptions([2,0],{'useDefaultUnits','units','defUnits'},varargin{:});
+if iscell(defUnits)
+	for i=1:size(defUnits,1)
+		units = AdaptDefaults(units,defUnits{i,:});
+	end
+elseif isstruct(defUnits)
+	for i=1:length(defUnits)
+		units = AdaptDefaults(units,defUnits(i).name,defUnits(i).default);
+	end
+elseif ~isempty(defUnits)
+	error('Wrong input for default units')
+end		% ~isempty(defUnits)
+
+[e,ne,~,e2,gegs,~,Ds]=leesTDMS(fName,options{1:2,:});
 if isempty(Ds)
 	e=[];
 	ne=[];
@@ -37,18 +63,39 @@ if isfield(S,'units')
 			warning('LEESVATDMS:TDMScellOutput','Cell output from leesTDMS?')
 			e=[e{:}];
 		end
+		bSIunitsOK = false;
 		for i=1:length(S)
-			switch de{i}
-				case 'g'
-					e(:,i)=e(:,i)/S(i).sensitivity;
-				case {'m/s2','m/s^2'}
-					e(:,i)=e(:,i)/(S(i).sensitivity*9.80665);
-					de{i}='g';
-				otherwise
-					e(:,i)=e(:,i)/S(i).sensitivity;
-			end
-		end
-	end
+			e(:,i) = e(:,i)/S(i).sensitivity;
+			if ischar(useDefaultUnits)
+				if strcmpi(useDefaultUnits,'SI')
+					if ~bSIunitsOK
+						% make sure 'g' means acceleration, not 0.001 kg !!
+						if ~isequal(unitcon('test','g'),[0 1 -2 0 0])
+							unitcon('addunit','g','L1T-2',9.80665)
+						end
+						bSIunitsOK = true;
+					end
+					[b,v,sUnit] = unitcon('test',de{i});
+					if ~isempty(b) && v~=1
+						e(:,i) = e(:,i)*v;
+					end
+					de{i} = sUnit;
+				else
+					error('Wrong use! (useDefaultUnits - %s)',useDefaultUnits)
+				end
+			elseif useDefaultUnits
+				for j = 1:length(units)
+					Bunit = strcmp(de{i},units(j).units(:,1));
+					if any(Bunit) && ~strcmp(de{i},units(j).default)
+						Bdef = strcmp(units(j).default,units(j).units(:,1));
+						factor = units(j).units{Bunit,2}/units(j).units{Bdef,2};
+						e(:,i) = e(:,i)*factor;
+						de{i} = units(j).default;
+					end
+				end
+			end		% if useDefaultUnits
+		end		% for i
+	end		% not empty e
 elseif isfield(S,'signals')&&isfield(S,'sampleRate')
 	% Multi-sample rate version of VA-toolbox
 	Sets={S.name_set};
@@ -81,4 +128,12 @@ end
 fn=fieldnames(Ds.properties);
 for i=1:length(fn)
 	gegs.(fn{i})=Ds.properties.(fn{i});
+end
+
+function units = AdaptDefaults(units,name,default)
+B = strcmpi({units.name},name);
+if any(B)
+	units(B).default = default;
+else
+	warning('Unit type "%s" is not known!  Default wasn''t changed.',name)
 end

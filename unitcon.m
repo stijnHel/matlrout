@@ -1,4 +1,4 @@
-function [c,unitInfo] = unitcon(u1,u2,u3)
+function [c,unitInfo,varargout] = unitcon(u1,u2,u3,varargin)
 % UNITCON - Geeft conversies van eenheden
 %    c=unitcon(unit1,unit2)
 %    c=unitcon(value,unit1,unit2)
@@ -124,9 +124,16 @@ if iscell(u1)
 		unitInfo = 'MLTAK';
 	end
 	return
-end
-
-if nargin==3
+elseif ischar(u1) && strcmpi(u1,'test')
+	[unitInfo,c] = getsi(u2,false);
+	if nargout>2
+		varargout = {siunit(c)};
+	end
+	return
+elseif ischar(u1) && strcmpi(u1,'addunit')
+	addunit(u2,u3,varargin{1})
+	return
+elseif nargin==3
 	if ischar(u1)
 		val=eval(u1);
 	else
@@ -137,11 +144,13 @@ if nargin==3
 else
 	val=1;
 end
-[v1,b1,off1]=getsi(u1);
+[v1,b1,off1]=getsi(u1,true);
 if nargin>1
 	if strcmp(u2,'toon')
 		i=find(sum(b1(ones(1,length(UNITinfo.conv)),:)~=UNITinfo.num,2)==0);
-		if isempty(i)
+		if nargout
+			c = UNITinfo.unit(i);
+		elseif isempty(i)
 			fprintf('!Er zijn geen compatibele eenheden!\n');
 		else
 			fprintf('compatibele eenheden :\n');
@@ -149,7 +158,7 @@ if nargin>1
 		end
 		return;
 	end
-	[v2,b2,off2]=getsi(u2);
+	[v2,b2,off2]=getsi(u2,true);
 	if any(b1~=b2)
 		error('incompatibele eenheden')
 	end
@@ -173,23 +182,35 @@ else
 end
 
 	function addunit(u,si,f,off)
-		UNITinfo.unit{1,end+1}=u;
-		UNITinfo.conv(end+1)=f;
+		if any(strcmp(UNITinfo.unit,u))
+			iU = find(strcmp(UNITinfo.unit,u));
+			warning('Unit overwritten! ("%s")',u)
+		else
+			iU = size(UNITinfo.unit,2)+1;
+			UNITinfo.unit{1,iU}=u;
+		end
+		UNITinfo.conv(iU)=f;
 		if ~exist('off','var')||isempty(off)
 			off=0;
 		end
-		UNITinfo.offset(end+1)=off;
-		UNITinfo.num(end+1,:)=numdim(si);
+		UNITinfo.offset(iU)=off;
+		UNITinfo.num(iU,:)=numdim(si);
 	end		% function addunit
 
-	function [v,b,offset]=getsi(u)
+	function [v,b,offset]=getsi(u,bErrorIfNE)
 		%getsi - Interprete formula of units to base units
 		uu=u;
 		uu(uu=='.')='*';	% allow multiply by point
 		[Df,U,Op,OpN]=InterpreteFormula(uu,'-bMatlab');
 		Bu=cell(3,length(U));
 		for iu=1:length(U)
-			[Bu{:,iu}]=GetSIvalues(U{iu});
+			[Bu{:,iu}]=GetSIvalues(U{iu},bErrorIfNE);
+			if isempty(Bu{1,iu})
+				v = [];
+				b = [];
+				offset = [];
+				return
+			end
 		end
 		BO=cell(3,size(Op,1));
 		for iO=1:size(Op,1)
@@ -266,6 +287,23 @@ end
 		end
 	end		% function numdim
 
+	function s = siunit(b)
+		C = {'','.','.','.','.';'kg','m','s','A','K'};
+		for ib=1:length(b)
+			if b(ib)
+				if b(ib)~=1
+					C{2,ib} = sprintf('%s^%d',C{2,ib},b(ib));
+				end
+			end
+		end
+		C = C(:,b~=0);
+		if isempty(C)
+			s = '-';
+		else
+			s = [C{2:end}];
+		end
+	end		% function printsi
+
 	function printsi(b)
 		j=0;
 		for ib=1:length(b)
@@ -296,7 +334,7 @@ end
 		end
 	end		% function printsi
 
-	function [b,v,offset]=GetSIvalues(u)
+	function [b,v,offset]=GetSIvalues(u,bErrorIfNE)
 		%GetSIvalues - convert to powers of base units with factor and offset
 		v=1;
 		iu=find(strcmp(u,UNITinfo.unit));
@@ -350,7 +388,12 @@ end
 				iu=find(strcmp(u,UNITinfo.unit));
 			end
 			if isempty(iu)
-				error('unit %s niet gevonden',u)
+				if bErrorIfNE
+					error('unit %s niet gevonden',u)
+				else
+					b = [];
+					return
+				end
 			end
 		end
 		v=v*UNITinfo.conv(iu);

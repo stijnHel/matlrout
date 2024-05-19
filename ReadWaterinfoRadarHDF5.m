@@ -15,6 +15,9 @@ function [IMGs,I,Prec] = ReadWaterinfoRadarHDF5(fName,varargin)
 %              ReadWaterinfoRadarHDF5 set pos (without position)
 %                delete position
 %      * started using cGeography, but a lot is done internally!!!
+%        communities are found via cGeography, but provinces are directly
+%        read
+%        --> is it possible to have multiple "admin-levels" in cGeography?
 
 [bPlot] = nargout==0;
 [bAnim] = false;

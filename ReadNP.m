@@ -24,13 +24,39 @@ if bUsePython
 	if count(py.sys.path,fP) == 0
 		insert(py.sys.path,int32(length(fP)),fP);
 	end
-	py.myPickleReader.load(fFull);
-	X = uint8(py.myPickleReader.GetLastAflat());
-	s = py.myPickleReader.GetSizeA();
-	sizeX = [double(s{3}),double(s{2}),double(s{1})];
-	T = py.myPickleReader.GetLastT();
-	X = reshape(X,sizeX);
-	I = double(T);
+	Xpyt = py.myPickleReader.load(fFull);
+	Xtype = Xpyt.dtype;
+	switch class(Xtype)
+		case 'py.numpy.dtype[int64]'
+			X = int64(Xpyt);
+		case 'py.numpy.dtype[uint64]'
+			X = uint64(Xpyt);
+		case 'py.numpy.dtype[int32]'
+			X = int32(Xpyt);
+		case 'py.numpy.dtype[uint32]'
+			X = uint32(Xpyt);
+		case 'py.numpy.dtype[int16]'
+			X = int16(Xpyt);
+		case 'py.numpy.dtype[uint16]'
+			X = uint16(Xpyt);
+		case 'py.numpy.dtype[int8]'
+			X = int8(Xpyt);
+		case 'py.numpy.dtype[uint8]'
+			X = uint8(Xpyt);
+		case 'py.numpy.dtype[float64]'
+			X = double(Xpyt);
+		case 'py.numpy.dtype[float32]'
+			X = single(Xpyt);
+		otherwise
+			warning('Not implemented dtype! (%s)',class(Xtype))
+	end
+% the following was created for a very specific file-contents
+% 	X = uint8(py.myPickleReader.GetLastAflat());
+% 	s = py.myPickleReader.GetSizeA();
+% 	sizeX = [double(s{3}),double(s{2}),double(s{1})];
+% 	T = py.myPickleReader.GetLastT();
+% 	X = reshape(X,sizeX);
+% 	I = double(T);
 else
 	if strcmpi(fExt,'.npz')
 		Z=ReadZip(fFull);

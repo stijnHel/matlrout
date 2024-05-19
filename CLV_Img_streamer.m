@@ -165,6 +165,26 @@ classdef CLV_Img_streamer < handle
 				end
 			end
 		end	% getImage
+
+		function [T,t0] = getImgTimes(c,nMax)
+			%getImgTimes - retrieves all timestamps
+
+			n = c.nFrames;
+			if nargin>=2 && ~isempty(nMax)
+				n = min(nMax,n);
+			end
+
+			TT = zeros(16,n,'uint8');
+			for i=1:n
+				c.f.fseek(c.headLen+(i-1)*c.blockSize,'bof');
+				TT(:,i) = c.f.fread(16,'*uint8');
+			end
+			T = double(typecast(reshape(TT(12:-1:5,:),n*8,1),'uint64'))/2^32;
+			T = T-T(1);
+			if nargout>1
+				t0 = lvtime(TT(:,1));
+			end
+		end		% getImgTimes
 		
 		function [X,E] = getImages(c,n1,n2)
 			if nargin==1

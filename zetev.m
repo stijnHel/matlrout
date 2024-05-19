@@ -93,6 +93,8 @@ if ~exist('a','var')
 		disp(EVDIR)
 	end
 	return
+elseif isstring(a)
+	a = char(a);	% to make the rest compatible with "old code"
 elseif ~ischar(a)
 	error('Verkeerde input');
 end

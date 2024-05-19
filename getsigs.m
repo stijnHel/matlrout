@@ -13,8 +13,9 @@ end
 [bClipData] = false;
 [bKeepCell] = false;	% if true, cell output also if only one channel
 [bRemoveHiddenPoints] = false;
+[bCombine] = false;
 if nargin>1
-	setoptions({'bClipData','bKeepCell','bRemoveHiddenPoints'},varargin{:})
+	setoptions({'bClipData','bKeepCell','bRemoveHiddenPoints','bCombine'},varargin{:})
 end
 if bRemoveHiddenPoints && ~bClipData
 	warning('bRemoveHiddenPoints only works if bClipData!')
@@ -68,7 +69,28 @@ for i=1:numel(graphs)
 		X{i}=X{i}{1};
 	end
 end
-if length(X)==1&&~bKeepCell
+if length(X)==1 && ~bKeepCell
 	X=X{1};
+end
+if bCombine
+	N = cellfun('length',X);
+	if isscalar(X)
+		X = X{1};
+	elseif all(N==N(1))
+		X0 = cellfun(@(x) x(1),X);
+		Xe = cellfun(@(x) x(end,1),X);
+		if all(X0==X0(1) & Xe==Xe(1))
+			X1 = X{1};
+			X1(1,end+length(X)-1) = X1(1);	% enlarge
+			for i=2:length(X)
+				X1(:,3+i) = X{i}(:,2);
+			end
+			X = X1;
+		else
+			warning('Not the same X-data?!')
+		end
+	else
+		warning('Not all signals the same length!')
+	end
 end
 Xinfo=Xi;

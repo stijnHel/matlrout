@@ -60,6 +60,7 @@ maxRawData = 1e12;
 nMaxObjects = 500;
 [bAutoChannel] = nargout>1;
 fDataFunc = [];
+[bFixUnequalLengths] = false;
 if nargin>1
 	options=varargin;
 	if isnumeric(options{1})
@@ -77,7 +78,8 @@ if nargin>1
 				,'nMaxD','nDStartData','nDStopData','nMaxObjects'	...
 				,'bDontStoreData','bStructured','bAutoChannel'	...
 				,'bReadAllNonChanData','bScaleChans','fDataFunc'	...
-				,'maxRawData','bTruncBlocks','bReadBrokenBlocks','bReadData'}	...
+				,'maxRawData','bTruncBlocks','bReadBrokenBlocks','bReadData'	...
+				,'bFixUnequalLengths'}	...
 			,options{:})
 		if ~isempty(bStructured)&&bStructured
 			% do nothing
@@ -766,34 +768,55 @@ for iG=1:nGroups
 end
 for iD=1:nD
 	id=0;
-	for iS=1:length(D(iD).idxChans)
-		iG=D(iD).idxGroups(iS);
-		iC=D(iD).idxChans(iS);
-		iB=groups(iG).nBlocks(iC)+1;
-		groups(iG).nBlocks(iC)=iB;
-		if D(iD).nVals(iS)
-			if iscell(D(iD).D)
-				D1=D(iD).D{iS};
-			elseif isstruct(D(iD).D)	% (currently) only if ~bReadData
-				D1 = D(iD).D;
-				if ~isscalar(D1) && iS<=length(D1)
-					D1 = D1(iS);
-				end
-			elseif size(D(iD).D,2)>1||nChan==1	%!!nChan==1 added!!
-				D1=D(iD).D(:,iS);
+	bLoop = true;
+	bAdd = false;
+	while bLoop && id<size(D(iD).D,1)
+		% !!!!!!!!!!!!!!!!!!!!!!!
+		% this loop (while bLoop ...) is added to solve a problem of not
+		% correctly using all data of a block
+		% This is not optimal!!!!
+		% !!!!!!!!!!!!!!!!!!!!!!!
+		for iS=1:length(D(iD).idxChans)
+			iG=D(iD).idxGroups(iS);
+			iC=D(iD).idxChans(iS);
+			if bAdd
+				iB=groups(iG).nBlocks(iC);
 			else
-				%!!!!interleaved data!!!! --- is this possible?
-				idn=id+D(iD).nVals(iS);
-				if idn>length(D(iD).D)
-					idn = length(D(iD).D);
-				end
-				D1=D(iD).D(id+1:idn);
-				id=idn;
+				iB=groups(iG).nBlocks(iC)+1;
+				groups(iG).nBlocks(iC)=iB;
 			end
-			groups(iG).channel(iC).data{iB} = D1;
-		end
-	end		% for iC
-end		% for iG
+			if D(iD).nVals(iS)
+				if iscell(D(iD).D)
+					D1=D(iD).D{iS};
+					bLoop = false;
+				elseif isstruct(D(iD).D)	% (currently) only if ~bReadData
+					D1 = D(iD).D;
+					if ~isscalar(D1) && iS<=length(D1)
+						D1 = D1(iS);
+					end
+					bLoop = false;
+				elseif size(D(iD).D,2)>1||nChan==1	%!!nChan==1 added!!
+					D1=D(iD).D(:,iS);
+					bLoop = false;
+				else
+					%!!!!interleaved data!!!! --- is this possible?
+					idn=id+D(iD).nVals(iS);
+					if idn>length(D(iD).D)
+						idn = length(D(iD).D);
+					end
+					D1=D(iD).D(id+1:idn);
+					id=idn;
+				end
+				if bAdd
+					groups(iG).channel(iC).data{iB} = [groups(iG).channel(iC).data{iB};D1];
+				else
+					groups(iG).channel(iC).data{iB} = D1;
+				end
+			end
+		end		% for iS
+		bAdd = true;
+	end %	while still data to add
+end		% for iD
 for iG=1:nGroups
 	channels=groups(iG).channel;
 	for iC=1:length(channels)
@@ -897,6 +920,22 @@ if nargout>7
 end
 varargout=cell(1,nargout-1);
 unData=unique(nData);
+if bFixUnequalLengths
+	if length(unData)>1
+		if unData(end)/unData(1)<1.001
+			warning('Almost the same number of signal data - should be combined')
+		elseif length(unData)>2
+			n1 = unData(1);
+			n2 = unData(end);
+			rn2 = n2./unData;
+			if all(unData/n1<1.002 | rn2<1.001)
+				bN1 = unData/n1<1.001;
+				bN2 = ~bN1 & rn2<1.001;
+				warning('Two sets of signals could be made out of signals with %d number of lengths!',length(unData))
+			end
+		end
+	end
+end
 if ~bReadData
 	e = [];
 elseif any([D.bDAQmxData])

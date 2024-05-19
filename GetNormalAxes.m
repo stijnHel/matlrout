@@ -47,7 +47,16 @@ if ischar(in)
 	return
 end
 
-ax=findobj(in,'Type','axes','Visible','on');
+ax = findobj(in,'Type','axes','Visible','on');
+if isempty(ax)	% try something... (related to tests using geoaxes)
+	C = get(in,'Children');
+	for i=1:length(C)
+		if strcmp(C(i).Type,'geoaxes')	% didn't find a better way!!
+			ax = C(i);
+			break
+		end
+	end
+end
 for tp=TagsToDiscard
 	ll=findobj(ax,'Tag',tp{1});
 	if ~isempty(ll)

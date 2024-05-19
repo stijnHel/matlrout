@@ -143,6 +143,11 @@ if nargin&&all(ishandle(c))
 			IN=IN(2:end);
 		end
 	end
+elseif nargin&&iscell(c)	% multiple "simulated key-commands"
+	for i=1:length(c)
+		navfig(c{i})
+	end
+	return
 else
 	f=gcf;
 	bNavfigStart=nargin==0;
@@ -601,7 +606,7 @@ if isempty(X)
 		if BxyRuler(1)
 			ptV{1} = num2ruler(pt(1),get(ax,'XAxis'));
 		end
-		if BxyRuler(1)
+		if BxyRuler(2)
 			ptV{2} = num2ruler(pt(2),get(ax,'YAxis'));
 		end
 		ptV{1} = string(ptV{1});
@@ -756,9 +761,16 @@ end
 function [X,Y,j]=GetXY(l,xl)
 X=get(l,'XData');
 Y=get(l,'YData');
-bOK=~isnan(X)&~isnan(Y);
-X=X(bOK);
-Y=Y(bOK);
+if isnumeric(X)
+	Bok = ~isnan(X);
+else
+	Bok = true(size(X));
+end
+if isnumeric(Y)
+	Bok = Bok & ~isnan(Y);
+end
+X=X(Bok);
+Y=Y(Bok);
 if nargin>1
 	b=X>=xl(1)&X<=xl(2);
 	X=X(b);
@@ -1754,7 +1766,11 @@ if doebepfig
 	end
 	if isempty(andere)
 		if isdatetime(get(gca,'xlim'))&&isnumeric(x)
-			x = datetime(x,'convertFrom','datenum');
+			if x(1)>700000 %	!!!!!!!
+				x = datetime(x,'convertFrom','datenum');
+			else
+				x = num2ruler(x,get(gca,'XAxis'));
+			end
 		end
 		if ~isequal(x,x0)
 			set(as,'XLim',x);
