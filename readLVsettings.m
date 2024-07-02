@@ -1,9 +1,13 @@
-function S=readLVsettings(fn)
+function S=readLVsettings(fn,varargin)
 %readLVsettings - Read settings in labView files - saved by GetSettings.vi
 %   S=readLVsettings(fn)
 
 global LVDEBUG_raw
 
+[bConv2Struct] = false;
+if nargin>1
+	setoptions({'bConv2Struct'},varargin{:})
+end
 bFile=true;
 bFileOpened=false;
 fid=0;
@@ -113,7 +117,14 @@ else	% (iType==2) TDMS file with settings
 					if iscell(d1)&&length(d1)>1&&isstruct(d1{1})
 						d1=TryStructArray(d1);
 					end
+					if bConv2Struct
+						S(i).controls(j).Name = MakeVarNames(S(i).controls(j).Name);
+					end
 					S(i).controls(j).data=d1;
+				end
+				if bConv2Struct
+					C = {S(i).controls.Name;S(i).controls.data};
+					S(i).controls = struct(C{:});
 				end
 			end
 		end		% if settings

@@ -27,8 +27,12 @@ fnr=c.nr;
 fnr0=fnr;
 hFig=c.fig;
 bHandleLinked = true;
-if isempty(varargin)
-	k=get(hFig,'CurrentCharacter');
+if isempty(varargin) || (ischar(varargin{1}) && strcmpi(varargin{1},'key'))
+	if isempty(varargin)
+		k=get(hFig,'CurrentCharacter');
+	else
+		k = varargin{2};
+	end
 	%fprintf('key : "%s", character : %s\n',get(gcf,'currentkey'),get(gcf,'currentcharacter'))
 	if isempty(k)
 		k = get(hFig,'CurrentKey');
@@ -112,6 +116,16 @@ if isempty(varargin)
 							hcm=uicontextmenu('parent',ancestor(axc(i),'figure'));
 							if strcmp(st,'channel')
 								sMenu=get(ht,'String');
+								if iscell(sMenu)
+									if isempty(sMenu)	% possible?
+										sMenu = '';
+									elseif isscalar(sMenu)	% possible?
+										sMenu = sMenu{1};
+									else
+										sMenu = sprintf('%s - ',sMenu{:});
+										sMenu(end-2:end) = [];
+									end
+								end
 							else
 								sMenu=num2str(fnr);
 							end
@@ -136,9 +150,10 @@ if isempty(varargin)
 				end
 			end	% for i
 			if bFirstCopy
-				D=struct('hL',{{hLc}},'ax',axc,'L',{{}});
+				D=struct('hL',{{hLc}},'ax',axc,'L',{{}},'nrs',fnr);
 			else
 				D.hL{end+1}=hLc;
+				D.nrs(1,end+1) = fnr;
 			end
 			if isempty(c.ne)
 				cName=fn;	% be sure it's a string
@@ -155,23 +170,16 @@ if isempty(varargin)
 			D.L{end+1}=cName;
 			setappdata(f,'navcopydata',D)
 		case 'C'	% stop copying to current copy-figure
-			f = getappdata(hFig,'copyFig');
-			if ~isempty(f)
-				set(f,'Tag','');
-				rmappdata(hFig,'copyFig')
-			end
+			f = GetCopyFigure(hFig);
+			set(f,'Tag','ex-copyFig');
+			rmappdata(hFig,'copyFig')
 		case 'L'    % legend on copy window
-			f=getmakefig('navmsrcopy',0,0);
-			if ~isempty(f)
-				D=getappdata(f,'navcopydata');
-				figure(f)
-				legend(D.L)
-			end
+			f = GetCopyFigure(hFig);
+			D=getappdata(f,'navcopydata');
+			figure(f)
+			legend(D.L)
 		case 'D'    % delete last lines on copy window
-			f=getmakefig('navmsrcopy',0,0);
-			if isempty(f)
-				return;
-			end
+			f = GetCopyFigure(hFig);
 			D=getappdata(f,'navcopydata');
 			if ~isempty(D.hL)
 				hLc=D.hL{end};
@@ -207,6 +215,7 @@ if isempty(varargin)
 				end
 			end
 			assignin('base','NAVdata',D);
+			fprintf('Data stored in "NAVdata"\n')
 		case 'N'	% normal view
 			axis auto
 		case {3,17}	% ctrl-C and ctrl-Q - close
@@ -230,6 +239,9 @@ else
 		fnr=varargin{1};
 		if length(varargin)>1
 			fnr0 = 0;	% force update
+			if length(varargin)>2	%(!!!ugly - and very undocumented!!!)
+				bHandleLinked = true;
+			end
 		end
 	else
 		error('Verkeerd gebruik van deze functie')
@@ -465,4 +477,12 @@ end
 ax = GetNormalAxes(hFig);
 if isequal(getappdata(ax(1),'updateAxes'),@axtick2date)
 	axtick2date(hFig)
+end
+
+function f = GetCopyFigure(hFig)
+f = getappdata(hFig,'copyFig');
+if isempty(f)
+	error('No copy-figure found!')
+elseif ~ishandle(f)
+	error('Copy-figure is deleted!')
 end

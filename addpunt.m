@@ -60,10 +60,10 @@ if ischar(f)
 		end
 		setappdata(gcf,'ADDP_sameMarkerCol',p);
 	elseif startsWith(f,'getState','IgnoreCase',true)
-		if nargin<2 || isempty(p)
-			f = p;
-		else
+		if isnumeric(p)&&p<0
 			f = gcf;
+		else
+			f = p;
 		end
 		[l,Bmarker] = GetLines(f);
 		varargout = {all(Bmarker),Bmarker,l};

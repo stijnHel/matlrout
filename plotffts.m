@@ -114,6 +114,8 @@ for i=1:length(l)
 	if length(x)<NMINLENGTH
 		fprintf('lijn met %d punten werd weggelaten\n',length(x))
 		l(i)=0;
+	elseif all(diff(x)<0)  && std(diff(x))<-mean(diff(x))*1e-2
+		x = -x;
 	elseif any(diff(x)<=0)||std(diff(x))/mean(diff(x))>1e-2
 		fprintf('lijn met niet equidistante punten (of dalende x-waarden) werd weggelaten\n')
 		lNE(i)=l(i);
@@ -297,7 +299,7 @@ for i=1:n
 	end
 	T=get(l(i),'xdata');
 	if bTotaalSig
-		j=1:length(x); %#ok<UNRCH>
+		j=1:length(x);
 	else
 		j=find(T>=xlim(1)&T<=xlim(2));
 	end
@@ -308,15 +310,20 @@ for i=1:n
 	dt=mean(diff(T(j)));
 	X=get(l(i),'ydata');
 	if bInterpolate
-		T1=T(j(1));
-		T2=T(j(end));
+		if dt>0
+			T1=T(j(1));
+			T2=T(j(end));
+		else
+			T2=T(j(1));
+			T1=T(j(end));
+		end
 		if j(1)>1	% add previous point
 			j=[j(1)-1;j(:)];
 		end
 		if j(end)<length(T)	% add next point
 			j(end+1)=j(end)+1; %#ok<AGROW>
 		end
-		dt=mean(diff(T(j)));
+		dt = abs(mean(diff(T(j))));
 		Teq=T1:dt:T2+(T2-T1)*100*eps;
 		T = T(j);
 		if isempty(interpType)
@@ -490,7 +497,7 @@ for i=1:length(ch)
 				end
 				y=get(ch(i),'YData');
 				y=y(B);
-				Y=abs(fft(y));
+				Y=abs(fft(y));	% (!!!!!) no windowing and division by length(y)/2?!
 				set(FFTlink.hFFT,'YData',Y)
 			catch err
 				DispErr(err)

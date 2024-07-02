@@ -892,10 +892,17 @@ l.UserData = ancestor(D.hI,'figure');
 l.ButtonDownFcn = @TimeplotClicked;
 
 function [pth,d,T] = DefaultPath()
-pth = fileparts(fileparts(which(mfilename)));
-pth1 = fullfile(pth,'weer');
-if exist(pth1,'dir')
-	pth = pth1;
+if exist('DefaultDatapath.m','file')
+	pth = fullfile(DefaultDatapath(),'weer\buienradar');
+	if ~exist(pth,'dir')
+		mkdir(pth)
+	end
+else
+	pth = fileparts(fileparts(which(mfilename)));	% go on level higher than file location
+	pth1 = fullfile(pth,'weer');
+	if exist(pth1,'dir')
+		pth = pth1;
+	end
 end
 if nargout>1
 	d = dir(fullfile(pth,'*.hdf5'));

@@ -94,6 +94,16 @@ while ix<length(x)
 			end
 	end
 end
+try
+	gegs = [gegs{:}];
+catch err
+	DispErr(err)
+	warning('Couldn''t combine "gegs"-parts?!')
+	return
+end
 if isscalar(gegs)
 	gegs = gegs{1};
 end
+ne = {gegs.PT_F};
+de = cell(1,length(gegs));
+[de{:}] = deal('V');

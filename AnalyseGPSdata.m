@@ -212,7 +212,7 @@ if bPlot
 		end
 		ax1 = geoaxes;
 		geobasemap streets
-		plot(ax1,X(:,2),X(:,3));
+		plot(ax1,X(:,2),X(:,3),'LineWidth',2);
 	else
 		ax1 = plotmat(NE,1,2,[],[],'fig',figTagNE);
 		axis equal;

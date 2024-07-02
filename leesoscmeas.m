@@ -9,11 +9,11 @@ elseif ~ischar(fn)
 end
 fid=fopen(fn);
 if fid<3
-	fid=fopen(zetev([],fn));
+	fn = fFullPath(fn);
+	fid=fopen(fn);
 	if fid<3
+		fclose(fid);
 		error('Can''t open the file (%s)',fn)
-	else
-		fn=zetev([],fn);
 	end
 end
 
@@ -25,9 +25,9 @@ else
 	firstWord=deblank(l1(1:icomma(1)-1));
 end
 fseek(fid,0,'bof');
-if length(icomma)<6&strcmp(lower(firstWord),'x-axis')
+if length(icomma)<6 && strcmpi(firstWord,'x-axis')
 	[x,nx,dx,x2,gegs]=leesAgilentOscData(fid);
-elseif strcmp(lower(firstWord),'record length')
+elseif strcmpi(firstWord,'record length')
 	[x,nx,dx,x2,gegs]=leesTektronicsOscData(fid);
 else
 	error('Unknown Format')

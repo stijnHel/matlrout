@@ -13,6 +13,7 @@ function lOut=PlotDiscrete(x,y,spec,varargin)
 %                  ( sprintf(sTickSpec,value) ) - default '%g'
 
 sTitle = [];
+[plotOptions] = {};
 
 options=varargin;
 if nargin<2||(~isnumeric(y)&&~iscell(y))||isempty(y)
@@ -53,7 +54,7 @@ sTickSpec='%g';
 [bUseStairs] = true;
 
 if ~isempty(options)
-	setoptions({'maxValues','bPlotYdirect','sTickSpec','bUseStairs'},options{:})
+	setoptions({'maxValues','bPlotYdirect','sTickSpec','bUseStairs','plotOptions'},options{:})
 end
 
 if isempty(spec)
@@ -102,9 +103,9 @@ else
 	yLabels=1:length(uy);
 end
 if bUseStairs
-	l = stairs(x,yPlot);
+	l = stairs(x,yPlot,plotOptions{:});
 else
-	l = plot(x,yPlot);
+	l = plot(x,yPlot,plotOptions{:});
 end
 grid
 if ~bPlotYdirect

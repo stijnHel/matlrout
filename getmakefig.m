@@ -106,7 +106,17 @@ else
 	bNew=false;
 	if ~isempty(options)
 		try
-			set(f,options{:})
+			[~,~,options] = setoptions({},options{:});	% convert to "standard Matlab options"
+			% to allow "creation-options" (like bUIfig), this is done in a
+			% loop and not at once
+			%set(f,options{1:2,:})
+			for i=1:size(options,2)
+				if isprop(f,options{1,i})
+					set(f,options{1,i},options{2,i})
+				else
+					fprintf('Assuming an "init-property" (%s) not to be re-set.\n',options{1,i})
+				end
+			end
 		catch err
 			DispErr(err)
 			warning('Problem with settings - maybe a special (n)figure-setting?')

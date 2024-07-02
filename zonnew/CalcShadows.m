@@ -1,14 +1,22 @@
-function Pshadow=CalcShadows(C,T)
+function Pshadow=CalcShadows(C,T,varargin)
 %CalcShadows - Calculate shadows from points to surface(s)
-%  Starting function!!!
 %   Pshadow=CalcShadows(C,T)
 %
 %   C: configuration
 %       surf: corners of surface (nx3 array)
 %          pts must go counter clockwise ("sun's view")
+%       Pts: points (in 3D coordinates) from which shadows should be calculated
 %   T: time (julian days)
+%
+% axis orientation:
+%       X: west
+%       Y: south
+%       Z: up (zenith)
 
 bPlot=nargout==0;
+if ~isempty(varargin)
+	setoptions({'bPlot'},varargin{:})
+end
 
 Vs1=C.surf(2,:)-C.surf(1,:);
 Vs2=C.surf(3,:)-C.surf(1,:);
@@ -26,13 +34,14 @@ Soffset=mean(Soffset);
 Pshadow = nan([size(C.Pts),length(T)]);
 
 Psun = calcposhemel([],T);
-Xsun = [cos(Psun(:,2)).*[cos(Psun(:,1)),sin(Psun(:,1))],sin(Psun(:,2))];
+Xsun = [cos(Psun(:,2)).*[sin(Psun(:,1)),cos(Psun(:,1))],sin(Psun(:,2))];
 Ssun = Xsun*Snormal(:);
 for i=1:length(T)
-	if Psun(i,2)>0&&Ssun(i)>0
-		p=(Soffset-C.Pts*Snormal')/(Xsun(i,:)*Snormal');
-		Q=C.Pts+p*Xsun(i,:);
-		Pshadow(:,:,i)=Q;
+	if Psun(i,2)>0&&Ssun(i)>0	% sun above horizon and sun above surface
+		% calculate crossing between line and surface
+		p = (Soffset-C.Pts*Snormal')/(Xsun(i,:)*Snormal');
+		Q = C.Pts+p*Xsun(i,:);
+		Pshadow(:,:,i) = Q;
 	end
 end
 

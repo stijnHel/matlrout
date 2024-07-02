@@ -1292,33 +1292,45 @@ fn=fieldnames(props);
 for i=1:length(fn)
 	fni=fn{i};
 	value=props.(fni);
+	typ = '';
+	old_value = [];
 	if iChannel>0
 		if isfield(groups(iG).channel(iChannel).properties		...
 				,fni)
-			DoWarn('overwritten','channel',fni,fname)
+			typ = 'channel';
+			old_value = groups(iG).channel(iChannel).properties.(fni);
 		end
 		groups(iG).channel(iChannel).properties.(fni)=value;
 	elseif iG>0
 		if isfield(groups(iG).properties		...
 				,fni)
-			DoWarn('overwritten','group',fni,fname)
+			typ = 'group';
+			old_value = groups(iG).properties.(fni);
 		end
 		groups(iG).properties.(fni)=value;
 	else
 		if isfield(Rprops,fni)
-			DoWarn('overwritten','root',fni,fname)
+			typ = 'root';
+			old_value = Rprops.(fni);
 		end
 		Rprops.(fni)=value;
 	end
+	if ~isempty(typ)
+		DoWarn('overwritten',typ,fni,fname,old_value,value)
+	end
 end		% for i
 
-function DoWarn(warnType,warnLevel,warnData,fName)
+function DoWarn(warnType,warnLevel,warnData,fName,old_value,value)
 persistent WARNlist
 
 switch warnType
 	case 'init'
 		WARNlist=[];
 	case 'overwritten'
+		if isempty(old_value)
+			% discard overwrites if it was first empty
+			return
+		end
 		i=[];
 		if isempty(WARNlist)
 			WARNlist=struct(warnLevel,{{warnData;1}});

@@ -63,7 +63,8 @@ classdef cnavmsrs < handle
 			
 			opties=struct('kols',[],'kanx',1,'ne',[],'fnr',1,'minNrFiles',1	...
 				,'evdir',[],'postNavFcn',[],'bWrap',true,'bVarSignames',false	...
-				,'b2Dnavigation',false,'blockName','block','readOptions',{{}});
+				,'b2Dnavigation',false,'blockName','block','readOptions',{{}}	...
+				,'nePlot',[]);
 			if isnumeric(fnaam)||istable(fnaam)
 				opties.kanx=-1;
 			end
@@ -256,10 +257,19 @@ classdef cnavmsrs < handle
 			else
 				plotOptions={};
 			end
-			if length(ne)==size(e,2)
-				nePlot=ne;
+			if iscell(ne)
+				nne = length(ne);
 			else
-				nePlot=[];
+				nne = size(ne,1);
+			end
+			if isempty(opties.nePlot)
+				if nne==size(e,2)
+					nePlot=ne;
+				else
+					nePlot=[];
+				end
+			else
+				nePlot = opties.nePlot;
 			end
 			if opties.b2Dnavigation && isempty(opties.kols)
 				if isscalar(opties.kanx) && opties.kanx>0
