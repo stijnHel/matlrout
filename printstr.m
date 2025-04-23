@@ -146,7 +146,9 @@ elseif isa(x1,'Simulink.SimulationData.Dataset')
 	return
 elseif nArgIn==1
 	F={'%s'};
-	if min(size(x1))>1
+	if isvector(x1) && isstring(x1)
+		D = {cellstr(x1(:))};
+	elseif min(size(x1))>1
 		F=F(1,ones(1,size(x1,2)));
 		D=mat2cell(x1,size(x1,1),ones(1,size(x1,2)));
 	else

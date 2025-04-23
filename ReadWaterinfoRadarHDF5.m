@@ -974,8 +974,12 @@ PlotTime(ax,D)
 SetMarker(D,'update')
 
 function [f,D] = GetRadarFigure(bReportError)
-f = gcf;
-D = getappdata(f,'D');
+if isempty(get(0,'children'))
+	D = [];
+else
+	f = gcf;
+	D = getappdata(f,'D');
+end
 if ~isstruct(D) || ~isfield(D,'hI') || ~isfield(D,'Xs')
 	f = getmakefig('WaterinfoRadarPlot',false,false);
 	if isempty(f)

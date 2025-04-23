@@ -17,7 +17,8 @@ function [D,T]=readLVvariantData(fn,varargin)
 %
 %   see also readStructLVdata
 
-if ischar(fn)
+bMyFile = ischar(fn) || isstring(fn);
+if bMyFile
 	fid=fopen(fn,'r','ieee-be');
 	if fid<3
 		fid=fopen(zetev([],fn),'r','ieee-be');
@@ -73,7 +74,7 @@ if nD0==0&&size(xs,2)==nD
 		warning('not everything measured (%d/%1.0f)',nD,nD+(eF-pF)/lXs);
 	end
 end
-if ischar(fn)
+if bMyFile
 	fclose(fid);
 end
 if lXs>0

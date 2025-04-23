@@ -41,12 +41,21 @@ for i=1:numel(graphs)
 	end
 	X{i}=cell(1,length(l));
 	for j=1:length(l)
-		Xdata=double(get(l(j),'XData'));	% double - to prevent problems with combining X and Y with integer data
-		Ydata=double(get(l(j),'YData'));
-		if bClipData
-			B=Xdata>=xl(1)&Xdata<=xl(2) & Ydata>=yl(1)&Ydata<=yl(2);
-		else
-			X{i}{j}=[Xdata;Ydata;Xdata>=xl(1)&Xdata<=xl(2);Ydata>=yl(1)&Ydata<=yl(2)]';
+		Xdata=get(l(j),'XData');
+		Ydata=get(l(j),'YData');
+		if isinteger(Xdata)
+			Xdata=double(Xdata);	% double - to prevent problems with combining X and Y with integer data
+		end
+		if isinteger(Ydata)
+			Ydata=double(Ydata);
+		end
+		B=Xdata>=xl(1)&Xdata<=xl(2) & Ydata>=yl(1)&Ydata<=yl(2);
+		if ~bClipData
+			if strcmp(class(Xdata),class(Ydata))
+				X{i}{j}=[Xdata;Ydata;Xdata>=xl(1)&Xdata<=xl(2);Ydata>=yl(1)&Ydata<=yl(2)]';
+			else
+				X{i}{j}={Xdata(:),Ydata(:),Xdata(:)>=xl(1)&Xdata(:)<=xl(2),Ydata(:)>=yl(1)&Ydata(:)<=yl(2)};
+			end
 		end
 		if isprop(l(j),'BrushData') && any(l(j).BrushData) && ~all(l(j).BrushData)
 			X{i}{j}(1:length(l(j).BrushData),end+1) = l(j).BrushData(:)>0;
@@ -62,7 +71,11 @@ for i=1:numel(graphs)
 			end
 		end		% if MarkerIndices
 		if bClipData
-			X{i}{j} = [Xdata(B)' Ydata(B)'];
+			if strcmp(class(Xdata),class(Ydata))
+				X{i}{j} = [Xdata(B)' Ydata(B)'];
+			else
+				X{i}{j} = {Xdata(B)',Ydata(B)'};
+			end
 		end
 	end		% for i
 	if length(l)==1&&~bKeepCell

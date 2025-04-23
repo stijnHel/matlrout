@@ -99,7 +99,7 @@ else
 			end
 		end
 	else
-		if activate
+		if activate && f~=gcf
 			figure(f);
 		end
 	end

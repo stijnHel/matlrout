@@ -108,6 +108,11 @@ else
 	if bTime||bSize
 		lName=cellfun('length',{d.name});
 		sTyp2=['%-' num2str(max(lName)) 's'];
+		if bSize
+			mxS = max([d.bytes]);
+			nDig = floor(log10(mxS))+1;
+			formSize = sprintf(' #%%%dd',nDig);
+		end
 	else
 		sTyp2='%s';
 	end
@@ -121,7 +126,7 @@ else
 				fprintf(' %s',d(i).date)
 			end
 			if bSize
-				fprintf(' #%d',d(i).bytes)
+				fprintf(formSize,d(i).bytes);
 			end
 		end
 		fprintf('\n')

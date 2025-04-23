@@ -1,4 +1,4 @@
-function [varargout] = volglijn(lvar,lvast,lvolg)
+function [varargout] = volglijn(lvar,lvast,lvolg,varargin)
 % VOLGLIJN - verplaatsen van lijn op basis pointer op andere lijn
 %      volglijn(lvariabel,lvast,lvolg)
 %           lvariabel : handle van lijn(en) die moet(en) volgen
@@ -51,17 +51,40 @@ function [varargout] = volglijn(lvar,lvast,lvolg)
 %           example: volglijn('setKeyFun',@(S,c) disp(['key: "',c,'"']))
 %                  S : struct with handles to different parts
 %                  c : character or key pressed
+%        volglijn('plot',X,{<Y/X-plotparameters>},{<Y/T-plotparameters})
+%             create plots with volglijn-functionality
+%             X: array
+%             plot-parameters - input to plotmat for two types of plots
+
+% errors:
+% - 'X' with multiple lvast-lijnen geeft error!
+% - 'Z' with multiple lvast-lijnen geeft error!
 
 % toe te voegen
-% - als te volgen assen "axtick2date" zijn, juist updaten bij scrollen
-%       --> klaar?
+%  - use of cGenKeyPressHandler is almost completely implemented, but only
+%    usable via "test-code" (see testkeyhandler)
+%    This can be finalized (by changing the keypress-handler, and removing
+%    a lot of code(!).
 % - delete-function bij marker-lijnen
 % - mogelijkheid om XY-plot te zoomen naar getoonde deel in Y/t plots
 %   en/of volledige track (zeker bij "belgie-mode")
+% - nog een "oude manier" is gebruikt voor callback functies (volglijn(<...>)
+%   dit wordt beter aangepast
+% - mogelijkheid tot weghalen van pointer lines
 
-% Er is gestart met meerdere "vaste lijnen", maar nog niets werkends.
-
-global lastVLfvast
+if nargin && ischar(lvar)
+	switch lower(lvar)
+		case 'plot'
+			X = lvast;
+			argXY = lvolg;
+			argYt = varargin{1};
+			axXY = plotmat(X,argXY{:});
+			axYt = plotmat(X,argYt{:});
+			volglijn(axYt(:),axXY(:))
+			%volglijn(ancestor(axYt(1),'figure'),ancestor(axXY(1),'figure'))
+			return
+	end
+end
 
 if isempty(get(0,'children'))
 	return
@@ -79,14 +102,12 @@ try
 	end
 	bCallUpdateFcn = true;
 	
-	S=getappdata(f,'volglijn_fvast');
+	S=getappdata(f,'volglijn_S');
 	if isempty(S)
-		if ~isempty(lastVLfvast)
-			f=lastVLfvast;
-			S=getappdata(f,'volglijn_fvast');
+		if isappdata(f,'VL_fvast')
+			fvast = getappdata(f,'VL_fvast');
+			S = getappdata(fvast,'volglijn_S');
 		end
-	else
-		lastVLfvast=f;
 	end
 	if ~isempty(S)
 		VL1=S.VL1;
@@ -147,9 +168,6 @@ try
 				if strcmp(get(lvast,'type'),'figure')
 					fvast=lvast;
 					VLa=GetNormalAxes(lvast);
-					if length(lvast)>1
-						warning('VOLGLIJN:multiAxes','!!!!meerdere assen in figuur (lvast), de eerste wordt genomen!!!')
-					end
 				else
 					fvast=get(lvast,'parent');
 					VLa=lvast;
@@ -161,10 +179,6 @@ try
 						error('Kan geen lijn in vaste as vinden')
 					end
 				end
-				if length(lvast)>1
-					warning('VOLGLIJN:multiLine','!Meerdere lijnen in vaste as gevonden!!')
-					%lvast=lvast(1);
-				end
 		end
 		u=get(VLa(1),'Units');
 		set(VLa(1),'Units','pixels')
@@ -175,7 +189,7 @@ try
 		if length(lvast)>1
 			VL1=cell(1,length(lvast));	% start with cell(!)
 			for i=1:length(lvast)
-				VL1{i}=get(lvast(i),'XData_I')+1i*get(lvast(i),'YData_I')*VLDy;	% XData_I always available? (maybe from Matlab Rxxxx?)
+				VL1{i}=double(get(lvast(i),'XData_I'))+1i*double(get(lvast(i),'YData_I'))*VLDy;	% XData_I always available? (maybe from Matlab Rxxxx?)
 					% XData_I to (try to) make geoaxes possible
 				VL1{i}=VL1{i}(:);
 			end
@@ -189,7 +203,7 @@ try
 			end
 			VL1=cat(2,VL1{:});
 		else
-			VL1=get(lvast,'XData_I')+1i*get(lvast,'YData_I')*VLDy;
+			VL1=double(get(lvast,'XData_I'))+1i*double(get(lvast,'YData_I'))*VLDy;
 			VL1=VL1(:); 
 		end
 		if isempty(lvolg)
@@ -234,12 +248,13 @@ try
 			,'lvar',lvar	...
 			,'lvast',lvast	...
 			);
-		setappdata(fvast,'volglijn_fvast',S);
+		setappdata(fvast,'volglijn_S',S);
 		setappdata(fvast,'VL_AXlink',[])
+		setappdata(fvast,'VL_type','fvast')
 		for i=1:length(fvar)
-			setappdata(fvar(i),'VL_fvar',fvast)
+			setappdata(fvar(i),'VL_fvast',fvast)
+			setappdata(fvar(i),'VL_type','fvar')
 		end
-		lastVLfvast=fvast;
 		volglijn key home
 	elseif nargin && ischar(lvar)
 		if isempty(S)
@@ -256,8 +271,7 @@ try
 					fig=gcf;
 				end
 				set(fig,'WindowButtonMotionFcn','','WindowButtonDownFcn','','KeyPressFcn','');
-				%rmappdata(S.fvast,'volglijn_fvast')
-				lastVLfvast=[];
+				%rmappdata(S.fvast,'volglijn_S')
 			case 'herstart'
 				set(get(VLa,'parent'),'WindowButtonMotionFcn','volglijn'	...
 					,'WindowButtonDownFcn','volglijn'	...
@@ -268,7 +282,7 @@ try
 				set(get(VLa,'parent'),'WindowButtonMotionFcn','volglijn');
 			case 'clear'
 				volglijn stop
-				rmappdata(S.fvast,'volglijn_fvast')
+				rmappdata(S.fvast,'volglijn_S')
 				if ~isempty(VLcurl)&&ishghandle(VLcurl)&&VLcurl~=0
 					delete(VLcurl)
 					VLcurl=[];
@@ -295,7 +309,7 @@ try
 				setappdata(S.fvast,'volglijn_fUpdate',lvast)
 			case 'togglevolg'
 				S.bVolg=~bVolg;
-				setappdata(S.fvast,'volglijn_fvast',S);
+				setappdata(S.fvast,'volglijn_S',S);
 			case 'link'
 				setappdata(S.fvast,'VL_AXlink',GetNormalAxes(lvast))
 				navfig('link',[S.fvast lvar(:)'])
@@ -579,8 +593,8 @@ try
 				B = S.lvar(1).XData>=xl(1) & S.lvar(1).XData<=xl(2);
 				Xmin = min(S.lvast.XData_I(B));
 				Xmax = max(S.lvast.XData_I(B));
-				Ymin = min(S.lvast.YData(B));
-				Ymax = max(S.lvast.YData(B));
+				Ymin = min(S.lvast.YData_I(B));
+				Ymax = max(S.lvast.YData_I(B));
 				SetAxisLimits(S.VLa,[Xmin,Xmax],[Ymin,Ymax]);
 			case 'showzoomed'	% plot part shown in T-plots
 				l = findobj(S.VLa,'Tag','partPlot');
@@ -609,6 +623,8 @@ try
 				X = S.lvast.XData_I(ii)';
 				Y = S.lvast.YData_I(ii)';
 				varargout = {var2struct(i1,i2,t,X,Y),S};
+			case 'testkeyhandler'
+				CreateKeyPressHandler(f)
 		end
 	else
 		if isempty(S)
@@ -681,29 +697,36 @@ try
 	end		% if bLimAxes
 	
 catch err
-	f=lastVLfvast;
-	lastVLfvast=[];
+	% Wat moet hiervan behouden blijven?
+% 	f=lastVLfvast;
+% 	lastVLfvast=[];
 	DispErr(err)
-	if ~isempty(f)&&~isempty(S)
-		warning('VOLGLIJN:Error','Volglijn gestopt omwille van errors (?sluiten van venster?)')
-		volglijn clearall
-	else
-		if ~strcmp(get(gcf,'BeingDeleted'),'on')
-			warning('VOLGLIJN:ErrorBijStoppen','!!error bij stoppen???!!')
-		end
-	end
+% 	if ~isempty(f)&&~isempty(S)
+% 		warning('VOLGLIJN:Error','Volglijn gestopt omwille van errors (?sluiten van venster?)')
+% 		volglijn clearall
+% 	else
+% 		if ~strcmp(get(gcf,'BeingDeleted'),'on')
+% 			warning('VOLGLIJN:ErrorBijStoppen','!!error bij stoppen???!!')
+% 		end
+% 	end
 end
 
-function OK=CheckPt(S,i)
-axC=get(S.VLcurl,'parent');
+function OK = CheckPt(S,i)
+axC = get(S.VLcurl,'parent');
 [xlC,ylC] = GetAxLimits(axC);
-x=real(S.VL1(i));
-y=imag(S.VL1(i))/S.VLDy;
+x = real(S.VL1(i));
+y = imag(S.VL1(i))/S.VLDy;
 OK=x>=xlC(1)&&x<=xlC(2)&&y>=ylC(1)&&y<=ylC(2);
 
 function ShowPt(S,i)
+if ishandle(S)
+	S = getappdata(S,'volglijn_S');
+end
+if nargin<2 || ~isnumeric(i)
+	i = getappdata(S.VLl(1),'VL_i');
+end
 if ~isnan(S.VL1(i))
-	axC=get(S.VLcurl,'parent');
+	axC = get(S.VLcurl,'parent');
 	[xlC,ylC] = GetAxLimits(axC);
 	SetAxLimits(axC,xlC-mean(xlC)+real(S.VL1(i))	...
 		,ylC-mean(ylC)+imag(S.VL1(i))/S.VLDy	...
@@ -715,37 +738,37 @@ if ~isnan(S.VL1(i))
 end
 
 function PtSelectedT(h,~)
-ax=ancestor(h,'axes');
-pt=get(ax,'CurrentPoint');
-fVar=ancestor(ax,'figure');
-fVast=getappdata(fVar,'VL_fvar');
-X=get(h,'XData');
-[~,i]=min(abs(X-pt(1)));
+ax = ancestor(h,'axes');
+pt = get(ax,'CurrentPoint');
+fVar = ancestor(ax,'figure');
+fVast = getappdata(fVar,'VL_fvast');
+X = get(h,'XData');
+[~,i] = min(abs(X-pt(1)));
 figure(fVast);
 volglijn('setPt',i)
 
 function l=FindLines(ax,nMin,nExact)
-l=[findobj(ax,'type','line');findobj(ax,'type','stair')];
+l = [findobj(ax,'type','line');findobj(ax,'type','stair')];
 if nargin>1
-	N=zeros(1,length(l));
-	for i=1:length(l)
+	N = zeros(1,length(l));
+	for i = 1:length(l)
 		if isprop(l,'XData_I')
-			N(i)=length(get(l(i),'XData_I'));
+			N(i) = length(get(l(i),'XData_I'));
 		else
-			N(i)=length(get(l(i),'XData'));
+			N(i) = length(get(l(i),'XData'));
 		end
 	end
 	if ~isempty(nMin)
-		B=N>=nMin;
+		B = N>=nMin;
 		if ~all(B)
-			l=l(B);
-			N=N(B);
+			l = l(B);
+			N = N(B);
 		end
 	end
 	if nargin>2&&~isempty(nExact)
-		B=N==nExact;
+		B = N==nExact;
 		if ~all(B)
-			l=l(B);
+			l = l(B);
 		end
 	end
 end		% minimum or exact size requested
@@ -768,6 +791,12 @@ end
 SetAxLimits(ax,xl,yl)
 
 function SetMarker(sTag,iMarker,S)
+if ishandle(S)
+	S = getappdata(S,'volglijn_S');
+end
+if isempty(iMarker)
+	iMarker = getappdata(S.VLl(1),'VL_i');
+end
 lMarker = findobj([S.fvast;S.fvar(:)],'Tag',sTag);
 if ~isempty(lMarker)
 	if lMarker(1).UserData.i==iMarker
@@ -808,7 +837,8 @@ else
 		lMarker(i).UserData.i = iMarker;
 	end
 end
-if t>=720000 && t<=750000
+if t>=720000 && t<=750000 && isappdata(S.lvar(1).Parent,'TIMEFORMAT')	...
+		&& ~isempty(getappdata(S.lvar(1).Parent,'TIMEFORMAT'))
 	st = datestr(t);
 else
 	st = num2str(t);
@@ -817,8 +847,8 @@ fprintf('Set %s: #%4d - %s\n',sTag,iMarker,st)
 
 function UpdateZoomedPart(ax)
 fT = ancestor(ax,'figure');
-f = getappdata(fT,'VL_fvar');
-S = getappdata(f,'volglijn_fvast');
+f = getappdata(fT,'VL_fvast');
+S = getappdata(f,'volglijn_S');
 l = findobj(S.VLa,'Tag','partPlot');
 if ~isempty(l)
 	xl = S.lvar(1).Parent.XLim;
@@ -830,16 +860,272 @@ end
 
 function [xl,yl] = GetAxLimits(ax)
 if isprop(ax,'XLim')
-	xl=get(ax,'XLim');
-	yl=get(ax,'YLim');
+	xl = get(ax,'XLim');
+	yl = get(ax,'YLim');
 else	% assume geoaxes
 	%[yl,xl] = geolimits(ax);
 	[xl,yl] = geolimits(ax);
 end
 
 function SetAxLimits(ax,xl,yl)
+% set axis limits, both for normal axes as for geoaxes
 if isprop(ax,'XLim')
 	set(ax,'XLim',xl,'YLim',yl)
 else	% assume geoaxes
 	geolimits(ax,xl,yl)
 end
+
+%%!!!!!!!!!!!!!!!!!!this is "preparing work" to replace integrated key-press
+% try this code with:
+%        volglijn testkeyhandler
+% check well before replacing old key-handling!!
+% don't forget
+%       - error-handling (auto-stop volglijn)
+%       - reset pointer lines - does it work well in "old version"?
+%                 (RemakePtrLines - ctrl-R <-> shift-L)
+%       - use of fupdate (see use in GPS_PhotoViewer)
+
+function Zoom(f,facT,facXY)
+S = getappdata(f,'volglijn_S');
+i = getappdata(S.VLl(1),'VL_i');
+xd = get(S.VLl(1),'xdata');
+xd = xd(1);
+xl = get(get(S.VLl(1),'parent'),'xlim');
+dxl = diff(xl)/2;
+if ischar(facT)
+	switch facT
+		case 'auto'
+			set(S.VLa,'XLimMode','auto','YLimMode','auto')
+			axis(S.VLa,'equal')	% otherwise it might look ugly
+			return
+		case 'full'	% (XY)
+			xl = [min(S.lvast.XData_I),max(S.lvast.XData_I)];
+			yl = [min(S.lvast.YData_I),max(S.lvast.YData_I)];
+			SetAxisLimits(S.VLa,xl,yl);
+			return
+		case 'visible'
+			if xd<xl(1)||xd>xl(2)
+				xl = xd+[-dxl dxl];
+			else	% do nothing
+				return
+			end
+		otherwise
+			error('Wrong use of this Zoom-function!')
+	end
+elseif isempty(facT)
+	axC = get(S.VLcurl,'parent');
+	[xlC,ylC] = GetAxLimits(axC);
+	dx = diff(xlC)*facXY;
+	dy = diff(ylC)*facXY;
+	if ~any(isnan(S.VL1(i)))
+		SetAxLimits(axC,real(S.VL1(i))+[-.5 .5]*dx	...
+			,imag(S.VL1(i))/S.VLDy+[-.5 .5]*dy)
+	end
+	return
+else
+	xl = xd+[-dxl dxl]*facT;
+end
+UpdateAxes(f,S,xl)
+
+function MoveFocusPt(f,di)
+S = getappdata(f,'volglijn_S');
+i = getappdata(S.VLl(1),'VL_i');
+if isscalar(di)
+	i = max(1,min(length(S.VL1),i+di));
+elseif di(1)==0
+	if di(2)==0
+		i = length(S.VL1);
+	elseif di(2)==1
+		i = 1;
+	else
+		error('Wrong use!!)')
+	end
+else
+	error('Wrong use?!')
+end
+set(S.VLl,'XData',S.VLx+S.VLvx(i));
+set(S.VLcurl,'XData',real(S.VL1(i,:)),'YData',imag(S.VL1(i,:))/S.VLDy)
+setappdata(S.VLl(1),'VL_i',i)
+if S.bVolg
+	if ~CheckPt(S,i)
+		ShowPt(S,i)
+	end
+end
+
+function ShowFig(f)
+S = getappdata(f,'volglijn_S');
+for iF=1:length(S.fvar)
+	figure(S.fvar(iF))
+end
+figure(S.fvast)
+
+function FindPt(f,typ)
+S = getappdata(f,'volglijn_S');
+switch typ
+	case 'centre'
+		xl = S.lvar(1).Parent.XLim;
+		i = findclose(mean(xl),VLvx);
+	case 'vis'	% ga naar punt van lvar
+		ax = get(S.VLl(1),'Parent');
+		xl = get(ax,'XLim');
+		i = findclose(S.VLvx,mean(xl));
+	otherwise
+		error('Unknown type of FindPt!')
+end
+ShowPt(S,i)
+
+function RemakePtrLines(f,typ)
+S = getappdata(f,'volglijn_S');
+set(S.VLl,'Visible','off')
+if strcmp(typ,'marker')
+	ax=get(S.VLl,'Parent');
+	if iscell(ax)
+		ax=cat(2,ax{:});
+	end
+	xl=get(ax(1),'XLim');
+	set(ax,'XLim',xl(1)+[0.1 0.9]*diff(xl))
+	
+	ff = ancestor(ax,'figure');
+	if iscell(ff)
+		ff = [ff{:}];
+	end
+	addpunt(ff)
+	drawnow
+	verwpunt(ff)
+	
+	for i=1:length(S.VLl)
+		yl = get(get(S.VLl(i),'Parent'),'YLim');
+		set(S.VLl(i),'YData',yl(1)+[0.1 0.9]*diff(yl))
+	end
+	set(ax,'XLim',xl)
+elseif strcmp(typ,'pointer')
+		% similer to 'L' (but different)!!!!
+	for i=1:length(S.VLl)
+		X = getsigs(get(S.VLl(i),'Parent'));
+		if isnumeric(X)
+			X = {X};
+		end
+		mnX = Inf;
+		mxX = -Inf;
+		for j = 1:length(X)
+			X{j} = X{j}(X{j}(:,3)>0,2);
+			if ~isempty(X{j})
+				mnX = min(mnX,min(X{j}));
+				mxX = max(mxX,max(X{j}));
+			end
+		end
+		if ~isinf(mnX)
+			if mnX==mxX
+				if mnX==0
+					mnX = -1;
+					mxX = 1;
+				else
+					mnX = mnX*.9;
+					mxX = mxX*1.1;
+				end
+			end
+			set(S.VLl(i),'YData',[mnX mxX])
+		end
+	end
+else
+	error('Wrong type!?!')
+end
+set(S.VLl,'Visible','on')
+
+function Close(f,~)
+S = getappdata(f,'volglijn_S');
+close(S.fvast);
+close(S.fvar);
+
+function ActivePt(f,~)
+S = getappdata(f,'volglijn_S');
+i = getappdata(S.VLl(1),'VL_i');
+fprintf('Active point: %d\n',i)
+LOGidx = getappdata(S.fvast,'LOGidx');
+LOGidx(1,end+1) = i;
+setappdata(S.fvast,'LOGidx',LOGidx)
+
+function AddMarker(f,on)
+S = getappdata(f,'volglijn_S');
+if on
+	set(S.lvar,'Marker','x');
+	set(S.lvast,'Marker','x');
+else
+	set(S.lvar,'Marker','none');
+	set(S.lvast,'Marker','none');
+end
+
+function UpdateAxes(f,S,xl)
+a = get(S.VLl,'Parent');
+if iscell(a)
+	aa = unique(cat(1,a{:}));
+else
+	aa = unique(a);
+end
+lLink = getappdata(f,'VL_AXlink');
+if ~isempty(lLink)
+	aa = [aa;lLink(:)];
+end
+set(aa,'XLim',xl);
+for i = 1:length(aa)
+	fUpdate = getappdata(aa(i),'updateAxes');
+	if ~isempty(fUpdate)&&isa(fUpdate,'function_handle')
+		fUpdate(aa(i))
+	end
+end		% for i
+
+function CreateKeyPressHandler(f)
+%handler by a cGenKeyPressHandler-object.
+CHARs = {	...
+	'l',@(f,~) Zoom(f,'visible'),[],'';
+	'i',@(f,~) Zoom(f,0.5),[],'zoom in (T-plot)';
+	'o',@(f,~) Zoom(f,2),[],'zoom out (T-plot)';
+	'u',@(f,~) Zoom(f,2),[],'zoom out (T-plot)';
+	'n',@(f,~) MoveFocusPt(f,1),[],'next point';
+	' ',@(f,~) MoveFocusPt(f,1),[],'next point';
+	'1',@(f,~) MoveFocusPt(f,1),[],'next point';
+	'p',@(f,~) MoveFocusPt(f,1),[],'previous point';
+	'9',@(f,~) MoveFocusPt(f,1),[],'previous point';
+	'2',@(f,~) MoveFocusPt(f,10),[],'forward - increasing step size';
+	'8',@(f,~) MoveFocusPt(f,-10),[],'back';
+	'3',@(f,~) MoveFocusPt(f,100),[],'forward - increasing step size';
+	'7',@(f,~) MoveFocusPt(f,-100),[],'back';
+	'4',@(f,~) MoveFocusPt(f,1000),[],'forward - increasing step size';
+	'6',@(f,~) MoveFocusPt(f,-1000),[],'back';
+	'0',@(f,~) MoveFocusPt(f,[0 1]),[],'first point (start)';
+	'e',@(f,~) MoveFocusPt(f,[0 0]),[],'last point (end)';
+	's',@(f,~) ShowFig(f),[],'';
+	'S',@(f,~) volglijn('stopvolg'),[],'stop following';
+	'R',@(f,~) volglijn('volgopnieuw'),[],'restart following';
+	'v',@(f,~) volglijn('togglevolg'),[],'start/stop keeping marker in the middle';
+	'f',@(f,~) FindPt('centre'),[],'find centre point';
+	'P',@(f,~) FindPt('vis'),[],'';
+	'L',@(f,~) RemakePtrLines(f,'marker'),[],'remake marker lines';
+	'M',@(f,~) volglijn('addlogpts'),[],'show/toggle logged points';
+	'C',@Close,[],'Close figures';
+	'I',@(f,~) Zoom(f,[],0.5),[],'zoom in (XY-plot)';
+	'U',@(f,~) Zoom(f,[],2),[],'zoom out (XY-plot)';
+	'O',@(f,~) Zoom(f,[],2),[],'zoom out (XY-plot)';
+	't',@ShowPt,[],'';
+	'x',@ActivePt,[],'show index of current point';
+	'X',@(f,~) Zoom(f,'full'),[],'full measurement view';
+	12,@(f,~) volglijn('ShowZoomed'),[],'plot(/toggle) line of zoomed parts in T-plots';	% ctrl-L
+	16,@(f,~) SetMarker('marker1',[],f),[],'set marker 1';	% ctrl-P
+	17,@(f,~) SetMarker('marker2',[],f),[],'set marker 2';	% ctrl-Q
+	18,@(f,~) RemakePtrLines(f,'pointer'),[],'reset pointer lines (similar to "L")';	% ctrl-R
+	'a',@(f,~) AddMarker(f,true),[],'show points on lines';
+	'A',@(f,~) AddMarker(f,false),[],'hide points on lines';
+	'Z',@(f,~) volglijn('MatchZoom'),[],'zoom to zoomed parts in T-plots';
+	};
+KEYs = {	...
+	'rightarrow',@(f,~) MoveFocusPt(f,1),[],'';
+	'leftarrow',@(f,~) MoveFocusPt(f,-1),[],'';
+	'uparrow',@(f,~) MoveFocusPt(f,10),[],'';
+	'downarrow',@(f,~) MoveFocusPt(f,-10),[],'';
+	'pageup',@(f,~) MoveFocusPt(f,100),[],'';
+	'pagedown',@(f,~) MoveFocusPt(f,-100),[],'';
+	'home',@(f,~) MoveFocusPt(f,[0 1]),[],'';
+	'end',@(f,~) MoveFocusPt(f,[0 0]),[],'';
+	'escape',@(f,~) Zoom(f,'auto'),[],'automatic axes in XY-graph';
+	};
+cGenKeyPressHandler(f,'keys',KEYs,'char',CHARs);

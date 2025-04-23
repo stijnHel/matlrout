@@ -12,7 +12,7 @@ function d=dirrecurs(f,varargin)
 % To be able to check equal contents, without requiring all data, file
 % contents can be hashed with option bHashContents. (uses md5_c)
 %
-%  see also hierdir
+%  see also hierdir, dir (with '**\')
 
 [bReadContents,bHashContents,bSortFullname	...
 	,bIncludeDotFiles,nMaxDeep,bRemoveDirs	...
@@ -20,12 +20,13 @@ function d=dirrecurs(f,varargin)
 		[],false,true	... bReadContents(default equal to bHashContents), bHashContents, bSortFullname
 		,false,500,true,false);	% bIncludeDotFiles,nMaxDeep,bRemoveDirs
 %bIncludeDotFiles: include files/directories starting with dot (normally hidden files)
+fLenMax = 1e7;
 if nargin==0
 	f=[];
 end
 if nargin>1
 	setoptions({'bReadContents','bSortFullname','bIncludeDotFiles'	...
-		,'bRemoveDirs','nMaxDeep','bHashContents','bDOSdir'},varargin{:})
+		,'bRemoveDirs','nMaxDeep','bHashContents','bDOSdir','fLenMax'},varargin{:})
 end
 if isempty(bReadContents)
 	bReadContents=bHashContents;
@@ -74,16 +75,30 @@ while i<=length(d)
 			if fid<3
 				warning('Can''t open file "%s"!',d(i).fullname)
 			else
-				d(i).contents=fread(fid,[1 Inf],'*uint8');
+				if d(i).bytes>fLenMax
+					n = fLenMax/2;
+					bPartialRead = true;
+				else
+					n = fLenMax;
+					bPartialRead = false;
+				end
+				c = fread(fid,[1 n],'*uint8');
+				if bPartialRead
+					fseek(fid,-n,'eof');
+					c = [c fread(fid,[1 Inf],'*uint8')]; %#ok<AGROW>
+				end
 				fclose(fid);
 				if bHashContents
 					try
-						d(i).contents={md5_c(d(i).contents)};
+						c = {md5_c(c)};
 					catch err
 						DispErr(err)
 						warning('Error when hashing "%s"',d(i).fullname)
 					end
+				elseif bPartialRead
+					c = struct('fLenMax',fLenMax,'start',c(1:n),'end',c(n+1:end));
 				end
+				d(i).contents = c;
 			end
 		end
 		i=i+1;

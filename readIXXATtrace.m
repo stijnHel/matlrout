@@ -312,7 +312,7 @@ while ix<length(x)
 	ix=ixn;
 end
 C=C(:,1:nC);
-T=double(typecast(reshape(X(1:4,1:nX),1,[]),'uint32'))/1e7;	% fixed scale?!!!!
+T=double(typecast(reshape(X(1:8,1:nX),1,[]),'uint64'))/1e7;	% fixed scale?!!!!
 T = unwrapgen(T,2^32/1e7);
 ID=typecast(reshape(X(15:18,1:nX),1,[]),'uint32');
 D=X([19 21:28],1:nX)';

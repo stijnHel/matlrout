@@ -44,13 +44,34 @@ function [e,varargout]=leesTDMS(fname,varargin)
 %         that reading the file takes time and memory like reading the full
 %         file!
 
+% The data is first read as it is stored:
+%            data blocks, with root/group/channel data
+%      This data can have any order, and data of channels of a group can be
+%         stored in separate blocks or combined in one or more blocks
+% "structured data" is created (if needed) from this set of blocks.
+%      "structured data" puts properties and data of the root/groups/channels
+%          in a hierarchical structure (root/group/channel).
+% In the (original) normal case (with "simple TDMS data), this structured
+%     data is re-grouped to "measurement data".  This is one (or two)
+%     arrays with the channel data in columns.
+%     "Normal data" is data where there is one or two sampling rates, with
+%     in each channel (of that sampling rate block) the same number of data
+%     points.
+%     Sampling time is expected to be put in properties with the name
+%     "wf_increment" (as is done in standard LabVIEW logging code).
+%     In "e", the high sampling rate data is stored, and in "e2" the low
+%     sampling rate data.
+%     In case of two sampling rates "ne" and "de" contain combined channel
+%     names and units of "e" and "e2", starting with the high sampling rate
+%     data!
+
 iStart = [];
 maxLen = [];
 [bConvBlockTime, bScaleChans, bReadData] = deal(true);
 [bConvert, bCData, bCProps, bReadIndex, bLinChans, bRawBlocks] = deal(false);
 [bReadAllNonChanData, bDontStoreData, bOpenInBE, bTruncBlocks] = deal(false);
 [bReadBrokenBlocks] = false;
-[bStructured] = [];
+[bStructured] = [];	% create "logically structured data" (root / groups / channels)
 iDecimateData = 1;
 decimMethod = {};
 nMaxD = 1e9;
@@ -58,7 +79,7 @@ nDStartData = 0;
 nDStopData = 1e9;
 maxRawData = 1e12;
 nMaxObjects = 500;
-[bAutoChannel] = nargout>1;
+[bAutoChannel] = nargout>1;	% find measurement channels in data
 fDataFunc = [];
 [bFixUnequalLengths] = false;
 if nargin>1
@@ -98,6 +119,9 @@ end
 bDataProcess=~isempty(fDataFunc)&&isa(fDataFunc,'function_handle');
 if isempty(maxLen)
 	maxLen=1e9;
+end
+if isstring(fname)
+	fname = char(fname);
 end
 if isstruct(fname)&&isscalar(fname)
 	if isfield(fname,'fullname')
@@ -204,6 +228,9 @@ else
 	cStat=[];
 end
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Read the file, block by block (raw data blocks in "D")
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 fseek(fid,0,'bof');
 bVersionWarning=false;
 NdataTot=0;
@@ -310,7 +337,7 @@ while ~feof(fid)
 						iG1=find(strcmp(groupName,numberedGroups(:,1)));
 						if isempty(iG1)
 							iG=nGroups+1;
-							numberedGroups{end+1,1}=groupName;
+							numberedGroups{end+1,1}=groupName; %#ok<AGROW> 
 							numberedGroups{end,2}=[groupNumber iG];
 						else
 							iG2=find(numberedGroups{iG1,2}(:,1)==groupNumber);
@@ -759,11 +786,14 @@ end
 D=D(1:nD);
 groups=groups(1:nGroups);
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Create structured data (Dstruct)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Dstruct=struct('group',groups,'properties',Rprops,'version',D(1).version);
 for iG=1:nGroups
 	groups(iG).nBlocks=zeros(1,length(groups(iG).channel));
 	for iC=1:length(groups(iG).channel)
-		groups(iG).channel(iC).data=cell(1,length(groups(iG).idxD));
+		groups(iG).channel(iC).data=cell(1,length(groups(iG).idxD));	% maximum size
 	end
 end
 for iD=1:nD
@@ -821,6 +851,10 @@ for iG=1:nGroups
 	channels=groups(iG).channel;
 	for iC=1:length(channels)
 		if bReadData
+			nG = groups(iG).nBlocks(iC);
+			if nG<length(channels(iC).data)
+				channels(iC).data  = channels(iC).data(1:nG);
+			end
 			channels(iC).nData=cellfun('size',channels(iC).data,1);
 			channels(iC).data=cat(1,channels(iC).data{:});
 			if bScaleChans&&isfield(channels,'properties')	...
@@ -851,7 +885,7 @@ chanInfo=[];
 if bStructured
 	e=Dstruct;
 	return
-elseif bRawBlocks
+elseif bRawBlocks	% Shouldn't this be done before creating Dstruct?
 	e=D;
 	if nargout>1
 		varargout={groups,Dstruct};
@@ -956,12 +990,12 @@ elseif any([D.bDAQmxData])
 elseif length(unData)==1
 	if iStart>0
 		for i=1:nChan
-			chanData{i}(1:iStart,:)=[];
+			chanData{i}(1:iStart,:)=[]; %#ok<AGROW> 
 		end
 	end
 	for i=1:nChan
 		if nData(i)>maxLen
-			chanData{i}(maxLen+1:end,:)=[];
+			chanData{i}(maxLen+1:end,:)=[]; %#ok<AGROW> 
 		end
 	end
 	e=CombineChanData(chanData);
@@ -969,13 +1003,13 @@ elseif length(unData)==2&&length(nData)==nChan
 	iHSchan=find(nData==unData(2));	% longest (probably fastest) data
 	if iStart>0
 		for i=iHSchan
-			chanData{i}(1:iStart)=[];
+			chanData{i}(1:iStart)=[]; %#ok<AGROW> 
 			nData(i)=nData(i)-iStart;
 		end
 	end
 	for i=1:nChan
 		if nData(i)>maxLen
-			chanData{i}(maxLen+1:end)=[];
+			chanData{i}(maxLen+1:end)=[]; %#ok<AGROW> 
 		end
 	end
 	e=CombineChanData(chanData(iHSchan));

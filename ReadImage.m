@@ -90,9 +90,9 @@ if ver>1&&ver<=2
 		xt(end+1)=cFile.fread(1,'*uint16');
 	end
 elseif ver>2
-	if ~strcmp(imgTypString,'RGB')
-		warning('This function is only tested for RGB-data on version>2 data!')
-	end
+% 	if ~strcmp(imgTypString,'RGB')
+% 		warning('This function is only tested for RGB-data on version>2 data!')
+% 	end
 	if double(t)>737835&&double(t)<737835.6658	% (!!) wrongly saved image format
 		imgTypInt = 0;
 		filePixTyp = 'uint8';

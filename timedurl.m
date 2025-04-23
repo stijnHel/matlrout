@@ -3,7 +3,11 @@ function timOut=timedurl(url,n,delay,target,offset,sdelay,varargin)
 %    timedurl(url,n,delay,target[,offset[,sdelay]])
 %    timedurl(url,n,delay,target[,options])
 %       target: used in an sprint command, and is expected to be e.g.:
-%                 xx...xx%d.yyy
+%                 xx...xx%d.yyy / xxx..%s.yy
+%                        %d replaced by frame number (also counting doubles
+%                           in data)
+%                        %s replaced by date/time
+%                       
 %           single '\' are replaced by '\\' to avoid unwanted translation
 %           to escape codes
 %
@@ -28,9 +32,10 @@ end
 rData=[];
 bHoldTimer=false;
 bOnlyUnique=true;
+tFormat = 'yyyyMMdd_HHmmSS';
 if ~isempty(options)
 	setoptions({'offset','sdelay','restart','rData','bHoldTimer'	...
-			,'bOnlyUnique'}	...
+			,'bOnlyUnique','tFormat'}	...
 		,options)
 end
 if any(target=='\')&&~any(target(1:end-1)=='\'&target(2:end)=='\')
@@ -40,6 +45,7 @@ end
 S=struct('n',n,'target',target,'url',url,'offset',offset	...
 	,'restart',false,'rData',rData	...
 	,'bHoldTimer',bHoldTimer,'bOnlyUnique',bOnlyUnique,'xLast',[]	...
+	,'tFormat',tFormat	...
 	);
 tim=timer('ExecutionMode','fixedRate','Period',delay	...
 	,'TasksToExecute',n		...
@@ -55,17 +61,40 @@ end
 
 function Update(h,ev)
 S=get(h,'UserData');
+%fprintf('Reading file (%s)\n',datetime)
 x=urlbinread(S.url);
 if S.bOnlyUnique
 	if isequal(x,S.xLast)
+		%fprintf('   not unique(!)\n')
 		return	% don't save unique data
 	end
 	S.xLast=x;
 	set(h,'UserData',S);
 end
-f=sprintf(S.target,h.TasksExecuted+S.offset);
+ii = find(S.target=='%');
+A = cell(size(ii));
+s = S.target;
+for i=1:length(ii)
+	j = ii(i)+1;
+	if s(j)=='-'
+		j = j+1;
+	end
+	while s(j)>='0' && s(j)<='9'
+		j = j+1;
+	end
+	if s(j)=='d'
+		A{i} = h.TasksExecuted+S.offset;
+	elseif s(j)=='s'
+		A{i} = string(datetime,S.tFormat);
+	else
+		error('Wrong filename format string?!')
+	end
+end
+
+f = sprintf(S.target,A{:});
 fid=fopen(f,'w');
 if fid<3
+	%fprintf('Problem opening the file(?!)\n')
 	stop(h);
 	delete(h)
 	error('Can''t open file')

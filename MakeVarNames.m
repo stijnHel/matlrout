@@ -1,9 +1,10 @@
-function N=MakeVarNames(N,bAvoidDoubles)
+function N=MakeVarNames(N,bAvoidDoubles,maxLen)
 %MakeVarNames - Make names that can be used as variable name
-%    N=MakeVarNames(N,bAvoidDoubles)
+%    N=MakeVarNames(N,bAvoidDoubles,maxLen)
 %           N: char (one name) or cell-vector (multiple names)
 %           bAvoidDoubles: default true, avoid doubles
 %                doubles are extended with '_'
+%           maxLen: maximum length
 %
 % only made for simple cases(!)
 
@@ -11,6 +12,9 @@ persistent repC bRepC
 
 if nargin<2||isempty(bAvoidDoubles)
 	bAvoidDoubles=true;
+end
+if nargin<3 || isempty(maxLen)
+	maxLen = 250;
 end
 
 defName='x';
@@ -49,18 +53,28 @@ if isempty(repC)
 end
 
 if ischar(N)
+	N = strtrim(N);
 	B=N==13|N==10;
 	if any(B)
 		N(B)='_';
 	end
+	if length(N)>maxLen
+		N = N(1:maxLen);	% just truncate - nothing more usefull(!)
+	end
 	if isempty(N)
 		N=defName;
-	elseif any(N==0)
-		warning('LVDATA2STRUCT:ZeroInString','Zero-value in string?!')
-		N(N==0)='a';
-	elseif any(bRepC(abs(N)))
-		for ii=1:size(repC,1)
-			N(N==repC(ii))=repC(ii,2);
+	else
+		if any(N==0)
+			warning('LVDATA2STRUCT:ZeroInString','Zero-value in string?!')
+			N(N==0)='a';
+		end
+		if any(abs(N)>255)
+			N(abs(N)>255) = 'a';	%!!!!!
+		end
+		if any(bRepC(abs(N)))
+			for ii=1:size(repC,1)
+				N(N==repC(ii))=repC(ii,2);
+			end
 		end
 	end
 	if (N(1)>='0'&&N(1)<='9')||N(1)=='_'
@@ -68,7 +82,7 @@ if ischar(N)
 	end
 else
 	for i=1:length(N)
-		N{i}=MakeVarNames(N{i});
+		N{i}=MakeVarNames(N{i},bAvoidDoubles,maxLen);
 	end
 	[~,i,j]=unique(N);
 	if bAvoidDoubles&&length(i)<length(j)

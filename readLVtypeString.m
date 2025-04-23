@@ -85,9 +85,6 @@ if iscell(x)
 		varargout={D,T};
 		return
 	end
-	if false&&~isa(data,'double')	% a better solution?
-		data=double(data);
-	end
 	[D,id]=ConvertData(T,data);
 	if bAll
 		if islogical(bAll)||bAll>0
@@ -115,16 +112,25 @@ if iscell(x)
 				% check on id? (otherwise id can be removed)
 				D(:,iD+1)=D1(:,1);
 			end
-			if bStruct
-				DD=D(:,1:2)';
-				for iD=1:size(DD,2)
-					DD{2,iD}=D(iD,2:end);
-				end
-				D=struct(DD{:});
-			end
 		else	% variable length structures
-			warning('Variable length structure not ready - only the first element is kept!!!')
-			D = D(:,[2 1]);
+			nDest = round(length(data)/(id-1));
+			D = D(:,[2 ones(1,nDest)]);
+			nD = 1;
+			while id<length(data)
+				[D1,id] = ConvertData(T,data,id);
+				nD = nD+1;
+				D(:,nD+1) = D1(:,1);
+			end
+			if nD<size(D,2)-1
+				D = D(:,1:nD+1);
+			end
+		end
+		if bStruct
+			DD=D(:,1:2)';
+			for iD=1:size(DD,2)
+				DD{2,iD}=D(iD,2:end);
+			end
+			D=struct(DD{:});
 		end
 	elseif bStruct
 		D=lvData2struct(D);
@@ -427,10 +433,12 @@ else
 	return
 end
 
-	function [D,id]=ConvertData(T,data)
+	function [D,id]=ConvertData(T,data,id)
 		data=data(:);
 		D=cell(size(T,1),2);
-		id=1;
+		if nargin<3 || isempty(id)
+			id=1;
+		end
 		for i=1:size(T,1)
 			nb=T{i,3};
 			iT=T{i};

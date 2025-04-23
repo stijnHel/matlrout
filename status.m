@@ -18,7 +18,8 @@ function [fOut,out2]=status(sArg,prcin,varargin)
 %          (for example to see the total time)
 %     status([],<text>)  : replaces current text by new tekst (without
 %                          incrementing level)
-%     status(...,'nMaxHier',<nr>) : displays multiple status teksts
+%     status('msg',[],'nMaxHier',<nr>) : displays multiple status teksts
+%               do this only at "top level status"!
 %         (multiple "hierarchies")
 
 persistent STATUSTIME FIGwin

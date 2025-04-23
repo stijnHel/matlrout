@@ -66,7 +66,7 @@ classdef CLV_Img_streamer < handle
 			c.curFrame = 0;
 		end		% function CLV_Img_streamer
 		
-		function [Ximage,E] = getImage(c,nr)
+		function [Ximage,E,C] = getImage(c,nr)
 			%CLV_Img_streamer/getImage - get one image
 			%     Ximage=getImage(c[,nr])
 			%        nr: number of the image (1-based!)
@@ -160,7 +160,7 @@ classdef CLV_Img_streamer < handle
 					end
 					if ~isempty(TS_H)
 						TS = [TS_L(:,[4 3 2 1])';TS_H(:,[4 3 2 1])'];
-						E.TS = double(typecast(TS(:),'uint64'))*1e-7;
+						E.TS = double(typecast(TS(:),'uint64'))*1e-6;
 					end
 				end
 			end

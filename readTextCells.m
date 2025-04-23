@@ -3,7 +3,7 @@ function [A,B]=readTextCells(fName,varargin)
 %    [A,B]=readTextCells(fName[,options])
 %        options:
 %             - cColDelim : delimiter between columns
-%                 character - default "automatic" (tab / ';' / ',' / '|'
+%                 character - default "automatic" (tab / ';' / ',' / '|' )
 %                             just by maximum occurrence (in first part)
 %             - cDecPoint: decimal point (',' / '.')
 %                 default: automatic
@@ -12,14 +12,17 @@ function [A,B]=readTextCells(fName,varargin)
 %                formats)
 %        A: cell array with cell data
 %        B: numeric matrix with NaN if no value
+%
+% (!!!) mex-version exist - check if this is not called replacing this function!!!
 
 cColDelim=[];	% automatic
 cDecPoint=[];	% automatic
 wordTranslateFcn=[];
 bReplaceZeros=false;
+bTrim = false;	% this was an idea - after seeing result of mex-version...
 
 if nargin>1
-	setoptions({'cColDelim','cDecPoint','wordTranslateFcn','bReplaceZeros'},varargin{:})
+	setoptions({'cColDelim','cDecPoint','wordTranslateFcn','bReplaceZeros','bTrim'},varargin{:})
 	if ~isempty(wordTranslateFcn)
 		if ~isa(wordTranslateFcn,'function_handle')
 			error('Wrong value for "wordTranslateFcn"')

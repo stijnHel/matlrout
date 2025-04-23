@@ -43,6 +43,15 @@ else
 	elseif nargin==1
 		axType='X';
 	end
+	if strcmpi(axType,'string')
+		t = Tim2MLtime(varargin{1},getappdata(ax(1),'TIMEFORMAT'));
+		s = datestr(t); %#ok<DATST> 
+		if length(t)>1
+			s = cellstr(s);
+		end
+		varargout = {s,t};
+		return
+	end
 end
 ax=GetNormalAxes(ax);
 nStringTest=max(length(axType),2);

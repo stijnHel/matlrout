@@ -1,11 +1,16 @@
-function [msgs,X]=leesdbc(f)
+function [msgs,X]=leesdbc(f,varargin)
 % LEESDBC  - Leest can-DBC-file
-%    msgs=leesdbc(f)
+%    msgs=leesdbc(f[,options])
 %       msgs te gebruiken als input voor init van 'canmsg'-functie
 
 persistent UnknownCodes
 if ~iscell(UnknownCodes)
 	UnknownCodes = {};
+end
+
+[bReplaceFE] = false;	% J1939 functionality
+if nargin>1
+	setoptions({'bReplaceFE'},varargin{:})
 end
 
 fid=file(f);
@@ -61,6 +66,11 @@ while ~feof(fid)
 				case 'BU_'	% CAN-nodes
 					X.BU = C(2:end);
 				case 'BO_'	% can-boodschap
+					if ~strcmp(C{4},':')
+						warning('Unexpected format of message definition?!')
+					else
+						C(4) = [];
+					end
 					inblok=2;
 					n = size(msgs,1)+1;
 					msgs{n,3}=struct('signal',{},'M',{},'byte',{},'bit',{}	...
@@ -309,6 +319,29 @@ while ~feof(fid)
 	end
 end
 fclose(fid);
+
+if bReplaceFE
+	% (in X.BA_DEF_DEF, 254 (0xFE) is defined for NmStationAddress)
+	%      --> this value is used fixed
+	ID = cell2mat(msgs(:,1));
+	iiFE = find(bitand(ID,255)==254);
+	srcID = msgs(iiFE,5);
+	iiStationAddress = find([X.BA.sig]=="NmStationAddress");
+	for i=1:length(iiStationAddress)
+		BA = X.BA(iiStationAddress(i)).value;
+		if ~strcmp(BA{1},'BU_')
+			warning('NmStationAddress for non BU-part?')
+			disp(BA)
+		else
+			B = strcmp(srcID,BA{2});
+			if any(B)
+				ii = iiFE(B);
+				ID(ii) = ID(ii)-254+BA{3};
+			end
+		end
+	end
+	msgs(:,1) = num2cell(ID);
+end
 
 % (if nargout>1) group data per message(?)
 %       ID, msg-name, signals, message attributes (e.g. send-type, send-time, ...)

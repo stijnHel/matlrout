@@ -114,6 +114,9 @@ for i=1:length(l)
 			if n>1
 				if isinteger(Y)
 					Y = double(Y);
+				elseif isa(Y,'single')
+					Y = double(Y);
+					mnY = double(mnY);
 				end
 				Y=decimate(Y-mnY,n)+mnY;
 				mn_dX=(X(end)-X(1))/(length(X)-1);

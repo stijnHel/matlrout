@@ -108,6 +108,10 @@ for i=1:length(l)
 	end
 	xlim=get(ax1,'XLim');
 	x=get(l(i),'XData');
+	if isduration(x)
+		xlim = seconds(xlim);
+		x = seconds(x);
+	end
 	if ~bTotaalSig
 		x=x(x>=xlim(1)&x<=xlim(2));
 	end

@@ -101,7 +101,7 @@ catch err
 	warning('Couldn''t combine "gegs"-parts?!')
 	return
 end
-if isscalar(gegs)
+if isscalar(gegs) && iscell(gegs)
 	gegs = gegs{1};
 end
 ne = {gegs.PT_F};

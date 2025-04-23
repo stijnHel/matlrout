@@ -2,19 +2,21 @@ function [D,Dinfo]=ReadTXTwithDate(fname,varargin)
 %ReadTXTwithDate - Read text file with date column(1)
 %    D=ReadTXTwithDate(fname,varargin)
 
-bAutoConf=false;
-bTranslateComma=false;
-cDelim=char(9);
-nSkip=0;
-iDateFields=1;
-iTextFields=[];
-%sDateFormat='dd/mm/yyyy HH:MM:SS';
-sDateFormat='dd.mm.yyyy HH:MM:SS';
-nBlock=1000;
+bAutoConf = false;
+bTranslateComma = false;
+cDelim = char(9);
+nSkip = 0;
+iDateFields = 1;
+iTimeFields = [];
+iTextFields = [];
+%sDateFormat = 'dd/mm/yyyy HH:MM:SS';
+sDateFormat = 'dd.mm.yyyy HH:MM:SS';
+sTimeFormat = 'HH:MM:SS';
+nBlock = 1000;
 
 if nargin>1
 	setoptions({'bAutoConf','bTranslateComma','cDelim','nSkip'	...
-			,'iTextFields','sDateFormat'}	...
+			,'iDateFields','iTimeFields','iTextFields','sDateFormat','sTimeFormat'}	...
 		,varargin{:})
 end
 if ~exist(fname,'file')
@@ -53,6 +55,7 @@ if bAutoConf
 	end
 	iDelim=[0 strfind(l,cDelim) length(l)+1];	% strfind appears to be faster than find(l==cDelim)!
 	Bdate=false(1,length(iDelim)-1);
+	Btime=Bdate;
 	Btext=Bdate;
 	for iCol=1:length(Bdate)
 		s=GetField(l,iDelim,iCol);
@@ -73,10 +76,10 @@ if bAutoConf
 	iDateFields=find(Bdate);
 	iTextFields=find(Btext);
 	Bhead=false(1,9);
-	Dref=GetLineData(L{10},cDelim,nCols,Bdate,Btext,sDateFormat,bTranslateComma);
+	Dref=GetLineData(L{10},cDelim,nCols,Bdate,Btime,Btext,sDateFormat,sTimeFormat,bTranslateComma);
 	nNaN=sum(isnan(Dref));
 	for iL=1:length(Bhead)
-		D1=GetLineData(L{iL},cDelim,nCols,Bdate,Btext,sDateFormat,bTranslateComma);
+		D1=GetLineData(L{iL},cDelim,nCols,Bdate,Btime,Btext,sDateFormat,sTimeFormat,bTranslateComma);
 		if ~isempty(D1)
 			if sum(isnan(D1))==nNaN
 				if iL>1
@@ -103,8 +106,10 @@ end
 
 nCols=sum(l==cDelim)+1;
 Bdate=false(1,nCols);
+Btime=Bdate;
 Btext=Bdate;
 Bdate(iDateFields)=true;
+Btime(iTimeFields)=true;
 Btext(iTextFields)=true;
 
 DC=cell(1,10000);
@@ -131,7 +136,7 @@ while true
 		BOK(:)=false;
 	end
 	l=L{iL};
-	D1=GetLineData(l,cDelim,nCols,Bdate,Btext,sDateFormat,bTranslateComma);
+	D1=GetLineData(l,cDelim,nCols,Bdate,Btime,Btext,sDateFormat,sTimeFormat,bTranslateComma);
 	if isempty(D1)
 		% do something if not the end of the file?
 		% (now empty lines are not visible in result)
@@ -156,7 +161,7 @@ elseif length(s)>1&&s(1)=='"'&&s(end)=='"'
 	s=s(2:end-1);
 end
 
-function D=GetLineData(l,cDelim,nCols,Bdate,Btext,sDateFormat,bTranslateComma)
+function D=GetLineData(l,cDelim,nCols,Bdate,Btime,Btext,sDateFormat,sTimeFormat,bTranslateComma)
 iDelim=[0 strfind(l,cDelim) length(l)+1];	% strfind appears to be faster than find(l==cDelim)!
 if length(iDelim)-1<nCols
 	if isempty(l)
@@ -180,6 +185,11 @@ for iCol=1:min(length(iDelim)-1,nCols)
 	elseif Bdate(iCol)
 		try %#ok<TRYNC>
 			D(iCol)=datenum(s,sDateFormat);
+		end
+	elseif Btime(iCol)
+		try %#ok<TRYNC>
+			x = datenum(s,sTimeFormat);
+			D(iCol) = x-floor(x);
 		end
 	elseif Btext(iCol)
 		% ?

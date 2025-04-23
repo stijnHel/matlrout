@@ -22,6 +22,9 @@ if nargin>1
 end
 
 bFileOpen=false;
+if isstring(fName)
+	fName = char(fName);
+end
 if ischar(fName)
 	bFileOpen=true;
 	fid=file(fFullPath(fName,[],'.zip'));

@@ -1,4 +1,4 @@
-function D=ReadPickle(fName,bUsePython)
+function D=ReadPickle(fName,bUsePython,varargin)
 %ReadPickle - Read Python pickle-file
 %      D=ReadPickle(fName[,bUsePython]);
 %
@@ -17,18 +17,31 @@ if nargin<2 || isempty(bUsePython)
 	bUsePython = ~isempty(p) && isprop(p,'Version') && ~isempty(p.Version);
 end
 
+if isa(fName,'uint8')	% already pickled data
+	x = fName;
+	if bUsePython
+		D = PtUnpickle(x);
+		return
+	end
+else	% file
+	if bUsePython
+		D = ReadPtPickle(fFullPath(fName,varargin{:}));
+		return
+	else
+		fid = fopen(fFullPath(fName,varargin{:}));
+		if fid<3
+			error('Can''t open the file!')
+		end
+		x=fread(fid,[1 Inf],'*uint8');
+		fclose(fid);
+	end
+end
+
 if bUsePython
-	D = ReadPtPickle(fFullPath(fName));
+	D = ReadPtPickle(fFullPath(fName,varargin{:}));
 	return
 end
 warning('This is just started!!!')
-
-fid = fopen(fFullPath(fName));
-if fid<3
-	error('Can''t open the file!')
-end
-x=fread(fid,[1 Inf],'*uint8');
-fclose(fid);
 
 expectedStart = sscanf('80 3 7d 71 0 28','%x',[1 6]);
 if ~all(x(1:6)==expectedStart)
@@ -85,9 +98,27 @@ pyrun('import pickle')
 pyrun(['f=open("',fN,'","rb")']);
 D = pyrun('D=pickle.load(f)','D');
 pyrun('f.close()')
-D = UnPythonize(D);
+try
+	D = UnPythonize(D);
+catch err
+	DispErr(err)
+	warning('"Unpythonize didn''t work!')
+end
 
-function [D,bNum] = UnPythonize(D)
+function D = PtUnpickle(x)
+pyrun('import pickle')
+D = pyrun('D=pickle.loads(s)','D', s=x);
+try
+	D = UnPythonize(D);
+	if isstruct(D) && isfield(D,'char')
+		D.char = [D.char{:}];
+	end
+catch err
+	DispErr(err)
+	warning('"Unpythonize didn''t work!')
+end
+
+function D = UnPythonize(D)
 % Convert Python-data to Matlab data for some datatypes
 %    this code is called recursively
 % other, less obvious cases, this is currently not done(!!)
@@ -122,7 +153,12 @@ switch typD
 			bInt = bInt && isinteger(D{i});
 		end
 		if bNumeric
-			D = [D{:}];	% be careful for "stupid Matlab numeric datatype combining"!!!!
+			Nd = cellfun(@ndims,D);
+			S1 = cellfun('size',D,1);
+			S2 = cellfun('size',D,2);
+			if all(Nd==Nd(1)) && all(S1==S1(1)) && all(S2==S2(1))
+				D = [D{:}];	% be careful for "stupid Matlab numeric datatype combining"!!!!
+			end
 		end
 	case 'py.set'
 		DD = cell(1,py.len(D));
@@ -155,4 +191,22 @@ switch typD
 			case '<i4'	% (guessed(!))
 				D = int32(D);
 		end
+	case 'py.numpy.int8'
+		D = int8(D);
+	case 'py.numpy.uint8'
+		D = uint8(D);
+	case 'py.numpy.int16'
+		D = int16(int32(D));	% int16 from py.numpy.int16 gives an error?!
+	case 'py.numpy.uint16'
+		D = uint16(D);
+	case 'py.numpy.int32'
+		D = int64(D);	% (!!!) int32 results in an error, Matlab indicates: "Use int64 function to convert to a MATLAB array."!!!!
+	case 'py.numpy.uint32'
+		D = uint64(D);
+	case 'py.numpy.int64'
+		D = int64(D);
+	case 'py.numpy.uint64'
+		D = uint64(D);
+	case 'py.str'
+		D = char(D);
 end

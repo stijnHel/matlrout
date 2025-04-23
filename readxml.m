@@ -7,6 +7,10 @@ function S=readxml(fname,bFlat,bSimplify,bStruct,varargin)
 %         bStruct: replace structure with children, by direct struct-fields
 %    S=readxml(Sflat[,bSimplify])
 
+%!!!!!!!!!!!! bStruct loopt fout (combineren van delen?!!!!)
+%             gemerkt bij svg-file
+%                   "HADOC\harness_data\ZCR3sigs\FQ04.svg"
+
 blankChars=false(1,255);
 cBrackCharsOpen='([{';
 cBrackCharsClose=')]}';

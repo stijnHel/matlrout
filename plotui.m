@@ -53,7 +53,7 @@ function [uit,scale]=plotui(varargin)
 %        Plot image (in niet-plotui-venster) met schaal
 
 plotCMDs={'convert','topix','getconvfcn'	...
-	,'set','get','put','lijn','line','getx'	...
+	,'set','get','getcoor','put','lijn','line','getx'	...
 	,'plot','figName'};
 if nargin==0
 	f=getfigure;
@@ -114,6 +114,17 @@ elseif ischar(varargin{1})&&any(strcmpi(varargin{1},plotCMDs))
 			end
 		case 'get'
 			uit=GetData(f);
+		case 'getcoor'	% get coordinates of lines
+			PUI = GetData(f);
+			uit = cell(1,length(PUI.L));
+			Ps = uit;
+			for i=1:length(uit)
+				uit{i} = [PUI.L(i).x,PUI.L(i).y];
+				Ps{i} = PUI.L(i).XY;
+			end
+			if nargout>1
+				scale = Ps;
+			end
 		case 'put'
 			ud = varargin{2};
 			[bOnlyScale] = false;
@@ -179,11 +190,42 @@ elseif ischar(varargin{1})&&any(strcmpi(varargin{1},plotCMDs))
 			error('Wrong use of this function - unknown command')
 	end
 	return
+elseif isscalar(varargin{1}) && ~isnumeric(varargin{1}) && ishandle(varargin{1})	% add plotui functionality on figure
+		% (!!) test ~isnumeric is done for ths internal use of plotui:
+		%        plotui(<nr>) is used (because in the time this function is
+		%            created function handles didn't exist....
+	% just line copied from "main start functionality" this should be changed!!!!
+	h = varargin{1};
+	if strcmp(get(h,'Type'),'image')
+		f = ancestor(h,'figure');
+	else
+		h = findobj(h,'Type','image');
+		if isempty(h)
+			error('No image found!')
+		elseif length(h)>1
+			warning('Multiple images found - this is not foreseen!')
+		end
+		f = ancestor(h(1),'figure');
+	end
+	set(h,'ButtonDownFcn','plotui(2)','Tag','plotUIimage')
+	ud=uicontrol('Style','text','Position',[0 0 100 15]	...
+		,'String','0 - #0','horizontalal','left');
+	setappdata(f,'lijn',0);
+	setappdata(f,'schaal',[]);
+	ud = ud(1,ones(1,11));	% verleng
+	for i=2:11	% (lijn-nrs 0:9, ud(1)=uicontrol, ud(2)=handle lijn 0, ...)
+		ud(i)=line('Marker','x','Color',[0 0 1],'HitTest','off','PickableParts','none');
+		set(ud(i),'XData',[],'YData',[])	% what does this do?
+	end
+	set(ud(2),'Color',[1 0 0])
+	set(f,'KeyPressFcn','plotui(1)','Pointer','crosshair','UserData',ud)
+	set(ud,'HitTest','off')
+	set(gca,'DrawMode','fast')
 else
 	if ischar(varargin{1})||(isnumeric(varargin{1})&&min(size(varargin{1}))>1)
 		if ischar(varargin{1})
 			fName=varargin{1};
-			[x,map]=imread(fName);
+			[x,map]=imread(fFullPath(fName));
 		else
 			fName=[];
 			x=varargin{1};

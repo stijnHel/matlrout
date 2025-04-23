@@ -23,6 +23,10 @@ if nargin<4||isempty(bRaiseError)
 	bRaiseError=true;
 end
 
+if isstring(fName)
+	fName = char(fName);	% to make it easy...
+end
+
 bExist = true;
 if isstruct(fName)
 	if isscalar(fName)
@@ -127,7 +131,7 @@ if ~exist(fName,'file')&&bFreeExt	% (?)
 		end
 		if ~isscalar(d)&&bRaiseError
 			if isempty(d)
-				error('Can''t find the file')
+				error('Can''t find the file (%s)',fName)
 			else
 				printstr(d)
 				error('Multiple files found!')
@@ -156,7 +160,7 @@ else
 	fName1=which(fName);
 	if isempty(fName1)
 		if bRaiseError
-			error('Can''t find the file')
+			error('Can''t find the file (%s)',fName)
 		else
 			full=[];
 			return

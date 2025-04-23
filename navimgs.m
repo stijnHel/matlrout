@@ -77,6 +77,7 @@ function varargout=navimgs(varargin)
 %               !!!!!!!! see addkeyimg !!!!!!!!!!
 %               reason for new functionality: use of Key and Character...
 %               to be reviewed
+%      navimgs('createMovie',<filename>[,idxFrames])
 %
 %   Requirement IMGstream: (methods used)
 %         length() --> number of images
@@ -88,6 +89,8 @@ function varargout=navimgs(varargin)
 % *  Maybe extend AddKeyImg with "default action" as a replacement for
 %          otherKeyFcn?
 %!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+% * Use cGenKeyPressHandler (replacing key-handling)?
 
 D=varargin{1};
 if isstruct(D)||isobject(D)||iscell(D)||ischar(D)||(isnumeric(D)&&~ismatrix(D))
@@ -456,6 +459,30 @@ if isstruct(D)||isobject(D)||iscell(D)||ischar(D)||(isnumeric(D)&&~ismatrix(D))
 				LinkFigures(varargin{2});
 			case 'reset'
 				Update(f,true);
+			case 'createmovie'
+				aviName = varargin{2};
+				if nargin<3 || isempty(varargin{3})
+					ii = 1:getappdata(f,'NAVIMGSn');
+				else
+					ii = varargin{3};
+				end
+				if endsWith(aviName,'.mp4',IgnoreCase=true)
+					v = VideoWriter(aviName,'MPEG-4');
+				else
+					v = VideoWriter(aviName);
+				end
+				
+				open(v)
+				cStat = cStatus('Writing to movie',0);
+				for i = 1:length(ii)
+					X = navimgs('get',ii(i));
+					writeVideo(v,getframe(f));
+					%writeVideo(v,X)
+					cStat.status(i/length(ii))
+				end
+				close(v)
+				cStat.close()
+				fprintf('Movie written to "%s"\n',aviName)
 			otherwise
 				warning('NAVIMGS:unknowninput','Unknown use of navimgs - nothing happened')
 		end	% switch
@@ -598,14 +625,15 @@ if isempty(axlim)||~isscalar(axlim)||axlim
 		xl=axlim(1:2);
 		yl=axlim(3:4);
 	else
-		sx=size(X,2);
-		sy=size(X,1);
-		xl=get(h,'XData');
-		yl=get(h,'YData');
-		xl=xl([1 end]);
-		yl=yl([1 end]);
-		xl=xl(1)+diff(xl)/max(2,sx-1)*[-0.5 sx-0.5];
-		yl=yl(1)+diff(yl)/max(2,sy-1)*[-0.5 sy-0.5];
+		[sy,sx]=size(X);
+		if sy>1 && sx>1
+			xl=get(h,'XData');
+			yl=get(h,'YData');
+			xl=xl([1 end]);
+			yl=yl([1 end]);
+			xl=xl(1)+diff(xl)/max(2,sx-1)*[-0.5 sx-0.5];
+			yl=yl(1)+diff(yl)/max(2,sy-1)*[-0.5 sy-0.5];
+		end
 	end
 	set(get(h,'Parent'),'XLim',xl,'YLim',yl)
 end
@@ -806,6 +834,7 @@ if ~bDone
 			h=getappdata(f,'NAVIMGShImg');
 			X=get(h,'CData');
 			assignin('base','NVIimg',X);
+			fprintf('Image data put in base variable workspace "NVIimg"\n')
 		case 'c'
 			h=getappdata(f,'NAVIMGShImg');
 			X=get(h,'CData');

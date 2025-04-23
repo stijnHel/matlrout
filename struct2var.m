@@ -10,22 +10,27 @@ elseif numel(S)~=1
 	warning('multiple struct-records are concatenated!')
 end
 bExtrSimpar = false;
+limitVarSet = {};
 
 if ~isempty(varargin)
-	setoptions({'bExtrSimpar'},varargin{:})
+	setoptions({'bExtrSimpar','limitVarSet'},varargin{:})
 end
 
 fn=fieldnames(S);
 for f=fn'
+	f = f{1};
+	if ~isempty(limitVarSet) && ~ismember(f,limitVarSet)
+		error('Variable "%s" is not allowed to be set!',f)
+	end
 	if bConcat
-		v=[S.(f{1})];
+		v=[S.(f)];
 	else
-		v=S.(f{1});
+		v=S.(f);
 		if bExtrSimpar&&isa(v,'Simulink.Parameter')
 			v=v.Value;
 		end
 	end
-	assignin('caller',f{1},v)
+	assignin('caller',f,v)
 end
 if nargout
 	fnOut=fn;

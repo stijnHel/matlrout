@@ -4,8 +4,10 @@ function [Ximg,Xinfo,x]=ReadFFF(fName,varargin)
 
 % see: file:///C:/Users/stijn.helsen/Documents/temp/exiftool/html/TagNames/FLIR.html#FFF
 
-f=file(fFullPath(fName,0,'fff'));
-x=f.fread([1 Inf],'*uint8');
+%!!!!!!!!!!!!!!!!!!!!!!!!!!!!! be carefull with long logs !!!!!!!!
+
+f = file(fFullPath(fName,0,'fff'));
+x = f.fread([1 Inf],'*uint8');
 f.fclose();
 
 Xjpg = [];
@@ -32,7 +34,7 @@ else
 	error('Sorry, wrong format!')
 end
 
-[Ximg,FFF] = ReadFFFdata(x);
+[Ximg,FFF] = ReadFFFdata(x,varargin{:});
 
 if nargout>1
 	if isempty(Xjpg)
@@ -81,14 +83,30 @@ end
 % temperature from radiance
 T_C = Dir.PlanckB./log(val_to_log)-273.15;
 
-function [IR,FFF] = ReadFFFdata(x)
+function [IR,FFF] = ReadFFFdata(x,varargin)
+[bBigendian] = false;	%(!!!!!!)
+[bMulti] = true;
+[fRange] = [];
+[bKeepRaw] = false;
+
+if nargin>1
+	setoptions({'bBigEndian','bMulti','fRange','bKeepRaw'},varargin{:})
+end
+
 H = x(1:64);
-N1 = swapbytes(typecast(x(17:60),'uint32'));
+N1 = typecast(x(17:60),'uint32');
+if bBigendian
+	N1 = swapbytes(N1);
+end
 nEntries = N1(4);	%?!!!!
 ix = 64;
-E = reshape(x(64+1:64+32*nEntries),32,nEntries);
-TYP = typecast(reshape(E([2 1],:),1,nEntries*2),'uint16');
-II = swapbytes(reshape(typecast(reshape(E(13:20,:),1,nEntries*4*2),'uint32'),2,nEntries));
+E = reshape(x(ix+1:ix+32*nEntries),32,nEntries);
+TYP = typecast(reshape(E(1:2,:),1,nEntries*2),'uint16');
+II = reshape(typecast(reshape(E(13:20,:),1,nEntries*4*2),'uint32'),2,nEntries);
+if bBigendian
+	II = swapbytes(II);
+	TYP = swapbytes(TYP);
+end
 START = II(1,:);
 LEN = II(2,:);
 FFF = struct();
@@ -132,7 +150,84 @@ for iEntry=1:nEntries
 			warning('Unkown header FFF-data?! (%d - 0x%04x)',TYP(iEntry),TYP(iEntry))
 	end
 end
-IR = Convert2Temp(FFF.raw,FFF.CameraInfo);
+if bMulti
+	len0 = START(iEntry)+LEN(iEntry);
+	ix = len0;
+	nFrames = length(x)/double(ix);	% (!) approximate number of frames(!!)
+	if nFrames>=2
+		nFrames = floor(nFrames);
+		FFF(nFrames) = FFF;
+		iFFF = 1;
+		while length(x)-ix>len0-100		%(!!)
+			iFFF = iFFF+1;
+			%!!!!! copy of previous code!!!!!
+			N1 = typecast(x(ix+17:ix+60),'uint32');
+			if bBigendian
+				N1 = swapbytes(N1);
+			end
+			nEntries = N1(4);	%?!!!!
+			E = reshape(x(ix+65:ix+64+32*nEntries),32,nEntries);
+			TYP = typecast(reshape(E(1:2,:),1,nEntries*2),'uint16');
+			II = reshape(typecast(reshape(E(13:20,:),1,nEntries*4*2),'uint32'),2,nEntries);
+			if bBigendian
+				II = swapbytes(II);
+				TYP = swapbytes(TYP);
+			end
+			START = II(1,:);
+			LEN = II(2,:);
+			for iEntry=1:nEntries
+				x1 = x(ix+START(iEntry)+1:ix+START(iEntry)+LEN(iEntry));
+				switch TYP(iEntry)
+					case 0
+						if any(TYP(iEntry+1:end)>0)
+							warning('Data after NULL-data?!')
+						end
+						break
+					case 1	% RawData
+						FFF(iFFF).raw = GetRawData(x1);
+					case 5	% GainDeadData
+						FFF(iFFF).GainDeadData = x1;
+					case 6	% CoarseData
+						FFF(iFFF).CoarseData = x1;
+					case 14	% EmbeddedImage
+						FFF(iFFF).EmbeddedImage = x1;
+					case 32	% CameraInfo
+						FFF(iFFF).CameraInfo = GetCameraInfo(x1);
+					case 33	% MeasurementInfo
+						FFF(iFFF).MeasurementInfo = x1;
+					case 34	% PaletteInfo
+						FFF(iFFF).Palette = GetPalette(x1);
+					case 35	% TextInfo
+						FFF(iFFF).TextInfo = x1;
+					case 36	% EmbeddedAudioFile
+						FFF(iFFF).EmbeddedAudioFile = x1;
+					case 40	% PaintData
+						FFF(iFFF).PaintData = x1;
+					case 42	% PiP
+						FFF(iFFF).PiP = x1;
+					case 43	% GPSInfo
+						FFF(iFFF).GPSInfo = x1;
+					case 44	% MeterLink
+						FFF(iFFF).MeterLink = x1;
+					case 50	% ParameterInfo
+						FFF(iFFF).ParameterInfo = x1;
+					otherwise
+						warning('Unkown header FFF-data?! (%d - 0x%04x)',TYP(iEntry),TYP(iEntry))
+				end		% switch TYP
+			end		% for iEntry
+			len0 = START(iEntry)+LEN(iEntry);
+			ix = ix+len0;
+		end		% while data in x
+	end		% more than 1 frame
+end		% if bMulti
+if bMulti
+	IR = Convert2Temp(cat(3,FFF.raw),FFF(1).CameraInfo);	% !!!!!!!! only first CameraInfo?!!!!!!
+else
+	IR = Convert2Temp(FFF.raw,FFF.CameraInfo);
+end
+if ~bKeepRaw
+	FFF = rmfield(FFF,'raw');
+end
 
 function RAW = GetRawData(x)
 I = typecast(x,'uint16');

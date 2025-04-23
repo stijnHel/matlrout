@@ -76,6 +76,9 @@ end
 
 markerlijst=cat(1,JPEGMarkers{:,1});
 
+if isstring(f)
+	f = char(f);
+end
 if ischar(f)
 	fid=fopen(f);
 	if fid<3
@@ -112,7 +115,7 @@ for j=1:length(i)
 			end
 		elseif strcmp(d(j).markerName,'EOI')	% stop reading
 			if length(x)-i(j)>10
-				if x(i(j+1)+1)==216	% second SOI!
+				if j<length(i) && x(i(j+1)+1)==216	% second SOI!
 					warning('Extra JPEG-block after the main JPEG-block!')
 				else
 					warning('Extra bytes in JPEG-file (#%d)\n',length(x)-i(j)-1)

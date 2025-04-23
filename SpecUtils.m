@@ -26,6 +26,7 @@ function SpecUtils(varargin)
 %       sum rather than mean can also be useful.
 %   SpecUtils legend & list in case of categories (not numeric axes)
 %       --> display category, not number!
+%   Possibility of "following cut" in X and Y! (now one is stopping the other)
 
 if nargin==0
 	h=[findobj(gcf,'type','image');findobj(gcf,'type','surface')];
@@ -258,6 +259,7 @@ function CreateFollowingCut(h,typ)
 [X,Y,D]=ExtractData(h,typ);
 ax = ancestor(D.src,'axes');
 f=ancestor(h,'figure');
+curMMoved = get(f,'WindowButtonMotionFcn');
 tickLabels = [];
 if typ=='X'
 	fcnMoved = @MouseMovedX;

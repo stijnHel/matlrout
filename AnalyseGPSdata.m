@@ -1,8 +1,18 @@
 function [D,NE,V,G,X] = AnalyseGPSdata(X,varargin)
 %AnalyseGPSdata - Analyse GPS data
-%   The goal is to separate analysis of GPS-data from ReadFIT-function
+%   Analyses GPS-data (e.g. from ReadFIT or ReadGPX)
 %        to make it usable for other file types.
-%    [D,G] = AnalyseGPSdata(X,varargin)
+%    [D,G] = AnalyseGPSdata(X,...)
+%
+%     X: array with in first 3 columns T, latitude, longitude
+%
+% See also ReadFIT, ReadGPX, cGPStrack
+
+% !!!!! review of functionality of this function, and cGPStrack is
+%       necessary!!!
+% NaN's are discarded when separating blocks? (also causing short
+%    "non-block") being "glued" to the next (or previous) block?!
+%    --> solved(?)
 
 [bDispAnal] = true;	% display analysis-results (if analysed)
 [bRemoveNonBlocks] = true;	% remove "non-blocks" - too short blocks (currently only start and end)
@@ -95,7 +105,11 @@ cumD = [0;cumsum(dD)];
 % "nonblocks" (with a larger standstill-time than
 % maxStandStillTime).
 % Now the "internal non-blocks" are kept.
-jj = [0;find(diff(X(:,1))>maxStandStillTime);size(X,1)];
+Bnan = isnan(X(:,1));
+BnanFirst = Bnan;
+BnanFirst(find(Bnan(1:end-1)&Bnan(2:end))+1) = false;
+%jj = [0;find(diff(X(:,1))>maxStandStillTime);size(X,1)];
+jj = [0;find(diff(X(:,1))>maxStandStillTime|BnanFirst(1:end-1));size(X,1)];
 lBlock = cumD(jj(2:end))-cumD(jj(1:end-1)+1);
 dtGap = (X(jj(2:end-1)+1)-X(jj(2:end-1)));
 BshortStop = [true;dtGap(1:end-1)<minKeepBlockInterTime;true];
@@ -240,6 +254,27 @@ if bPlot
 		title('Altitude')
 	end
 	ax3(1) = subplot(nP,1,1);
+	bLoop = true;
+	while bLoop
+		bLoop = false;
+		[mxV,iMx] = max(V);
+		if mxV<1
+			break
+		elseif iMx==1
+			if V(2)<mxV/4
+				V(1) = V(2);
+				bLoop = true;
+			end
+		elseif iMx==length(V)
+			if V(end-1)<mxV/4
+				V(end) = V(end-1);
+				bLoop = true;
+			end
+		elseif all(V(iMx+[-1 1])<mxV/4)
+			V(iMx) = mean(V(iMx+[-1 1]));
+			bLoop = true;
+		end
+	end
 	plot([X(1);middlepoints(X(:,1))],V([1 1:end])*3.6);grid
 		% extended with one point, so that the link with volglijn works
 		% correctly
@@ -266,7 +301,8 @@ if bPlot
 		end
 	end
 	tFigs = [fig2,fig3];
-	volglijn(tFigs,ancestor(ax1,'figure'))
+	figXY = ancestor(ax1,'figure');
+	volglijn(tFigs,figXY)
 	set([ancestor(ax1,'figure'),tFigs],'UserData',var2struct(X,NE,V,G))
 	if isempty(Vgps)
 		Vjj1 = V(jj(1:end-1)+1);
@@ -296,6 +332,8 @@ if bPlot
 		,'HitTest','off','PickableParts','none'		...
 		,'Linestyle','none','Marker','x','Tag','blockData','Parent',ax3(nP))
 	navfig('link',tFigs)
+	volglijn('setKeyFun',@MyKeyHandling)
+	setappdata(figXY,'GPSdata',D)
 end
 
 end		% AnalyseGPSdata
@@ -398,3 +436,47 @@ if ~isempty(name)
 end
 xlabel(name)
 end		% PointClicked
+
+function MyKeyHandling(S,c)
+if c=='W'
+	FPOS = {'NEplot',[1036 390 872 653];
+		'NEtimePlot',[29 497 945 539];
+		'VHDplot',[29 5 944 598];
+		};
+	for i=1:size(FPOS,1)
+		f = getmakefig(FPOS{i},false,false);
+		if ~isempty(f)
+			set(f,'Position',FPOS{i,2})
+		end
+	end
+elseif c==1	% ctrl-A - analyse based on markers
+	m1 = getappdata(S.fvast,'marker1');
+	m2 = getappdata(S.fvast,'marker2');
+	if isempty(m1) || isempty(m2)
+		errordlg('Two markers are required (use ctrl-P and ctrl-Q to set them)')
+		return
+	elseif m1==m2
+		errordlg('Two markers must be different!!')
+		return
+	elseif m1>m2
+		[m2,m1] = deal(m1,m2);
+	end
+	D = get(S.fvast,'UserData');
+	disp([m1,m2])
+	l = D.G.cumD(m2)-D.G.cumD(m1);
+	dt = (D.X(m2)-D.X(m1))*86400;
+	v = l/dt;
+	%!!!!!!!!!!!!?????????????? fit <-> gpx data !!!!!!!!!!!!!
+	if l<2000
+		fprintf('%s..%s - %4.0f m, %5.0f sec, %6.2f km/h\n'	...
+			,datestr(D.X(m1)),datestr(D.X(m2))	...
+			,l,dt,v*3.6	...
+			)
+	else
+		fprintf('%s..%s - %5.1f km, %5.2f hr, %6.2f km/h\n'	...
+			,datestr(D.X(m1)),datestr(D.X(m2))	...
+			,l/1000,dt/3600,v*3.6	...
+			)
+	end
+end
+end		% MyKeyHandling

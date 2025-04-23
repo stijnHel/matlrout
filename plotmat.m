@@ -155,6 +155,14 @@ elseif isstruct(e)
 		bCommon=true;
 	elseif isfield(S,'X')&&isfield(S,'Y')
 		[Sout{:}]=plotmat(S.Y,kols,S.X,varargin{:});
+	elseif isfield(S,'msgID')	% from MapCANDBC
+		X = S.X;
+		nX = {S.signals.signal};
+		dX = {S.signals.unit};
+		if isempty(x)
+			x = S.t;
+		end
+		[Sout{:}]=plotmat(X,kols,x,nX,dX,varargin{:});
 	elseif isfield(S,'signals')	% Simulink output
 		if (nargin<3||isempty(x))&&isfield(S,'time')
 			x=S.time;
@@ -260,6 +268,9 @@ elseif isa(e,'Simulink.SimulationData.Dataset')
 elseif istable(e)
 	naame = e.Properties.VariableNames;
 	%e = table2array(e);
+elseif istabular(e)
+	naame = e.Properties.VariableNames;
+	% does this work???
 end
 bXvector = length(x)>1 && length(x)==size(e,1);
 
@@ -646,7 +657,7 @@ lijnen=cell(nkan,2);
 nXi = [];
 if bXcommon
 	Xi = X;
-	if istable(Xi)
+	if istable(Xi) || istabular(Xi)
 		Xi = table2array(Xi);
 	end
 	if xl && isscalar(x) && x>=1
@@ -667,6 +678,8 @@ for i=1:nkan
 			Xi = X(:,x(i));
 			if istable(Xi)
 				Xi = table2array(Xi);
+			elseif istabular(Xi)
+				Xi = Xi.Time;	%!!!!!!!??????????
 			end
 			if xl
 				nXi = naame{x(i)};
@@ -744,7 +757,7 @@ for i=1:nkan
 			xl = false;
 		else
 			ePlot = e(:,k);
-			if istable(ePlot)
+			if istable(ePlot) || istabular(ePlot)
 				ePlot = table2array(ePlot);
 			end
 			if isempty(Xi)
@@ -804,7 +817,12 @@ for i=1:nkan
 				end
 				set(gca,'YTick',0:length(j)-2,'YTickLabel',dex);
 			else
-				ylabel(['[' deblank(de1) ']'])
+				if isstring(de1)
+					de1 = "["+deblank(de1)+"]";
+				else
+					de1 = ['[' deblank(de1) ']'];
+				end
+				ylabel(de1)
 			end
 		end
 	end
@@ -856,7 +874,8 @@ for i=1:nkan
 					)
 			end
 		end
-		ylabel(['[' de{k3(1)} ']'])
+		de1 = de{k3(1)};
+		ylabel(de1)
 	end
 end
 if bXdata

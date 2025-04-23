@@ -87,6 +87,8 @@ if isempty(p)
 	p=ls;
 	if size(ls,1)==1
 		p='x|+|o|*|square|diamond|v|^|>|<|pentagram|hexagram|.';
+	else	%!!!!! trial
+		p = set(gca,'DefaultLineMarker');
 	end
 end
 if size(p,1)==1

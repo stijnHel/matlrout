@@ -70,6 +70,7 @@ function varargout=navfig(c,x2,varargin)
 %        niet buiten (onderandere voor vermijden van moeilijkheden met
 %        korte streepjes)
 %        bij 'd' geeft dit problemen als aantallen wisselen
+%   bij extra keys: in help-fcn worden "overruled" keys dubbel gegeven!
 
 % toetsen-betekenissen :
 %    'l' : scroll naar links (halve pagina)
@@ -243,6 +244,12 @@ if ischar(c)&&length(c)>1
 			if isempty(get(f,'SizeChangedFcn'))
 				set(f,'SizeChangedFcn',@(f,~)axtick2date(f))
 			end
+			if ninput>1	% time format (this should be done with axtick2date changeTformat, but that doesn't work?!)
+				ax = GetNormalAxes(f);
+				for i=1:length(ax)
+					setappdata(ax(i),'TIMEFORMAT',x2)
+				end
+			end
 		case {'updateaxes','addupdateaxes'}
 			if ninput<2
 				error('navfig(''updateAxes'') must have an update function as second argument!')
@@ -318,12 +325,20 @@ if ischar(c)&&length(c)>1
 			ll=FindLines(gca);
 			setappdata(f,'navfigX',get(ll(1),'XData'))
 		case 'keys'
-			if nargin==1
+			if ninput==1
 				varargout = {getappdata(f,'NAVFIGkey')};
 				return
 			end
-			figs=getlinked(f,1);
-			figs=[f;figs(:)];
+			[bLinked] = false;
+			if ~isempty(varargin)
+				setoptions({'bLinked'},varargin{:})
+			end
+			if bLinked
+				figs=getlinked(f,1);
+				figs=[f;figs(:)];
+			else
+				figs = f;
+			end
 			for f1=figs(:)'
 				setappdata(f1,'NAVFIGkey',x2)
 			end
@@ -367,7 +382,7 @@ if ischar(c)&&length(c)>1
 			elseif ninput==4
 				K=vertcat(K,{x2,IN{1},IN{2}});
 			else
-				error('Verkeerd aantal ingangen voor navfig addkey')
+				error('Verkeerd aantal input argumenten voor navfig addkey')
 			end
 			for f1=figs(:)'
 				setappdata(f1,'NAVFIGkey',K)
@@ -401,7 +416,7 @@ if ischar(c)&&length(c)>1
 			for f1=figs(:)'
 				setappdata(f1,'NAVFIGkey',K)
 			end
-		case 'keylist'
+		case 'keylist'	% (functionality partially available in 'keys'!)
 			K=getappdata(f,'NAVFIGkey');
 			if isempty(K)
 				if nargout
@@ -418,7 +433,7 @@ if ischar(c)&&length(c)>1
 						K{i,4} = ['''',c,''''];
 					else
 						K{i,4} = sprintf('<%d|0x%02x>',abs([c c]));
-						if c>1&&c<=26
+						if c>0&&c<=26
 							K{i,4} = sprintf('%s(ctrl-%c)',K{i,4},char(c+64));
 						end
 					end
@@ -517,7 +532,7 @@ if ischar(c)&&length(c)>1
 			error('Onbekende opdracht voor navfig')
 	end
 elseif ischar(c)&&isscalar(c)
-	if nargin==1
+	if ninput==1
 		k = c;
 	else
 		if c==0
@@ -702,6 +717,8 @@ for i=1:length(l)
 	if ~isempty(X)
 		if isdatetime(X)
 			X = datenum(X);
+		elseif isduration(X)
+			X = seconds(X);
 		end
 		XL(1)=min(XL(1),min(X));
 		XL(2)=max(XL(2),max(X));
@@ -710,6 +727,8 @@ end
 x = xlim;
 if isdatetime(x)
 	XL = datetime(XL,'ConvertFrom','datenum','TimeZone',x.TimeZone);
+elseif isduration(x)
+	XL = seconds(XL);
 end
 
 function fs=GetAvailableHandles(fs)
@@ -1087,7 +1106,9 @@ if ~reedsverwerkt
 		case 'X'
 			x=getxlim(as,xislog);
 			if diff(x)<=0
-				if x(1)==0
+				if ~isnumeric(x)
+					x = x+[-1 1];
+				elseif x(1)==0
 					x=[-1 1];
 				else
 					x=sort(x(1)*[.9 1.1]);
@@ -1182,8 +1203,8 @@ if ~reedsverwerkt
 				getPtFcn(ax,pt);
 			end
 			if isequal(getappdata(as(1),'updateAxes'),@axtick2date)
-				t = Tim2MLtime(pt(1));
-				sPt = sprintf('(%5g,%5g - %s) - ',pt,datestr(t));
+				st = axtick2date(as(1),'string',pt(1));
+				sPt = sprintf('(%5g,%5g - %s) - ',pt,st);
 			else
 				sPt = sprintf('(%5g,%5g) - ',pt);
 			end
@@ -1233,8 +1254,8 @@ if ~reedsverwerkt
 			D=getappdata(ax,'navfigLastData');
 			pt=get(ax,'CurrentPoint');pt=pt(1,1:2);
 			if isequal(getappdata(as(1),'updateAxes'),@axtick2date)
-				t = Tim2MLtime(pt(1));
-				sPt = sprintf('(%5g,%5g - %s) ',pt,datestr(t));
+				st = axtick2date(as(1),'string',pt(1));
+				sPt = sprintf('(%5g,%5g - %s) ',pt,st);
 			else
 				sPt = sprintf('(%5g,%5g) ',pt);
 			end
@@ -1390,9 +1411,9 @@ if ~reedsverwerkt
 				[X,Y,j]=GetXY(l(i),x);
 				[mn,imn]=min(Y);
 				[mx,imx]=max(Y);
-				imn=j(imn);
-				imx=j(imx);
-				fprintf('%10g(%5d) - %10g --- %10g(%5d) - %g\n',X(imn),imn,mn,X(imx),imx,mx)
+				imn_l=j(imn);
+				imx_l=j(imx);
+				fprintf('%10g(%5d) - %10g --- %10g(%5d) - %g\n',X(imn),imn_l,mn,X(imx),imx_l,mx)
 			end
 		case 27		% escape - automatic scaling
 			set(as,'XLimMode','auto')	% only on current axes!
@@ -1424,6 +1445,9 @@ if ~reedsverwerkt
 					end
 				end
 				[X,Y]=GetXY(l);
+				if isinteger(Y)
+					Y = double(Y);
+				end
 				nFFT=min(length(Y),NAVFIGsets.SG_nFFT);
 				m_dx = median(diff(X));
 				if m_dx<=0
@@ -1736,9 +1760,9 @@ if ~reedsverwerkt
 			end
 		case '?'
 			if isequal(getappdata(as(1),'updateAxes'),@axtick2date)
-				t=Tim2MLtime(x);
-				fprintf('   limit: %s - %s, %gs\n',datestr(t(1))	...
-					,datestr(t(2)),diff(t)*86400)
+				[st,t]=axtick2date(as(1),'string',x);
+				fprintf('   limit: %s - %s, %gs\n',st{1}	...
+					,st{2},diff(t)*86400)
 			else
 				fprintf('   limit: %g - %g, %gs\n',x,diff(x))
 			end
@@ -1850,26 +1874,31 @@ switch typ
 		warning('Not expected SelectRect-type! (%s)',typ)
 end
 setappdata(f,'uihandlingactive',true)
-k=waitforbuttonpress;
-if k
-	set(f,'Pointer',ptr)
-	xMin=0;
-	xMax=0;
-	yMin=0;
-	yMax=0;
-	bOK=false;
-else
-	ax=gca;
-	pt1=get(ax,'CurrentPoint');
-	rbbox;
-	set(f,'Pointer',ptr)
-	drawnow		% does this help for updating the position?  It seems to be.
-	pt2=get(ax,'CurrentPoint');
-	xMin=min(pt1(1),pt2(1));
-	xMax=max(pt1(1),pt2(1));
-	yMin=min(pt1(1,2),pt2(1,2));
-	yMax=max(pt1(1,2),pt2(1,2));
-	bOK=true;
+try
+	k=waitforbuttonpress;
+	if k
+		set(f,'Pointer',ptr)
+		xMin=0;
+		xMax=0;
+		yMin=0;
+		yMax=0;
+		bOK=false;
+	else
+		ax=gca;
+		pt1=get(ax,'CurrentPoint');
+		rbbox;
+		set(f,'Pointer',ptr)
+		drawnow		% does this help for updating the position?  It seems to be.
+		pt2=get(ax,'CurrentPoint');
+		xMin=min(pt1(1),pt2(1));
+		xMax=max(pt1(1),pt2(1));
+		yMin=min(pt1(1,2),pt2(1,2));
+		yMax=max(pt1(1,2),pt2(1,2));
+		bOK=true;
+	end
+catch err
+	DispErr(err)
+	warning('Recovered from an error?!')
 end
 pause(0.01)
 rmappdata(f,'uihandlingactive')
@@ -1877,6 +1906,7 @@ rmappdata(f,'uihandlingactive')
 function l=FindLines(h)
 l=[findobj(h,'Type','line','Visible','on');
 	findobj(h,'Type','stair','Visible','on');
+	findobj(h,'Type','scatter','Visible','on');
 	findobj(h,'Type','patch','Visible','on')];
 l = l(end:-1:1);
 
