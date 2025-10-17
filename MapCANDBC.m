@@ -1,6 +1,6 @@
 function [D,IDundefined,Ilog]=MapCANDBC(Xlog,Cdbc,bReplaceFE_id,node_id,bDiscardPrio)
 %MapCANDBC - Map logged CAN-data with DBC-specification
-%    [D,IDundefined]=MapCANDBC(Xlog,Cdbc)
+%    [D,IDundefined] = MapCANDBC(Xlog,Cdbc)
 %        Xlog: log of CAN data (see ReadCANLOG)
 %             struct with fields:
 %                T: timestamp (vector)
@@ -18,6 +18,13 @@ function [D,IDundefined,Ilog]=MapCANDBC(Xlog,Cdbc,bReplaceFE_id,node_id,bDiscard
 %                     Timestamp
 %                     Payload
 %                     Identifier
+%
+%           ....MapCANDBC(Xlog,Cdbc,bReplaceFE_id,node_id,bDiscardPrio)
+%                         bReplaceFE_id --> replace node FE by another node number
+%                                          (J1939)
+%                         node_id       --> node_id to be used (fixed for all!)
+%                                      if <0 ==> autoselect based on data
+%                         bDiscardPrio  --> discard priority (top bits of ID)
 
 D=[];
 IDundefined=[];
@@ -123,7 +130,11 @@ end
 if nargin<4||isempty(node_id)
 	node_id = 0;
 elseif ~isnumeric(node_id)
-	node_id = str2double(node_id);% node_id can still be a string as entered in dbc_can
+	if startsWith(node_id,'0x')
+		node_id = hex2dec(node_id(3:end));
+	else
+		node_id = str2double(node_id);% node_id can still be a string as entered in dbc_can
+	end
 end
 if nargin<5||isempty(bDiscardPrio)
 	bDiscardPrio = false;
@@ -131,13 +142,56 @@ end
 if bReplaceFE_id
 	% if DBC-ID ends with 0xFE (254), then it's replaced by node_id (default 0)
 	%     (a J1939-option - "not yet defined addresses")
+	if node_id<0	% automatic
+		if isfield(Xlog,'uID')
+			uID = Xlog.uID;
+		else
+			uID = unique(Xlog.ID);
+			Xlog.uID = uID;
+		end
+	end
 	for i=1:size(Cdbc,1)
 		if Cdbc{i}>1024&&bitand(Cdbc{i},255)==254
-			Cdbc{i}=Cdbc{i}-254+node_id;
+			if node_id>=0
+				Cdbc{i}=Cdbc{i}-254+node_id;
+			else
+				id0 = Cdbc{i}-254;
+				ii = find(bitand(uID,2^30-256)==Cdbc{i}-254);
+				n_id = bitand(uID(ii),255);
+				if isscalar(ii)
+					id = double(id0+n_id);
+					if any([Cdbc{:,1}]==id)
+						warning('Multiple ID''s? (%08x)',id)
+					end
+					fprintf('  msgID (%-20s)  0x%08x --> 0x%08x\n',Cdbc{i,[2 1]},id)
+					Cdbc{i} = id;
+				elseif length(ii)>1
+					fprintf('  multiple nodes sending %s - 0x%08x!!\n',Cdbc{i,[2,1]})
+					fprintf('    ');fprintf(' %02x',n_id);fprintf('\n')
+					id = double(id0+n_id(1));
+					msg = Cdbc{i,2};
+					if any([Cdbc{:,1}]==id)
+						warning('Multiple ID''s? (%08x)',id)
+					end
+					Cdbc{i} = id;
+					Cdbc{i,2} = sprintf('%s_node_%02x',msg,n_id(1));
+					n = size(Cdbc,1);
+					Cdbc = [Cdbc;Cdbc(i+zeros(length(ii)-1,1),:)]; %#ok<AGROW> 
+					for j = 2:length(ii)
+						id = double(id0+n_id(j));
+						if any([Cdbc{:,1}]==id)
+							warning('Multiple ID''s? (%08x)',id)
+						end
+						Cdbc{n+j-1} = id;
+						Cdbc{n+j-1,2} = sprintf('%s_node_%02x',msg,n_id(j));
+					end
+				end
+			end
 			if bDiscardPrio
 				Cdbc{i}=bitand(Cdbc{i},2^26-1);
 			end
 		end
+
 	end
 end
 

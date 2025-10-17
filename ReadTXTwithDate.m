@@ -13,10 +13,12 @@ iTextFields = [];
 sDateFormat = 'dd.mm.yyyy HH:MM:SS';
 sTimeFormat = 'HH:MM:SS';
 nBlock = 1000;
+[bGetHead] = false;
 
 if nargin>1
 	setoptions({'bAutoConf','bTranslateComma','cDelim','nSkip'	...
-			,'iDateFields','iTimeFields','iTextFields','sDateFormat','sTimeFormat'}	...
+			,'iDateFields','iTimeFields','iTextFields','sDateFormat'	...
+			,'sTimeFormat','bGetHead'}	...
 		,varargin{:})
 end
 if ~exist(fname,'file')
@@ -31,7 +33,12 @@ if isempty(L)
 	error('Can''t read from file!')
 end
 Head={};
-Fields=[];
+if bGetHead
+	Fields = regexp(L{1},cDelim,'split');
+	L(1) = [];
+else
+	Fields = [];
+end
 if nSkip
 	Head=L(1:nSkip); %#ok<UNRCH>
 	L(1:nSkip)=[];

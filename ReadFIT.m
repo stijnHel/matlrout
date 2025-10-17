@@ -7,6 +7,8 @@ function [D,Xrecord,nX,NE,V,G]=ReadFIT(fName,varargin)
 %
 %  see also ProjGPS2XY
 
+persistent FITinterpretDATA
+
 if ischar(fName)
 	switch lower(fName)
 		case 'get'
@@ -70,7 +72,7 @@ else
 end
 bGPX=bGPX||ischar(fileGPX);
 bProcess=bProcess||bGPX||bPlot||bAnalyse||bStdOut;
-bProject = nargout>3 || bProcess;
+bProject = nargout>3;% || bProcess;
 bInterpret=bInterpret||bGPX;
 
 BE16=[1;256];
@@ -85,12 +87,14 @@ InvalValues=[255 127 255 32767 65536 2^31-1 2^32-1 0	... 0-7
 	0];
 
 if bInterpret
-	if exist('FITprofile.mat','file')
-		F=load('FITprofile');
-		Btypes=F.Btypes;
-		Ctypes=F.Ctypes;
-		Bmsgs=F.Bmsgs;
-		Cmsgs=F.Cmsgs;
+	if ~isempty(FITinterpretDATA) || exist('FITprofile.mat','file')
+		if isempty(FITinterpretDATA)
+			FITinterpretDATA = load('FITprofile');
+		end
+		Btypes = FITinterpretDATA.Btypes;
+		Ctypes = FITinterpretDATA.Ctypes;
+		Bmsgs = FITinterpretDATA.Bmsgs;
+		Cmsgs = FITinterpretDATA.Cmsgs;
 	else
 		pth=fileparts(which(mfilename));
 		fFITprofile=fullfile(pth,'Profile.xlsx');
@@ -98,10 +102,33 @@ if bInterpret
 		[~,Bmsgs,Cmsgs]=xlsread(fFITprofile,'Messages');
 		fFITprofile=fullfile(pth,'FITprofile.mat');
 		save(fFITprofile,'Btypes','Ctypes','Bmsgs','Cmsgs')
+		FITinterpretDATA = var2struct(Btypes, Ctypes, Bmsgs, Cmsgs);
 	end
 	msgNames=GetElems('mesg_num');
 end
 
+if ~ischar(fName) && length(fName)>1
+	Xrecord = cell(1,length(fName));
+	for iF=1:length(fName)
+		if iscell(fName)
+			fN = fName{iF};
+		else
+			fN = fName(iF);
+		end
+		[D,Xrecord{iF},nX] = ReadFIT(fN);
+	end
+	Xrecord = cat(1,Xrecord{:});
+	if bProject
+		iX_V = find(strcmp(nX,'enhanced_speed'));
+		iX_H = find(strcmp(nX,'enhanced_altitude'));
+		n = median(Xrecord(:,2));
+		iM = findclose(Xrecord(:,2),n);
+		Z1 = Xrecord(iM,2:3);
+		[D,NE,V,G,Xrecord] = AnalyseGPSdata(Xrecord,'iVgps',iX_V,'iAltitude',iX_H	...
+			,'bPlot',bPlot,Oextra{1:2,:},'Z1',Z1);
+	end
+	return
+end
 fName=fFullPath(fName,[],'.fit');
 fid=fopen(fName);
 x=fread(fid,[1 Inf],'*uint8');
@@ -239,11 +266,12 @@ elseif bProcess
 	else
 		Xrecord(:,1) = Xrecord(:,1)/86400+t0Data;
 	end
-	
-	iX_V = find(strcmp(nX,'enhanced_speed'));
-	iX_H = find(strcmp(nX,'enhanced_altitude'));
-	[D,NE,V,G,Xrecord] = AnalyseGPSdata(Xrecord,'iVgps',iX_V,'iAltitude',iX_H	...
-		,'fTitle',fTitle,'bPlot',bPlot,Oextra{1:2,:});
+	if bProject
+		iX_V = find(strcmp(nX,'enhanced_speed'));
+		iX_H = find(strcmp(nX,'enhanced_altitude'));
+		[D,NE,V,G,Xrecord] = AnalyseGPSdata(Xrecord,'iVgps',iX_V,'iAltitude',iX_H	...
+			,'fTitle',fTitle,'bPlot',bPlot,Oextra{1:2,:});
+	end
 end		% if bProcess
 if bStdOut	% 
 	% D,	Xrecord,	nX,	NE,	V,	G
@@ -268,7 +296,11 @@ if bStdOut	%
 	else
 		G = D;
 	end
-	[D,Xrecord,nX,NE,V] = deal(Xrecord,nX,dX,V,G);
+	[D,Xrecord,nX] = deal(Xrecord,nX,dX);
+	if bProject
+		NE = V;
+		V = G;
+	end
 end
 
 	function crc=CalcCRC(x)
@@ -512,17 +544,17 @@ end
 
 	function [elems,typ]=GetElems(typeName)
 		iMsgNum=find(strcmp(Ctypes(:,1),typeName));
-		i=iMsgNum+1;
-		while ~isempty(Btypes{i,3})
-			if ~isnumeric(Ctypes{i,4})
-				if strncmpi(Ctypes{i,4},'0x',2)
-					Ctypes{i,4}=sscanf(Ctypes{i,4},'0x%x',1);
+		iTyp=iMsgNum+1;
+		while ~isempty(Btypes{iTyp,3})
+			if ~isnumeric(Ctypes{iTyp,4})
+				if strncmpi(Ctypes{iTyp,4},'0x',2)
+					Ctypes{iTyp,4}=sscanf(Ctypes{iTyp,4},'0x%x',1);
 				end
 			end
-			i=i+1;
+			iTyp=iTyp+1;
 		end
 		typ=Ctypes{iMsgNum,2};
-		elems=Ctypes(iMsgNum+1:i-1,3:5);
+		elems=Ctypes(iMsgNum+1:iTyp-1,3:5);
 	end		% function GetTypes
 
 end		% function ReadFIT

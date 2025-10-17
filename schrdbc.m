@@ -46,12 +46,12 @@ for i=1:length(ids)
 	nbit=nbit(j);
 	str=str(j);
 	for j=1:length(str)
-		if strcmp(lower(str(j).signal),'r_imotc')
+		if strcmpi(str(j).signal,'r_imotc')
 			order=1;	%!!!breakpoint-setting
 		end
 		order=1;
 		if length(str(j).byte)>1
-			if any(diff(str(j).byte))<0
+			if any(diff(str(j).byte))<0	%!!!!!!!!!!!!!
 				order=0;	%????juist!!!
 			end
 		end
@@ -91,7 +91,7 @@ for i=1:length(tail)
 end
 for i=1:length(ids)
 	str=ids(i).structure;
-	if ~isempty(str)&isfield(str,'comment')
+	if ~isempty(str)&&isfield(str,'comment')
 		for j=1:length(str)
 			if ~isempty(str(j).comment)
 				fprintf(fid,'CM_ SG_ %d %s "%s";\n',ids(i).ID,str(j).signal,str(j).comment);

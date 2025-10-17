@@ -258,16 +258,22 @@ if ischar(c)&&length(c)>1
 				navfig(f)	% start navfig-functionality
 			end
 			bAdd = strcmpi(c,'addUpdateAxes');
+			bRemove = ~isempty(IN) && strcmpi(IN{1},'stop');
 			assen=GetNormalAxes(f);
 			if ischar(x2)&&strcmpi(x2,'stop')
-				x2=[];
+				%(!!!) assuming axtick2date
+				x2 = [];
 				set(assen,'XTickMode','auto','XTickLabelMode','auto')
 				set(f,'SizeChangedFcn',[])
+				bRmTimeFormat = true;
+			else
+				bRmTimeFormat = bRemove && isequal(x2,@axtick2date);
 			end
 			if ischar(x2) && ~isempty(x2)
 				x2 = str2func(x2);
 			end
 			for i=1:length(assen)
+				bRmTF = bRmTimeFormat;
 				if bAdd
 					fcnUpd = getappdata(assen(i),'updateAxes');
 					if isempty(fcnUpd)
@@ -278,13 +284,32 @@ if ischar(c)&&length(c)>1
 						end
 						fcnUpd{1,end+1} = x2; %#ok<AGROW>
 					end
+				elseif bRemove
+					fcnUpd = getappdata(assen(i),'updateAxes');
+					b = false;
+					if isempty(fcnUpd)
+						% do nothing - better give a warning?
+					elseif iscell(fcnUpd)
+						B = cellfun(@(f) isequal(f,x2),fcnUpd);
+						fcnUpd(B) = [];
+						bRmTF = bRmTimeFormat;
+					elseif isequal(fcnUpd,x2)
+						fcnUpd = [];
+						bRmTF = bRmTimeFormat;
+					end
 				else
 					fcnUpd = x2;
 				end
-				setappdata(assen(i),'updateAxes',fcnUpd)
-				if isempty(x2)
-					% reset timeformat (assuming axtick2date!!)
-					setappdata(assen(i),'TIMEFORMAT',[])
+				if bRmTF && isappdata(assen(i),'TIMEFORMAT')
+					rmappdata(assen(i),'TIMEFORMAT')
+				end
+				if isempty(fcnUpd)
+					rmappdata(assen(i),'updateAxes')
+				else
+					if iscell(fcnUpd) && isscalar(fcnUpd)
+						fcnUpd = fcnUpd{1};
+					end
+					setappdata(assen(i),'updateAxes',fcnUpd)
 				end
 			end
 		case 'mouse'
@@ -1686,6 +1711,9 @@ if ~reedsverwerkt
 			if xMax>xMin
 				x=[xMin xMax];
 				doebepfig=1;
+				if isdatetime(gca(f).XLim)	% convert to ruler to have correctly linked axes behaviour
+					x = num2ruler(x,get(gca(f),'XAxis'));
+				end
 			end
 		case 25	% ctrl-y - manual (graphical) zoom in Y
 			[~,~,yMin,yMax,bOK]=SelectRect(f,'y');

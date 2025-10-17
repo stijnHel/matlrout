@@ -18,6 +18,14 @@ function [IMGs,I,Prec] = ReadWaterinfoRadarHDF5(fName,varargin)
 %        communities are found via cGeography, but provinces are directly
 %        read
 %        --> is it possible to have multiple "admin-levels" in cGeography?
+%      * "add plot" is added, but storing the info (to be able to create a
+%        legend), would be useful
+
+global PYTHON_EXTENSIONS
+
+if isempty(PYTHON_EXTENSIONS)
+	PYTHON_EXTENSIONS = python_extensions();
+end
 
 [bPlot] = nargout==0;
 [bAnim] = false;
@@ -215,7 +223,11 @@ if ischar(fName)
 		URLformat = 'https://hydro.vmm.be/grid/kiwis/KiWIS?datasource=10&service=kisters&type=queryServices&request=getrastertimeseriesvalues&ts_path=COMP_VMM/Vlaanderen_VMM/Ni/5m.Cmd.Raster.O.SRI_1km_cappi&period=PT%dH&to=%04d-%02d-%02dT%02d:%02d:%02d&format=hdf5';
 		%          DPSRI: Surface Rainfall Intensity
 		urlString = sprintf(URLformat,tPeriod,tVec);
-		H5 = urlbinread(urlString);
+		H5 = PYTHON_EXTENSIONS.url_bin_read(urlString);
+		if ~strcmp(char(H5(2:4)),'HDF')
+			printhex(H5(1:min(end,64)))
+			error('Bad response!')
+		end
 		tv = datevec(tEnd-tPeriod/24);
 		%fName = sprintf('rastervalues_%04d%02d%02d_%02d%02d%02.0f.hdf5',clock);
 		fName = sprintf('rastervalues_%04d%02d%02d_%02d%02d%02.0f_%02.0fhr.hdf5',tv,tPeriod);
@@ -739,6 +751,10 @@ if bUpdate
 end
 
 function Update(hI,X,nr,I)
+if nr>length(I.t)
+	warning('image request beyond the end?! (%d<->%d)',nr,length(I.t))
+	nr = length(I.t);
+end
 set(hI,'cdata',X(:,:,nr),'AlphaData',~isnan(X(:,:,nr))*0.6)
 t = I.t(nr);
 if isDST(t)
@@ -796,7 +812,10 @@ else
 	ax.XLabel.String = sprintf('%8.3f mm/hr (max %8.3f mm/hr)',v,exp(max(X,[],'all')));
 end
 
-function PlotTime(ax,D)
+function PlotTime(ax,D,bAdd)
+if nargin<3
+	bAdd = false;
+end
 bCum = isfield(D,'type') && strcmp(D.type,'cum');
 [Irange,name] = GetRange(ax);
 if isvector(Irange)	&& all(Irange>=1)	...
@@ -838,14 +857,26 @@ if bCum
 else
 	CR = cumsum([0,middlepoints(R(:)').*min(0.01,diff(t))*24]);
 	subplot 211
-	l = plot(t,R);grid
+	if bAdd
+		hold on
+		l = plot(t,R);
+		hold off
+	else
+		l = plot(t,R);grid
+	end
 	title 'rain rate'
 	ylabel [mm/hr]
 	l.UserData = ancestor(D.hI,'figure');
 	l.ButtonDownFcn = @TimeplotClicked;
 	subplot 212
 end
-l = plot(t,CR);grid
+if bAdd
+	hold on
+	l = plot(t,CR);
+	hold off
+else
+	l = plot(t,CR);grid
+end
 l.UserData = ancestor(D.hI,'figure');
 l.ButtonDownFcn = @TimeplotClicked;
 title 'cumulative rain fall'
@@ -970,7 +1001,7 @@ else
 	Range = struct('name',name,'country',cntry,'pt',pt,'pGeo',p,'Irange',Irange);
 end
 setappdata(ax,'Range',Range)
-PlotTime(ax,D)
+PlotTime(ax,D,ev.Button>1)
 SetMarker(D,'update')
 
 function [f,D] = GetRadarFigure(bReportError)

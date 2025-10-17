@@ -525,26 +525,27 @@ else
 	for i=1:length(S.children)
 		tag=S.children(i).tag;
 		Si=MakeDirectStruct(S.children(i));
+		tag_name = MakeVarNames(tag);
 		if isfield(Sd,tag)
 			Sdtag=Sd.(tag);
 			if isstruct(Sdtag)
 				try
-					Sd.(tag)(1,end+1)=Si;
+					Sd.(tag_name)(1,end+1)=Si;
 				catch
 					if isscalar(Sdtag)
-						Sd.(tag)={Sdtag};
+						Sd.(tag_name)={Sdtag};
 					else
-						Sd.(tag)=num2cell(Sdtag);
+						Sd.(tag_name)=num2cell(Sdtag);
 					end
-					Sd.(tag){1,end+1}=Si;
+					Sd.(tag_name){1,end+1}=Si;
 				end
 			elseif iscell(Sdtag)
-				Sd.(tag){1,end+1}=Si;
+				Sd.(tag_name){1,end+1}=Si;
 			else
-				Sd.(tag)={Sdtag,Si};
+				Sd.(tag_name)={Sdtag,Si};
 			end
 		else
-			Sd.(tag)=Si;
+			Sd.(tag_name)=Si;
 		end
 	end		% for i (all children)
 end		% with children

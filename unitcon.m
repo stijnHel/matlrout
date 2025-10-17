@@ -5,7 +5,15 @@ function [c,unitInfo,varargout] = unitcon(u1,u2,u3,varargin)
 %    unitcon <eenheid> toon
 %        geeft alle compatibele eenheden.
 %
-%   werd hernoemd door de nieuwe ctrlguis/unitconv-functie
+%    andere mogelijkheden:
+%           unitcon('addunit',<nieuw>,<SI-unit>,factor[,offset])
+%                     SI-unit: *([MLTKA]n) - e.g. L1T-1 for m/s
+%                          [MLTKA] (1 letter) for mass/length/time/temperature/el.current
+%           unitcon(<unit>,'toon') toont compatibele eenheden
+%           [factor,Info] = unitcon(<unit>);
+%                Info: struct with all info
+%
+%   werd hernoemd door de "nieuwe" ctrlguis/unitconv-functie
 
 persistent UNITinfo
 if isempty(UNITinfo)
@@ -74,10 +82,10 @@ if isempty(UNITinfo)
 	addunit('bar','M1L-1T-2',1e5)
 	addunit('atm','M1L-1T-2',101325)	% fysisch
 	addunit('at','M1L-1T-2',98066.5);	% technisch
-	addunit('mmHg','M1L-1T-2',133.322368421)
-	addunit('inHg','M1L-1T-2',3386.38815789)	% afh van in en mmHg
+	addunit('mmHg','M1L-1T-2',13595.1*9.80665/1000)
+	addunit('inHg','M1L-1T-2',3386.38815789)	% afh van in en mmHg - in feite temperatuursafhankelijk!! (https://en.wikipedia.org/wiki/Inch_of_mercury)
 	addunit('psi','M1L-1T-2',unitcon('lbf/in^2'))
-	addunit('torr','M1L-1T-2',133.322368421)	% ? gelijk aan mmHg ?
+	addunit('torr','M1L-1T-2',101325/760)	% oorspronkelijk zelfde als mmHg, maar niet meer exact na herdefinities
 	
 	addunit('Wb','M1L2A-1T-2',1)
 	addunit('T','M1A-1T-2',1)

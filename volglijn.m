@@ -27,7 +27,6 @@ function [varargout] = volglijn(lvar,lvast,lvolg,varargin)
 %          's' : toon andere figuren
 %          'C' : sluit figuren
 %          't' : toon punt
-%          'P' : zet punt van op het midden van de Y/t graph(lvariabel)
 %          'S' : stop volg (zelfde als volglijn stopvolg)
 %          'R' : herstart (restart) volg (zelfde als volglijn volgopnieuw)
 %          'L' : make markers to the right limit
@@ -65,12 +64,35 @@ function [varargout] = volglijn(lvar,lvast,lvolg,varargin)
 %    usable via "test-code" (see testkeyhandler)
 %    This can be finalized (by changing the keypress-handler, and removing
 %    a lot of code(!).
-% - delete-function bij marker-lijnen
+%    At least the combination of upd_lijn en bLimAxes werkt niet altijd
+%    correct.
+% - een volgende opkuis(/modernisering) is het vervangen van een aantal
+%   "volglijn(<command>)" door lokale functies.  Let er wel op dat het
+%   externe gebruik ervan moet mogelijk blijven!!!
 % - mogelijkheid om XY-plot te zoomen naar getoonde deel in Y/t plots
 %   en/of volledige track (zeker bij "belgie-mode")
-% - nog een "oude manier" is gebruikt voor callback functies (volglijn(<...>)
-%   dit wordt beter aangepast
-% - mogelijkheid tot weghalen van pointer lines
+
+% cGenKeyPressHandler-werking: (of toch de problemen ervan)
+% volglijn - cGenKeyHandler (transitie)
+% 	'f'	--> werkt niet (gaat naar een verkeerde plaats?)
+% 	'v'	--> geen effect?
+% 			--> werkt wel, maar updating zelf kijkt enkel naar XY-plot?!
+% 				bLimAxes-part doesn't exist!!!!
+% 	'L'	--> (bijna) geen effect?
+% 	'ctrl-A' --> geen effect? 	(via funKey)!!!!
+%       ---> funKey werkt gewoon niet samen met cGenKeyPressHandler
+%                 ??? daar ook implementeren ???
+%                     neen - voeg zaken toen aan cGenKeyPressHandler-object
+% 	'ctrl-R' --> geen effect? of toch?
+%
+% (comments found somewhere else in this file....
+% check well before replacing old key-handling!!
+% don't forget
+%       - error-handling (auto-stop volglijn)
+%       - reset pointer lines - does it work well in "old version"?
+%                 (RemakePtrLines - ctrl-R <-> shift-L)
+%       - use of fupdate (see use in GPS_PhotoViewer)
+
 
 if nargin && ischar(lvar)
 	switch lower(lvar)
@@ -97,6 +119,7 @@ try
 	nMinPts=4;
 	dxl=[];
 	f=gcbf;
+	[bStartVolg] = true;	% (!!!) no setoptions used?!!!
 	if isempty(f)
 		f=gcf;
 	end
@@ -190,7 +213,7 @@ try
 			VL1=cell(1,length(lvast));	% start with cell(!)
 			for i=1:length(lvast)
 				VL1{i}=double(get(lvast(i),'XData_I'))+1i*double(get(lvast(i),'YData_I'))*VLDy;	% XData_I always available? (maybe from Matlab Rxxxx?)
-					% XData_I to (try to) make geoaxes possible
+					% XData_I to make geoaxes possible
 				VL1{i}=VL1{i}(:);
 			end
 			N=cellfun('length',VL1);
@@ -221,10 +244,12 @@ try
 		end
 		set(fvast	...
 			,'WindowButtonDownFcn','volglijn'	...
-			,'WindowButtonMotionFcn','volglijn'	...
 			,'KeyPressFcn','volglijn(''key'')'	...
 			...,'DeleteFcn','volglijn(''clearall'');delete(gcf)'	...
 			)
+		if bStartVolg
+			set(fvast,'WindowButtonMotionFcn','volglijn')
+		end
 		l=FindLines(fvar,[],length(VLvx));	% refinding lvar's?!
 		set(l,'ButtondownFcn',@PtSelectedT)
 		axes(VLa)
@@ -423,11 +448,7 @@ try
 					case 'f'
 						upd_lijn=true;
 						i=findclose(mean(xl),VLvx);
-					case 'P'	% ga naar punt van lvar
-						ax=get(VLl(1),'Parent');
-						xl=get(ax,'XLim');
-						i=findclose(VLvx,mean(xl));
-						upd_lijn=true;
+					%case 'P'	% ga naar punt van lvar - the same as 'f'?!! ==> removed
 					case 'L'	% remake pointer lines
 						set(VLl,'Visible','off')
 						ax=get(VLl,'Parent');
@@ -441,6 +462,7 @@ try
 						if iscell(ff)
 							ff = [ff{:}];
 						end
+						% force redraws
 						addpunt(ff)
 						drawnow
 						verwpunt(ff)
@@ -875,16 +897,6 @@ else	% assume geoaxes
 	geolimits(ax,xl,yl)
 end
 
-%%!!!!!!!!!!!!!!!!!!this is "preparing work" to replace integrated key-press
-% try this code with:
-%        volglijn testkeyhandler
-% check well before replacing old key-handling!!
-% don't forget
-%       - error-handling (auto-stop volglijn)
-%       - reset pointer lines - does it work well in "old version"?
-%                 (RemakePtrLines - ctrl-R <-> shift-L)
-%       - use of fupdate (see use in GPS_PhotoViewer)
-
 function Zoom(f,facT,facXY)
 S = getappdata(f,'volglijn_S');
 i = getappdata(S.VLl(1),'VL_i');
@@ -962,13 +974,9 @@ figure(S.fvast)
 function FindPt(f,typ)
 S = getappdata(f,'volglijn_S');
 switch typ
-	case 'centre'
+	case 'centre'	% go to point in the middle of the "var-axes"
 		xl = S.lvar(1).Parent.XLim;
-		i = findclose(mean(xl),VLvx);
-	case 'vis'	% ga naar punt van lvar
-		ax = get(S.VLl(1),'Parent');
-		xl = get(ax,'XLim');
-		i = findclose(S.VLvx,mean(xl));
+		i = findclose(mean(xl),S.VLvx);
 	otherwise
 		error('Unknown type of FindPt!')
 end
@@ -1098,8 +1106,7 @@ CHARs = {	...
 	'S',@(f,~) volglijn('stopvolg'),[],'stop following';
 	'R',@(f,~) volglijn('volgopnieuw'),[],'restart following';
 	'v',@(f,~) volglijn('togglevolg'),[],'start/stop keeping marker in the middle';
-	'f',@(f,~) FindPt('centre'),[],'find centre point';
-	'P',@(f,~) FindPt('vis'),[],'';
+	'f',@(f,~) FindPt(f,'centre'),[],'find centre point in Y/t-graphs';
 	'L',@(f,~) RemakePtrLines(f,'marker'),[],'remake marker lines';
 	'M',@(f,~) volglijn('addlogpts'),[],'show/toggle logged points';
 	'C',@Close,[],'Close figures';
@@ -1128,4 +1135,23 @@ KEYs = {	...
 	'end',@(f,~) MoveFocusPt(f,[0 0]),[],'';
 	'escape',@(f,~) Zoom(f,'auto'),[],'automatic axes in XY-graph';
 	};
+if ~isprop(gca,'XLim')
+	KEYs = [KEYs;{	...
+		'rightarrow',@(f,~) ScrollGeo(f,0.1,0),'control','';
+		'leftarrow',@(f,~) ScrollGeo(f,-0.1,0),'control','';
+		'uparrow',@(f,~) ScrollGeo(f,0,0.1),'control','';
+		'downarrow',@(f,~) ScrollGeo(f,0,-0.1),'control','';
+		}];
+end
 cGenKeyPressHandler(f,'keys',KEYs,'char',CHARs);
+
+function ScrollGeo(f,dx,dy)
+ax = gca(f);
+[yl,xl] = geolimits(ax);
+if dx~=0
+	xl = xl+diff(xl)*dx;
+end
+if dy~=0
+	yl = yl+diff(yl)*dy;
+end
+geolimits(ax,yl,xl)

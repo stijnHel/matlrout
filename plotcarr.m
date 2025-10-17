@@ -66,15 +66,15 @@ if isempty(bits)
 		end
 	%	error('carrier moet positief zijn');
 	end
-	bits=zeros(length(c),ceil(log2(max(c))));
+	bits=zeros(length(c),nextpow2(max(c)));
 	nBit=0;
 	while any(c)
 		nBit=nBit+1;
-		bits(:,nBit)=rem(c,2);
-		c=floor(c/2+0.1);
+		bits(:,nBit)=bitand(c,1);
+		c=bitshift(c,-1);
 	end
 	if size(bits,2)<nBit
-		bits=bits(:,1:nBit);
+		bits=bits(:,1:nBit);	% possible?
 	end
 end
 if isempty(bits)

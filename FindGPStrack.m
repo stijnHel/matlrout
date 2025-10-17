@@ -5,6 +5,9 @@ function tracks = FindGPStrack(Pts,maxD,varargin)
 %                 coordinates in degrees
 %            maxD: max tolerance (in (approximately) meters
 
+% Add minimum distance found (and index?)
+%    and maybe some extra ("summarizing data")?
+
 d = [];
 dPath = [];
 fTyp = '.fit';

@@ -478,5 +478,10 @@ elseif c==1	% ctrl-A - analyse based on markers
 			,l/1000,dt/3600,v*3.6	...
 			)
 	end
+elseif c=='?'
+	fprintf('AnalyseGPSdata key-handling:\n')
+	fprintf('   "W"     : set positions of windows to a preset location\n')
+	fprintf('   "ctrl-A": analysis part between markers\n')
+	fprintf('    "?"    : this help-data\n')
 end
 end		% MyKeyHandling

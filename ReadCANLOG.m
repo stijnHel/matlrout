@@ -10,6 +10,7 @@ function X=ReadCANLOG(fName,typ,varargin)
 
 [bCANOPEN] = false;
 [optsUnused] = {};
+[extraArgs] = {};
 if isstruct(fName) && length(fName)>1 && isfield(fName,'data')
 	% Log from "IXXAT-CAN-msg-struct" (see IXXATcom)
 	fid = [];
@@ -32,6 +33,8 @@ else
 				else
 					typ='busmaster';
 				end
+			case '.txt'	% KVaser (CanKing-txt-log)
+				typ = 'kvaser_txt';
 			case '.asc'
 				typ='vector';
 			case '.mat'
@@ -42,7 +45,7 @@ else
 		end		% switch
 	end		% no given type
 	if nargin>2
-		[~,~,optsUnused]=setoptions([2,0],{'bCANOPEN'},varargin{:});
+		[~,~,optsUnused]=setoptions([2,0],{'bCANOPEN','extraArgs'},varargin{:});
 	end
 end
 CHAN=1;
@@ -131,7 +134,7 @@ switch lower(typ)
 			D = cell2mat(DD(10:17,2:end));
 		end
 	case 'vector'
-		[X,~,Dcmt] = leescana(fid);
+		[X,~,Dcmt] = leescana(fid,extraArgs{:});
 		t0 = [];
 		T = X(:,10);
 		TS = X(:,10);
@@ -217,6 +220,41 @@ switch lower(typ)
 		if nF<length(F)
 			F=F(1:nF);
 		end
+		Dextra = F;
+	case 'kvaser_txt'
+		lHead = fid.fgetl();
+		if length(lHead)~=75
+			warning('Different header line than expected!')
+		end
+		fPos = fid.ftell();
+		l1 = fid.fgetl();
+		fid.fseek(fPos,'bof');
+		x = fid.fread([length(l1)+2 Inf],'*char');
+		if strcmp(x(1:7,end)','Logging')
+			x(:,end) = [];
+		end
+		CHAN = x(2,:)'-'0';
+		ID = str2num(x(3:14,:)'); %#ok<ST2NM> 
+		F = x(16:18,:)';
+		DLC = x(24,:)'-'0';
+		B = DLC<0;
+		if any(B)
+			D = zeros(length(ID),8,'uint8');
+			D(~B,:) = uint8(str2num(x(26:56,~B)')); %#ok<ST2NM> 
+		elseif all(DLC==DLC(1))
+			D = uint8(str2num(x(26:56,:)')); %#ok<ST2NM> 
+		else
+			D = zeros(8,length(DLC));
+			for i=1:length(DLC)
+				d1 = uint8(str2num(x(26:56,i)'));
+				D(1:length(d1),i) = d1;
+			end
+		end
+		T = str2num(x(57:71,:)'); %#ok<ST2NM> 
+		t0 = T(1);
+		TS = T-t0;
+		Dir = x(73,:)';
+		Dextra = struct('Flags',F,'Dir',Dir);
 	case 'candump'
 		nMax = round(fid.length()/22);
 		T = zeros(nMax,1);

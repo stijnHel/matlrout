@@ -20,6 +20,9 @@ classdef cGeography < handle
 	%      see https://gadm.org/download_country_v3.html for information
 	%           --> choose "shapefile"
 
+	%!!!!!!!!!!!!!!!!! variatie in coordinaten [N,E] <=> [E,N]
+	%         GetCommunity <-> FindCommunity !!!!?????!!!
+
 	% NE --> P --> NE geeft niet het oorspronkelijke resultaat!
 	%   bij Long==0 ==> geen (belangrijke) fout
 	%   Bij long~=0 ==> fout op N (100 km --> 2.6 m)
@@ -91,6 +94,8 @@ classdef cGeography < handle
 		end		% Handle all inputs of object creation
 
 		function [com,cntry,coor,border] = FindCommunity(c,pt,cntry)
+			%FindCommunity - Find to which community a point belongs
+			%      [com,cntry,coor,border] = c.FindCommunity(pt[,cntry])
 			if nargin<=2 || isempty(cntry)	% search in all (known) countries
 				COUNTRIES = fieldnames(c.Countries);
 			elseif ischar(cntry)	% search in a specific country
@@ -213,7 +218,47 @@ classdef cGeography < handle
 		end		%GetCountryData
 
 		function [P,Pborder] = GetCommunity(c,cntry,com)
-			X = c.GetCountry(cntry,nargout>1);
+			%GetCommunity - Get the coordinates of a community
+			%    [P,Pborder] = GetCommunity(c,cntry,com)
+			%    [P,Pborder] = GetCommunity(c,[],com)
+			%    [P,Pborder] = GetCommunity(c,com)
+
+			if nargin<3
+				com = [];
+			end
+			if isstring(cntry)
+				if cntry.contains(':')
+					S = cntry.split(':');
+					cntry = S(1);
+					com = S(2);
+				end
+			elseif ischar(cntry)
+				if any(cntry==':')
+					S = regexp(cntry,':','split');
+					cntry = S{1};
+					com = S{2};
+				end
+			end
+			if isempty(com)
+				com = cntry;
+				cntry = [];
+			end
+			if isempty(cntry)
+				cntries = fieldnames(c.Countries);
+				k = [];
+				for i=1:length(cntries)
+					X = c.Countries.(cntries{i});
+					[~,k] = FindName(X.Names,com);
+					if ~isempty(k)
+						break
+					end
+				end
+				if isempty(k)
+					error('Community not found in available countries!')
+				end
+			else
+				X = c.GetCountry(cntry,nargout>1);
+			end
 			[~,i] = FindName(X.Names,com);
 			if isempty(i)
 				error('Not found!')
@@ -228,6 +273,7 @@ classdef cGeography < handle
 		end		% GetCommunity
 
 		function bInCom = PtInCommunity(c,cntry,com,pt)
+			%PtInCummunity - checks if a point is within the borders of a community
 			[~,P] = c.GetCommunity(cntry,com);
 			P = (P-pt)*[1;1i];
 			ii = find(isnan(P));
@@ -301,14 +347,17 @@ classdef cGeography < handle
 				Long = Lat(:,2);
 				Lat = Lat(:,1);
 			end
-			if isempty(Z1)
+			if isempty(Z1) && ~isempty(c.lastXYZ0)
 				XYZ0 = c.lastXYZ0;
 				Xe = c.lastXe;
 				Xn = c.lastXn;
 			else
-				if length(Z1)==3
+				if isempty(Z1) && isempty(c.lastXYZ0)
+					Z1 = [mean(Lat),mean(Long)];
+				end
+				if length(Z1)==3	% XYZ coordinates as reference frame
 					XYZ0 = Z1(:)';
-				else
+				else	% geographical coordinates as reference frame
 					XYZ0 = c.CalcXYZ(Z1(1),Z1(2));
 				end
 				c.lastXYZ0 = XYZ0;
@@ -317,7 +366,7 @@ classdef cGeography < handle
 			XYZ = c.CalcXYZ(Lat(:),Long(:),H);
 			
 			dP = XYZ-XYZ0;
-			XY = dP*[Xn',Xe'];	% ? first column north (to be consistent with angle based (on normally used)
+			XY = dP*[Xn',Xe'];	% ? first column north (to be consistent with angle order (normally used))
 			if nargout>1
 				Z = dP*cross(Xe,Xn)';
 			end
@@ -402,7 +451,27 @@ classdef cGeography < handle
 			c.lastXe = Xe;
 			c.lastXn = Xn;
 		end		% GetRefFrame
-		end		% methods
+
+		function [d,d_a] = CalcDistance(c,p1,p2)
+			%CalcDistance - Calculate distance between 2 points
+			%      [d,d_a] = c.CalcDistance(p1,p2)
+			%           p<i> can be coordinates or names or {country,cummunity}
+			% (simple spherical calculation!!)
+
+			if iscell(p1)
+				p1 = c.GetCommunity(p1{:});
+			elseif isstringlike(p1)
+				p1 = c.GetCommunity(p1);
+			end
+			if iscell(p2)
+				p2 = c.GetCommunity(p2{:});
+			elseif isstringlike(p2)
+				p2 = c.GetCommunity(p2);
+			end
+			d_a = calcdangd(p1,p2);
+			d = d_a*pi/180*c.a;
+		end		% CalcDistance
+	end		% methods
 end		% cGeography
 
 

@@ -63,7 +63,10 @@ classdef cStatus < handle
 			c.bStopRequest=true;
 		end
 		
-		function bStop=status(c,f)
+		function bStop=status(c,f,nTot)
+			if nargin>2
+				f = double(f)/double(nTot);	% (double to avoid problems with integer values)
+			end
 			status(f)
 			if nargout>0
 				bStop=c.bStopRequest;

@@ -9,6 +9,13 @@ classdef cGenKeyPressHandler < handle
 	%   2. direct configuration
 	%        cGenKeyPressHandler(fig,'Keys',{<key>,<fcn>,<mod>,<help-text>;...})
 	%
+	%       mod: if empty - discard modifier keys
+	%           !!!!!!!!!!!!!!!!!!!!!!!!!!! this is not yet implemented !!!!!!!!!!!!!!
+	%                      !!!!     (implemented but not tested)  !!!!
+	%            if numeric: only handle without any modifier
+	%            if char: this modifier key must have been pressed
+	%            if cell-vector: all given modifier keys must be pressed
+	%
 	%  by default, a "help-functionality" is implemented ("F1")
 	%     can be overridden (by adding Key-handler for 'F1')
 	%
@@ -27,7 +34,8 @@ classdef cGenKeyPressHandler < handle
 
 	% to do:
 	%     - some code is made to handle modifiers (shift, ctrl, ...) but
-	%       without any functionality.  This should be added
+	%       (possibly) not fully functional
+	%     - Keys handle multiple modifiers better thanb Chars!
 
 	% ideas:
 	%     - add property to make help-window a modal dialog
@@ -72,8 +80,12 @@ classdef cGenKeyPressHandler < handle
 
 		function AddKey(c,k,f,mod,help)
 			%AddKey - Add (or replace) key handler
+			%       c.AddKey(<key>,<function>,<modifier>,<help-string>)
 			K = struct('key',k,'fcn',f,'mod',[],'help','');
 			if nargin>3
+				if isstringlike(mod)
+					mod = {mod};
+				end
 				K.mod = mod;
 			end
 			if nargin>4
@@ -84,11 +96,12 @@ classdef cGenKeyPressHandler < handle
 			else
 				B = strcmp({c.Keys.key},k);
 				if any(B)
-					if sum(B)>1
-						error('Sorry, keys with different modifiers is not (yet) implemented!\n')
+					Bm = CheckModifiers(c.Keys(B),K);
+					if any(Bm)
+						ii = find(B);
+						c.Keys(ii(Bm)) = K;
 					else
-						%(!!) check modifiers!
-						c.Keys(B) = K;
+						c.Keys(end+1) = K;
 					end
 				else
 					c.Keys(end+1) = K;
@@ -98,11 +111,15 @@ classdef cGenKeyPressHandler < handle
 
 		function AddChar(c,ch,f,mod,help)
 			%AddChar - Add (or replace) char-handler
+			%       c.AddChar(<char>,<function>,<modifier>,<help-string>)
 			if isnumeric(ch)	% assuming ASCII code
 				ch = char(ch);
 			end
 			C = struct('char',ch,'fcn',f,'mod',[],'help','');
 			if nargin>3
+				if isstringlike(mod)
+					mod = {mod};
+				end
 				C.mod = mod;
 			end
 			if nargin>4
@@ -149,17 +166,13 @@ classdef cGenKeyPressHandler < handle
 			%HandleEvent - the base functionality of key-handling
 			if ~isempty(c.Keys)
 				B = strcmp({c.Keys.key},ev.Key);
-				if any(B)
-					% modifies are discarded !!!
-					c.Keys(B).fcn(fig,ev.Key)
+				if any(B) && HandleEvent(fig,c.Keys(B),ev)
 					return
 				end
 			end
 			if ~isempty(c.Chars) && ~isempty(ev.Character)
 				B = strcmp({c.Chars.char},ev.Character);
-				if any(B)
-					% modifies are discarded !!!
-					c.Chars(B).fcn(fig,ev.Character)
+				if any(B) && HandleEvent(fig,c.Chars(B),ev)
 					return
 				end
 			end
@@ -226,3 +239,35 @@ for i=1:length(CC)
 	C{j} = sprintf('"%s": %s\n',K,HH{i});
 end
 end		% AddHelpLines
+
+% why is this a local function (and not of ../HandleEvent)?
+function bHandled = HandleEvent(fig,spec,ev)
+	bHandled = false;
+	if isscalar(spec) && isempty(spec.mod)
+		spec.fcn(fig,ev);
+		bHandled = true;
+	else
+		for i=1:length(spec)
+			if (isnumeric(spec(i).mod) && isempty(ev.Modifier))	...allow any modifier(!!)
+					|| isequal(sort(ev.Modifier),sort(spec(i).mod))
+				spec(i).fcn(fig,ev)
+				bHandled = true;
+				break
+			end		% match found
+		end		% for i
+	end
+end		% HandleEvent
+
+function B = CheckModifiers(Sold, Snew)
+if isempty(Snew.mod)
+	B = cellfun('isempty',{Sold.mod});
+else
+	B = false(1,length(Sold));
+	for i=1:length(Sold)
+		if length(intersect(Sold(i).mod,Snew(i).mod))==length(Snew.mod)
+			B(i) = true;
+			break
+		end
+	end
+end
+end		% CheckModifiers

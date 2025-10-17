@@ -9,6 +9,36 @@ if nargin>1
 	setoptions({'bRawData'},varargin{:})
 end
 
+if isstruct(fName) && length(fName)>1
+	E = cell(length(fName),5);
+	for i=1:length(fName)
+		[E{i,:}] = leesISF(fName(i));
+	end
+	e = E(:,1);
+	ne = E(:,2);
+	de = E(:,3);
+	e2 = E(:,4);
+	gegs = E(:,5);
+	return
+elseif iscell(fName) && length(fName)==2 && isnumeric(fName{1})
+	E = cell(length(fName{2}),5);
+	for i=1:length(fName)
+		[E{i,:}] = leesISF(sprintf('T%04dCH%d.ISF',fName{1},fName{2}(i)));
+		if length(E{i,2})==2 && strcmp(E{i,2}(2),'ENV')
+			E{i} = E{i}(:,1);
+			E{i,2} = E{i,2}{1};
+			E{i,3} = E{i,3}{1};
+			E{i,5} = E{i,5}(1);
+		end
+	end
+	e = [E{:,1}];
+	ne = E(:,2);
+	de = E(:,3);
+	e2 = E(:,4);
+	gegs = E(:,5);
+	return
+end
+
 fid = fopen(fFullPath(fName,true,'.ISF'));
 x = fread(fid,[1 Inf],'*int8');
 fclose(fid);

@@ -5,12 +5,13 @@ function [X,nX,Dextra,Dhead]=leescana(fn,varargin)
 %              nMax : maximum number of data-lines
 
 nMax=1e12;
+[bSimpleHead] = false;
 
 if nargin>1
-	setoptions({'nMax'},varargin{:})
+	setoptions({'nMax','bSimpleHead'},varargin{:})
 end
 
-if ischar(fn) || (isstruct(fn) && isfield(fn,'datenum'))
+if isstringlike(fn) || (isstruct(fn) && isfield(fn,'datenum'))
 	fid=fopen(fFullPath(fn),'rt');
 	if fid<3
 		fid=fopen(fn,'rt');
@@ -18,49 +19,60 @@ if ischar(fn) || (isstruct(fn) && isfield(fn,'datenum'))
 			error('Kan file niet openen')
 		end
 	end
+	bMyFile = true;
 else
-	fid=fn;
+	fid = fn;
+	bMyFile = false;
 end
 fseek(fid,0,'eof');
 flen=ftell(fid);
 fseek(fid,0,'bof');
 
-x1='';
-xs='';	% not used - replaced by Dhead?
-CR=char([13 10]);
-Dhead = struct();
-Dextra = struct('t',cell(0,1),'CAN',0,'type','','data',[]);
-while ~strcmpi(x1(1:min(end,5)),'begin')||~strcmpi(x1(1:min(end,5)),'start')
-	x1=fgetl(fid);
-	[w,~,~,in] = sscanf(x1,'%s',1);
-	if any(strcmpi(w,{'begin','start'}))
-		x1 = x1(in:end);
-		[w,~,~,in] = sscanf(x1,'%s',1);
-		Dhead.begin = struct('typ',w,'t',datenum(x1(in+4:end)));
-		break
+if bSimpleHead
+	fgetl(fid);	% skip first line
+	l = 'a';
+	while ~isempty(l)
+		l = fgetl(fid);
 	end
-	if strcmpi(w,'date')
-		Dhead.date = datenum(x1(in+4:end));
-	elseif strcmpi(w,'base')
-		w = regexp(x1,' ','split');
-		i = 1;
-		while i<length(w)
-			if isempty(w{i})
-				i = i+1;
-			else
-				Dhead.(w{i}) = w{i+1};
-				i = i+2;
+	Dextra = [];
+else
+	x1='';
+	xs='';	% not used - replaced by Dhead?
+	CR=char([13 10]);
+	Dhead = struct();
+	Dextra = struct('t',cell(0,1),'CAN',0,'type','','data',[]);
+	while ~strcmpi(x1(1:min(end,5)),'begin')||~strcmpi(x1(1:min(end,5)),'start')
+		x1=fgetl(fid);
+		[w,~,~,in] = sscanf(x1,'%s',1);
+		if any(strcmpi(w,{'begin','start'}))
+			x1 = x1(in:end);
+			[w,~,~,in] = sscanf(x1,'%s',1);
+			Dhead.begin = struct('typ',w,'t',datenum(x1(in+4:end)));
+			break
+		end
+		if strcmpi(w,'date')
+			Dhead.date = datenum(x1(in+4:end));
+		elseif strcmpi(w,'base')
+			w = regexp(x1,' ','split');
+			i = 1;
+			while i<length(w)
+				if isempty(w{i})
+					i = i+1;
+				else
+					Dhead.(w{i}) = w{i+1};
+					i = i+2;
+				end
 			end
 		end
-	end
-	if feof(fid)
-		fclose(fid);
-		error('Kan begin van data niet vinden');
-	end
-	if isempty(xs)
-		xs=x1;
-	else
-		xs=[xs CR x1];
+		if feof(fid)
+			fclose(fid);
+			error('Kan begin van data niet vinden');
+		end
+		if isempty(xs)
+			xs=x1;
+		else
+			xs=[xs CR x1];
+		end
 	end
 end
 X=[];
@@ -82,9 +94,13 @@ while ~feof(fid)
 			i = i-1;
 		end
 		if x1(i+1)>='9'		% no digit
-			n = n-1;
-			a1(3) = [];
-			in = i+1;
+			if x1(i+1)=='x'	% extended
+				in = i+1;
+			else
+				n = n-1;
+				a1(3) = [];
+				in = i+1;
+			end
 		end
 	end
 	bTx = 0;
@@ -140,7 +156,9 @@ while ~feof(fid)
 						P{2,i} = strtrim(P{1,i}(j+2:end));
 						P{1,i} = strtrim(P{1,i}(1:j-2));
 					else
-						warning('Something wrong!! (%s)',a1)
+						%warning('Something wrong!! (%s)',a1)
+						P{2,i} = P{1,i};
+						P{1,i} = sprintf('raw%d',i);
 					end
 				end
 				Dextra(end).data = struct(P{:});
@@ -224,7 +242,7 @@ end		% while ~feof(fid)
 p1=ftell(fid);
 fseek(fid,0,'eof');
 p2=ftell(fid);
-if ischar(fn)
+if bMyFile
 	fclose(fid);
 end
 if p1<flen

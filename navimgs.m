@@ -63,6 +63,8 @@ function varargout=navimgs(varargin)
 %        or navimgs('transpose',0/1) to set it on or off
 %      navimgs raw2color - converts raw images (Bayer pattern) to colour
 %                        images (uses convRaw2Color)
+%      navimgs('setImgTfcn',@fcn) - install image transform function
+%      navimgs('setImgTfcn',cTx) - install image transform class
 %      navimgs zoom ['x'/'y'/'xy'(default) - set zooming on (standard off)
 %      navimgs('axscale',[xmin xmax],[ymin ymax])
 %                     or navimgs('axscale',[xmin xmax ymin ymax])
@@ -361,6 +363,8 @@ if isstruct(D)||isobject(D)||iscell(D)||ischar(D)||(isnumeric(D)&&~ismatrix(D))
 				setappdata(f,'NVimgFExt',varargin{2});
 			case 'setfdir'
 				setappdata(f,'NVimgDest',varargin{2})
+			case 'setimgtfcn'
+				setappdata(f,'ImgTranformData',varargin{2})
 			case 'transpose'
 				if nargin>1
 					b=varargin{2};
@@ -860,8 +864,8 @@ if ~bDone
 				for i=1:length(axSets)
 					set(ax1,axSets{i},get(ax0,axSets{i}))
 				end
-				xlabel(get(get(ax0,'XLabel'),'String'))
-				ylabel(get(get(ax0,'YLabel'),'String'))
+				xlabel(get(get(ax0,'XLabel'),'String'),'Interpreter','none')
+				ylabel(get(get(ax0,'YLabel'),'String'),'Interpreter','none')
 			else
 				h1=getappdata(f1,'hImage');
 				set(h1,'CData',X)

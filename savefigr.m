@@ -89,8 +89,8 @@ if isempty(pos)
 end
 [~,~,fext]=fileparts(fname);
 if isempty(fext)
-	fname=[fname '.eps'];
-	fext='.eps';
+	fname=[fname '.png'];
+	fext='.png';
 end
 bNoCrop = false;
 switch lower(fext)

@@ -34,7 +34,7 @@ if nargin<5
 	end
 end
 
-if min(size(X0))>1
+if min(size(X0))>1	% multiple points in a matrix
 	lMax=lMin;
 	if nargin<3
 		lMin=[];
@@ -47,7 +47,7 @@ if min(size(X0))>1
 	else	% multiple line segments given
 		d=Inf;
 		for i=1:size(X0,1)-1
-			[d1,l1]=CalcDistPtLine(Xp,X0(i,:),X0(i+1,:));
+			[d1,l1]=CalcDistPtLine(Xp,X0(i,:),X0(i+1,:),0,1);
 			if d1<d
 				d=d1;
 				l=l1+i;

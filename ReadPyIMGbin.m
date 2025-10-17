@@ -72,10 +72,12 @@ fid = fopen(fName);
 x = fread(fid,[1 Inf],'*uint8');
 fclose(fid);
 
+PossibleTypes = {'VIDEObin','VIDEOstream','REALSENSEbin'};
+
 [typ,ix] = ReadString(x,0);
-if ~startsWith(typ,'VIDEObin') && ~startsWith(typ,'VIDEOstream')
+if ~any(startsWith(PossibleTypes,typ))
 	%(!!!)VIDEOstream contains multile images!!!!
-	error('Unexpected start!')
+	error('Unexpected start! (%s)',typ)
 end
 D = struct('type',typ);
 while ix<length(x)
@@ -147,6 +149,10 @@ switch dtyp
 end
 ixn = ix+4*ndim;
 siz = typecast(x(ix+1:ixn),'uint32');
+if ndim>=2 && siz(2)==0	% normally not possible - maybe 64-bit sizes
+	ixn = ix+8*ndim;
+	siz = typecast(x(ix+1:ix+8*ndim),'uint64');
+end
 ix = ixn;
 ixn = ix+prod(siz)*nB;
 d = x(ix+1:ixn);

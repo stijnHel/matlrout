@@ -85,8 +85,14 @@ classdef CPYT_Img_streamer < handle
 				if ~c.b_const_datasize && nr>1
 					if c.StartsImgs(nr)
 						c.f.fseek(c.StartsImgs(nr),'bof');
-					elseif c.b_warned
-						warning('Random access doesn''t work with not constant blocksize!!')
+					else
+						if ~c.b_warned
+							warning('Reading file until requested frame!!')
+							c.b_warned = true;
+						end
+						while c.curFrame<nr-1
+							c.getImage();
+						end
 					end
 				else
 					c.f.fseek(c.headLen+(nr-1)*c.blockSize,'bof');
@@ -121,17 +127,25 @@ classdef CPYT_Img_streamer < handle
 				S.(tag) = D1;
 			end
 			Ximage = S.(c.fldImage);
-			if ndims(Ximage)==3
-				if any(size(Ximage)==3) && size(Ximage,3)~=3
-					if size(Ximage,1)==3
-						Ximage = permute(Ximage,[2,3,1]);
-					else
-						Ximage = permute(Ximage,[1,3,2]);
+			if ndims(Ximage)==3	% rgb
+				if any(size(Ximage)==1) % not really rgb...
+					Ximage = squeeze(Ximage);
+				else
+					if any(size(Ximage)==3) && size(Ximage,3)~=3
+						if size(Ximage,1)==3
+							Ximage = permute(Ximage,[2,3,1]);
+						else
+							Ximage = permute(Ximage,[1,3,2]);
+						end
 					end
+					Ximage = Ximage(:,:,[3 2 1]);	% BGR --> RGB
 				end
-				Ximage = Ximage(:,:,[3 2 1]);	% BGR --> RGB
 			end
-			t = S.time;
+			if isfield(S,'time')
+				t = S.time;
+			else
+				t = 0;
+			end
 
 			if c.bTranspose
 				if ismatrix(Ximage)
@@ -142,12 +156,23 @@ classdef CPYT_Img_streamer < handle
 			end
 			c.X_last = Ximage;
 			c.curFrame = nr;
-			if nargout>2 && isfield(S,'cam')
-				s = S.cam;
-				if startsWith(s,'exposure:')
-					S.exposure = str2double(s(10:end));
-				elseif startsWith(s,'gain:')
-					S.gain = str2double(s(6:end));
+			if nargout>2
+				if isfield(S,'cam')
+					s = S.cam;
+					if startsWith(s,'exposure:')
+						S.exposure = str2double(s(10:end));
+					elseif startsWith(s,'gain:')
+						S.gain = str2double(s(6:end));
+					end
+				elseif isfield(S,'lens')
+					s = S.lens;
+					if startsWith(s,'zoom:')
+						S.zoom = str2double(s(6:end));
+					elseif startsWith(s,'focus:')
+						S.focus = str2double(s(7:end));
+					elseif startsWith(s,'iris:')
+						S.iris = str2double(s(6:end));
+					end
 				end
 			end
 		end	% getImage
@@ -270,7 +295,11 @@ classdef CPYT_Img_streamer < handle
 					c.fldImage = Tags{i};
 				end
 			end
-			c.posTime = Spos.time;
+			if isfield(Spos,'time')
+				c.posTime = Spos.time;
+			else
+				warning('No time-field?!')
+			end
 			c.posImg = Spos.(c.fldImage);
 			c.nFrames = (c.lFile-c.headLen)/c.blockSize;
 			c.f.fseek(c.headLen,'bof');
@@ -303,6 +332,8 @@ classdef CPYT_Img_streamer < handle
 					ndim = 3;
 					typ = ReadWord(c.f);
 				case 'cam'
+					D = ReadWord(c.f);
+				case 'lens'
 					D = ReadWord(c.f);
 				otherwise
 					warning('Unknown tag! (%s)',tag)

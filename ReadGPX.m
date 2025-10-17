@@ -40,6 +40,11 @@ bTrack = ~isempty(Dgpx.trk);
 S = [];
 if bAnalyse && bTrack
 	S = CombineTracks(Dgpx.trk);
+	if all(S.t==0)
+		v = 10;
+		S.t = datenum(2001,1,1)+S.dCum/v/86400;
+		S.V = zeros(size(S.V))+v;
+	end
 	Dana = AnalyseGPSdata([S.t,S.coor(:,[2 1])],'Altitude',S.H,'bPlot',bPlot,Oextra{1:2,:});
 	flds = fieldnames(Dana);
 	for i=1:length(flds)

@@ -220,10 +220,10 @@ elseif isscalar(varargin{1}) && ~isnumeric(varargin{1}) && ishandle(varargin{1})
 	set(ud(2),'Color',[1 0 0])
 	set(f,'KeyPressFcn','plotui(1)','Pointer','crosshair','UserData',ud)
 	set(ud,'HitTest','off')
-	set(gca,'DrawMode','fast')
+	%set(gca,'DrawMode','fast')
 else
-	if ischar(varargin{1})||(isnumeric(varargin{1})&&min(size(varargin{1}))>1)
-		if ischar(varargin{1})
+	if isstringlike(varargin{1})||(isnumeric(varargin{1})&&min(size(varargin{1}))>1)
+		if isstringlike(varargin{1})
 			fName=varargin{1};
 			[x,map]=imread(fFullPath(fName));
 		else
@@ -262,7 +262,7 @@ else
 		set(ud(2),'Color',[1 0 0])
 		set(f,'KeyPressFcn','plotui(1)','Pointer','crosshair','UserData',ud)
 		set(ud,'HitTest','off')
-		set(gca,'DrawMode','fast')
+		%set(gca,'DrawMode','fast')
 		%warndlg('Dit programmatje is gemaakt zonder veel testen, en werkt dan ook alleen "als alles goed gebeurt".  Raadpleeg Stijn voor het gebruik hiervan.','plotui-waarschuwing')
 	else
 		switch varargin{1}
@@ -442,15 +442,15 @@ else
 			case 'c'	% clear lijn
 				ud=get(gcf,'UserData');
 				lnr=getappdata(gcf,'lijn');
-				set(ud(lnr+2),'EraseMode','normal');
+				%set(ud(lnr+2),'EraseMode','normal');
 				set(ud(lnr+2),'XData',[],'YData',[]);
-				set(ud(lnr+2),'EraseMode','none');
+				%set(ud(lnr+2),'EraseMode','none');
 				UpdateLineInfo1(ud,lnr)
 			case 'C'	% clear alles
 				ud=get(gcf,'UserData');
-				set(ud(2:end),'EraseMode','normal');
+				%set(ud(2:end),'EraseMode','normal');
 				set(ud(2:end),'XData',[],'YData',[]);
-				set(ud(2:end),'EraseMode','none');
+				%set(ud(2:end),'EraseMode','none');
 				lnr=getappdata(gcf,'lijn');
 				UpdateLineInfo1(ud,lnr)
 			case 'h'
@@ -464,9 +464,9 @@ else
 				if ~isempty(x)
 					x(end)=[];
 					y(end)=[];
-					set(l,'EraseMode','normal');
+					%set(l,'EraseMode','normal');
 					set(l,'XData',x,'YData',y)
-					set(l,'EraseMode','none');
+					%set(l,'EraseMode','none');
 					UpdateLineInfo1(ud,lnr)
 				end
 			case 't'
@@ -485,9 +485,9 @@ else
 					status
 					if ~isempty(L)
 						% do something with data?
-						set(l,'EraseMode','normal');
+						%set(l,'EraseMode','normal');
 						set(l,'XData',L(:,1),'YData',L(:,2))
-						set(l,'EraseMode','none');
+						%set(l,'EraseMode','none');
 						UpdateLineInfo1(ud,lnr)
 						assignin('base','Lplotui',L)
 						disp('RunThoughGraph done - result put in Lplotui')
