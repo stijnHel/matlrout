@@ -67,10 +67,13 @@ function varargout=navfig(c,x2,varargin)
 
 % gekende problemen:
 %   bij 'x' of 'd' --> enkel waarden gegeven van lijnen "rond" de x-waarde,
-%        niet buiten (onderandere voor vermijden van moeilijkheden met
-%        korte streepjes)
-%        bij 'd' geeft dit problemen als aantallen wisselen
+%      niet buiten (onderandere voor vermijden van moeilijkheden met korte streepjes)
+%      bij 'd' geeft dit problemen als aantallen wisselen
 %   bij extra keys: in help-fcn worden "overruled" keys dubbel gegeven!
+%   bij addkey wordt dit voor alle gelinkte pagina's gedaan.  Is dit OK?
+%      misschien selecteerbaar maken?
+%   momenteel is "help-tekst" niet beschikbaar bij addkey.  Dit zou
+%      toegevoegd moeten worden.
 
 % toetsen-betekenissen :
 %    'l' : scroll naar links (halve pagina)
@@ -368,6 +371,7 @@ if ischar(c)&&length(c)>1
 				setappdata(f1,'NAVFIGkey',x2)
 			end
 		case {'addkey','addkey1'}
+			% key is added for all linked files - is this OK?
 			if strcmpi(c,'addkey1')||(	...
 					isstruct(NAVFIGsets)&&isfield(NAVFIGsets,'bLinkKeys')	...
 					&&NAVFIGsets.bLinkKeys)
@@ -1557,7 +1561,7 @@ if ~reedsverwerkt
 				'"i" : zoom in (half scale), "I" zoom in 9/10 scale',newline,	...
 				'"o" : zoom out (double scale), "O" zoom in 10/9 scale',newline,	...
 				'"l" : go left (1/2 screen), "L"  go left (full screen)',newline,	...
-				'"r" : go left (1/2 screen), "L"  go left (full screen)',newline,	...
+				'"r" : go right (1/2 screen), "R"  go right (full screen)',newline,	...
 				'"<--"/"-->" go left/right (1/50 screen)',newline,	...
 				'"X" : full measurement view',newline,	...
 				'"F" : plot FFT''s (showed part)',newline,	...
@@ -1674,9 +1678,13 @@ if ~reedsverwerkt
 			end
 			doebepfig=1;
 		case 7	% ctrl-g - go to selected point (ref point)
-			ax=get(f,'CurrentAxes');
-			pt=get(ax,'CurrentPoint');pt=pt(1);
-			zt=getappdata(f,'zoomtype');
+			ax = get(f,'CurrentAxes');
+			pt = get(ax,'CurrentPoint');
+			pt = pt(1);
+			if ~isnumeric(x)
+				pt = num2ruler(pt,ax.XAxis);
+			end
+			zt = getappdata(f,'zoomtype');
 			if isempty(zt)
 				zt=1;
 			end

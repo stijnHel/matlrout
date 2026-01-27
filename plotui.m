@@ -178,9 +178,10 @@ elseif ischar(varargin{1})&&any(strcmpi(varargin{1},plotCMDs))
 				error('Only "real images" (#rows,#columns > 1)!')
 			end
 			S=getappdata(f,'schaal');
-			%!!!!!!!!!!!!!!!!!!!!!!!!!not yet exact!!!!!!!!!!!!!
-			px=[ S.X(1)/S.x0(2) 0];px(2)=S.X(2)-S.x0(1)*px(1);
-			py=[-S.Y(1)/S.y0(2) 0];py(2)=S.Y(2)-S.y0(1)*py(1);
+			px=[ S.X(1)/S.x0(2) 0];
+			px(2)=S.X(2)-S.x0(1)*px(1);
+			py=[-S.Y(1)/S.y0(2) 0];
+			py(2)=S.Y(2)-S.y0(1)*py(1);
 			xx=polyval(px,[0.5 sX(2)+0.5]);
 			yy=polyval(py,[0.5 sX(1)+0.5]);
 			image(xx,yy,X);
@@ -574,13 +575,13 @@ end
 if isempty(sch)
 	sch=struct('Atran',eye(2),'x0',[0 1],'y0',[0 1],'X',[1 0],'Y',[1 0]);
 end
-ptconv=(sch.Atran*[pt(:,1)'-sch.x0(1);sch.y0(1)-pt(:,2)'].*[sch.X(1)/sch.x0(2);sch.Y(1)/sch.y0(2)])';
+ptconv=(sch.Atran*[pt(:,1)'-sch.x0(1);sch.y0(1)-pt(:,2)'].*[sch.X(1)/sch.x0(2);sch.Y(1)/sch.y0(2)])'+[sch.X(2),sch.Y(2)];
 
 function pt=calcpixcoor(ptScaled,sch)
 if isempty(sch)
 	sch=struct('Atran',eye(2),'x0',[0 1],'y0',[0 1],'X',[1 0],'Y',[1 0]);
 end
-pt = (ptScaled./[sch.X(1)/sch.x0(2),-sch.Y(1)/sch.y0(2)]) * sch.Atran'	...
+pt = ((ptScaled-[sch.X(2),sch.Y(2)])./[sch.X(1)/sch.x0(2),-sch.Y(1)/sch.y0(2)]) * sch.Atran'	...
 	+ [sch.x0(1),sch.y0(1)];
 
 function [f_C2Z,f_Z2C] = GetConversionFcns(sch)

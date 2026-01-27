@@ -1,5 +1,5 @@
 function Pout=plotplan(T,el)
-%plotplan - plot positie van planten (in cirkelvormige banen!)
+%plotplan - plot positie van planeten (in cirkelvormige banen!)
 
 if ~exist('el','var') || isempty(el)
 	el={'mercurius','venus','aarde','mars','jupiter','saturnus','uranus','neptunus'};

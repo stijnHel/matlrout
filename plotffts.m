@@ -19,7 +19,7 @@ function [fOut,Data] = plotffts(f,varargin)
 %        no use of settings
 %        no use of window(!)
 
-global PLOTFFTsets
+persistent PLOTFFTsets
 
 [bAparteAssen] = false;
 [bTotaalSig] = false;
@@ -27,6 +27,11 @@ global PLOTFFTsets
 
 if isempty(PLOTFFTsets)
 	PLOTFFTsets=DefaultSets();
+end
+
+xScale = PLOTFFTsets.XScale;
+if isempty(xScale)
+	xScale = 1;
 end
 
 if nargin>0&&ischar(f)
@@ -311,7 +316,7 @@ for i=1:n
 		title(axPlot,'Te weinig punten')
 		return
 	end
-	dt=mean(diff(T(j)));
+	dt=mean(diff(T(j)))*xScale;
 	X=get(l(i),'ydata');
 	if bInterpolate
 		if dt>0
@@ -484,6 +489,11 @@ delete(l(end))
 
 function UpdateFFT(ax)
 ch=get(ax,'Children');
+xScale = getappdata(get(ax,'Parent'),'XScale');
+if isempty(xScale)
+	xScale = 1;
+end
+
 xl=xlim;
 for i=1:length(ch)
 	FFTlink=getappdata(ch(i),'FFTlink');
@@ -495,7 +505,7 @@ for i=1:length(ch)
 			try
 				if nPt~=FFTlink.nPt
 					x=x(B);
-					dt=mean(diff(x));
+					dt=mean(diff(x))*xScale;
 					X=(0:length(x)-1)/length(x)/dt;
 					set(FFTlink.hFFT,'XData',X);
 				end
@@ -517,4 +527,4 @@ S=struct('NmaxLijn',50,'NminLength',32,'windowUsed',1	...
 	,'detrend',false,'bHalfFFT',false,'bPlotPhase',false	...
 	,'interpType',[],'bUseLogInLogP',true	...
 	,'bUnwrapPhase',false,'bFreqHz',true		...
-	,'bLogX',false,'bLogY',false,'bNewFigure',true,'bLinkT_Fdomains',false);
+	,'bLogX',false,'bLogY',false,'bNewFigure',true,'bLinkT_Fdomains',false,'XScale',[]);

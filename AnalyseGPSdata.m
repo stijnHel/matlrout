@@ -14,6 +14,10 @@ function [D,NE,V,G,X] = AnalyseGPSdata(X,varargin)
 %    "non-block") being "glued" to the next (or previous) block?!
 %    --> solved(?)
 
+% idee voor functionaliteit:
+%      laat set van punten selecteren (algemeen)
+%      zoek tracks die dicht bij geselecteerde punten gaan (via FindGPStrack)
+
 [bDispAnal] = true;	% display analysis-results (if analysed)
 [bRemoveNonBlocks] = true;	% remove "non-blocks" - too short blocks (currently only start and end)
 [bGPX] = false;

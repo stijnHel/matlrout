@@ -147,13 +147,15 @@ elseif isa(x1,'Simulink.SimulationData.Dataset')
 elseif nArgIn==1
 	F={'%s'};
 	if isvector(x1) && isstring(x1)
-		D = {cellstr(x1(:))};
+		D = cellstr(x1(:));	% just to make it compatible with old code...
 	elseif min(size(x1))>1
-		F=F(1,ones(1,size(x1,2)));
-		D=mat2cell(x1,size(x1,1),ones(1,size(x1,2)));
+		D = cellstr(x1);
+% 		F=F(1,ones(1,size(x1,2)));
+% 		D=mat2cell(x1,size(x1,1),ones(1,size(x1,2)));
 	else
-		D={x1};
+		D=x1;
 	end
+	D = {D};	% 1 list of strings
 else
 	nArg = length(vargs);
 	n = 0;

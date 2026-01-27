@@ -71,6 +71,8 @@ function [varargout] = volglijn(lvar,lvast,lvolg,varargin)
 %   externe gebruik ervan moet mogelijk blijven!!!
 % - mogelijkheid om XY-plot te zoomen naar getoonde deel in Y/t plots
 %   en/of volledige track (zeker bij "belgie-mode")
+% - when geoaxes: make it possible for different map-views:
+%       streets, satellite, topographic, (colorterrain)
 
 % cGenKeyPressHandler-werking: (of toch de problemen ervan)
 % volglijn - cGenKeyHandler (transitie)
@@ -897,7 +899,7 @@ else	% assume geoaxes
 	geolimits(ax,xl,yl)
 end
 
-function Zoom(f,facT,facXY)
+function Zoom(f,facT,facXY,bCenterPt)
 S = getappdata(f,'volglijn_S');
 i = getappdata(S.VLl(1),'VL_i');
 xd = get(S.VLl(1),'xdata');
@@ -930,8 +932,12 @@ elseif isempty(facT)
 	dx = diff(xlC)*facXY;
 	dy = diff(ylC)*facXY;
 	if ~any(isnan(S.VL1(i)))
-		SetAxLimits(axC,real(S.VL1(i))+[-.5 .5]*dx	...
-			,imag(S.VL1(i))/S.VLDy+[-.5 .5]*dy)
+		if nargin>3 && ~isempty(bCenterPt)
+			pt = [mean(xlC),mean(ylC)];
+		else
+			pt = [real(S.VL1(i)),imag(S.VL1(i))/S.VLDy];
+		end
+		SetAxLimits(axC,pt(1)+[-.5 .5]*dx,pt(2)+[-.5 .5]*dy)
 	end
 	return
 else
@@ -1134,6 +1140,8 @@ KEYs = {	...
 	'home',@(f,~) MoveFocusPt(f,[0 1]),[],'';
 	'end',@(f,~) MoveFocusPt(f,[0 0]),[],'';
 	'escape',@(f,~) Zoom(f,'auto'),[],'automatic axes in XY-graph';
+	'i',@(f,~) Zoom(f,[],0.5,true),'control','zoom in around center pt';
+	'u',@(f,~) Zoom(f,[],2,true),'control','zoom out around center pt';
 	};
 if ~isprop(gca,'XLim')
 	KEYs = [KEYs;{	...

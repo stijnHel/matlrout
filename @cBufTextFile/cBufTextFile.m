@@ -6,6 +6,14 @@
 %    L=fgetlN(F,n);
 %        reads n lines - does go faster!
 %    clear c for deleting the object (and closing the file)
+%
+% remark:
+%   * the object contains property nLines.  This is the number of lines
+%     ub the current block, not necessarily the full file!!!
+
+% * add function to count all lines (if the first block is not containing all
+%     data)
+
 classdef cBufTextFile < handle
 	properties
 		fName	% filename
@@ -242,5 +250,12 @@ classdef cBufTextFile < handle
 			F.fid=0;
 		end
 		
+		function b = AllRead(F)
+			b = F.iLine>F.nLines;
+			if b
+				F.ReadBlock()
+				b = F.iLine>F.nLines;
+			end
+		end		% AllRead
 	end
 end

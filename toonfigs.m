@@ -1,5 +1,12 @@
 function fOut=toonfigs(ff,varargin)
 %TOONFIGS - Zet alle aanwezige figuren op de voorgrond
+%    toonfigs(<figs>) ---> opens(/activates) all figures
+%         by default (no input or empty array) all figures are found
+%    f = toonfigs(figs) - opens figures and returns a list
+%    [f = ]toonfigs(figs,...) options:
+%         bShowHidden    - include hidden handles
+%         bGetInvisible  - include invisible figures
+%         bOnlyReturn    - don't activate figures, only searches for them
 
 [bOnlyReturn] = false;	% don't "show" them
 if nargin==0 || isempty(ff)

@@ -157,6 +157,8 @@ if isempty(varargin) || (ischar(varargin{1}) && strcmpi(varargin{1},'key'))
 			end
 			if isempty(c.ne)
 				cName=fn;	% be sure it's a string
+			elseif c.opties.bVarSignames
+				cName = c.ne{2};
 			else
 				ne=c.ne;
 				if ischar(ne)
@@ -170,9 +172,13 @@ if isempty(varargin) || (ischar(varargin{1}) && strcmpi(varargin{1},'key'))
 			D.L{end+1}=cName;
 			setappdata(f,'navcopydata',D)
 		case 'C'	% stop copying to current copy-figure
-			f = GetCopyFigure(hFig);
-			set(f,'Tag','ex-copyFig');
-			rmappdata(hFig,'copyFig')
+			f = GetCopyFigure(hFig,false);
+			if ~isempty(f)
+				if ishandle(f)
+					set(f,'Tag','ex-copyFig');
+				end
+				rmappdata(hFig,'copyFig')
+			end
 		case 'L'    % legend on copy window
 			f = GetCopyFigure(hFig);
 			D=getappdata(f,'navcopydata');
@@ -185,7 +191,7 @@ if isempty(varargin) || (ischar(varargin{1}) && strcmpi(varargin{1},'key'))
 				hLc=D.hL{end};
 				for i=1:numel(hLc)
 					for j=1:size(c.kols,2)
-						if hLc{i}(j)
+						if ishandle(hLc{i}(j))
 							delete(hLc{i}(j))
 						end
 					end	% for j
@@ -389,7 +395,7 @@ if hasError
 else
 	if c.opties.bVarSignames
 		title(c.ax(1),ne{2},'Tag','channel')	%!!!!very specific!!!!!
-	elseif ~isequal(ne,c.ne)
+	elseif iscell(ne) && iscell(c.ne) && ~isequal(ne,c.ne)
 		if length(c.ne)<5&&length(ne)<5
 			disp('Oorspronkelijk :')
 			disp(c.ne)
@@ -433,7 +439,11 @@ else
 		for j=1:size(kols,2)
 			if kols(j)>0
 				lnr=lnr+1;
-				Y=e(:,kols(j));
+				if kols(j)>size(e,2)	% allow this? (or just give an error)
+					Y = [];
+				else
+					Y = e(:,kols(j));
+				end
 				if isfield(c.opties,'cfunc')	% character based function (transforming Y-values)
 					if ischar(c.opties.cfunc)
 						Y=eval([c.opties.cfunc '(Y);']);
@@ -455,17 +465,23 @@ else
 						set(hL{i}(j),'XData',X)
 					end
 				end
-				if islogical(Y)
-					Y = double(Y);	% plots don't like logicals...
+				if isempty(Y)
+					set(hL{i}(j),'XData',[],'YData',[])
+				else
+					if islogical(Y)
+						Y = double(Y);	% plots don't like logicals...
+					elseif isdatetime(Y)
+						Y = datenum(Y);	% also no datetimes (except special plots)...
+					end
+					set(hL{i}(j),'YData',Y)
 				end
-				set(hL{i}(j),'YData',Y)
 			end
 		end
 	end
 end
 c.nr=fnr;
 set(hFig,'Name',fTitle)
-if bHandleLinked && ~isempty(c.opties.postNavFcn)
+if bHandleLinked && ~isempty(c.opties.postNavFcn)	% only postNavFcn if bHandleLinked?
 	if ischar(c.opties.postNavFcn)
 		eval([c.opties.postNavFcn '(' num2str(c.fig) ',' num2str(fnr) ');']);
 	elseif isa(c.opties.postNavFcn,'function_handle')
@@ -479,10 +495,15 @@ if isequal(getappdata(ax(1),'updateAxes'),@axtick2date)
 	axtick2date(hFig)
 end
 
-function f = GetCopyFigure(hFig)
+function f = GetCopyFigure(hFig,bError)
+if nargin<2 || isempty(bError)
+	bError = true;
+end
 f = getappdata(hFig,'copyFig');
-if isempty(f)
-	error('No copy-figure found!')
-elseif ~ishandle(f)
-	error('Copy-figure is deleted!')
+if bError
+	if isempty(f)
+		error('No copy-figure found!')
+	elseif ~ishandle(f)
+		error('Copy-figure is deleted!')
+	end
 end

@@ -134,7 +134,7 @@ switch lower(typ)
 			D = cell2mat(DD(10:17,2:end));
 		end
 	case 'vector'
-		[X,~,Dcmt] = leescana(fid,extraArgs{:});
+		[X,~,Dcmt,Dhead] = leescana(fid,extraArgs{:});
 		t0 = [];
 		T = X(:,10);
 		TS = X(:,10);
@@ -148,6 +148,13 @@ switch lower(typ)
 			, 'BitCount', X(:,15)	...
 			, 'Dcmt',Dcmt	...
 			);
+		fn = fieldnames(Dhead);
+		for i=1:length(fn)
+			Dextra.(fn{i}) = Dhead.(fn{i});
+			if strcmp(fn{i},'date')
+				t0 = Dhead.(fn{i});
+			end
+		end
 	case 'mini_ixxat'
 		fclose(fid);
 		X=readIXXATtrace(fFullPath(fName));

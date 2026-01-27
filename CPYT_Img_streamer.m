@@ -278,7 +278,7 @@ classdef CPYT_Img_streamer < handle
 			while true
 				p = c.f.ftell();
 				tag = c.ReadBlock();
-				if strcmp(tag1,tag)
+				if isempty(tag) || strcmp(tag1,tag)
 					break
 				end
 				Tags{1,end+1} = tag; %#ok<AGROW> 

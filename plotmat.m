@@ -79,6 +79,7 @@ sfTitle = [];
 [bRemoveRootName] = [];
 cPathDelim = '/';
 [bDefMultiChan] = false;
+[bReturnFIG] = false;
 if nargin>5
 	opties=varargin;
 	if nargin==6&&iscell(opties{1})
@@ -88,7 +89,7 @@ if nargin>5
 			,'fignr','usetex','nrij','nkol','fx','dx','titleFig','bPlotLong'	...
 			,'bAddPlot','bPlotCarr','bXdata','bNavfig','bTNavfig'	...
 			,'bCMenu','sfTitle','bAbsTime','bPlotEnum','bRemoveRootName'	...
-			,'cPathDelim','bDefMultiChan'}	...
+			,'cPathDelim','bDefMultiChan','bReturnFIG'}	...
 		,opties{:})
 	if ~isempty(bTNavfig)
 		bXdata=bTNavfig;
@@ -603,10 +604,12 @@ elseif ischar(bAddPlot)
 			error('Wrong use of plotmat - option bAddPlot')
 	end
 end
+bNew = false;
 if isempty(fignr)
 	if bAddPlot
 		fignr=gcf;
 	else
+		bNew = true;
 		%fignr=figure('Menubar','none','Papertype','a4');
 		if exist('nfigure','file')
 			fignr=nfigure;
@@ -619,7 +622,7 @@ if isempty(fignr)
 	end
 else
 	if ischar(fignr)
-		fignr=getmakefig(fignr,[],[],sfTitle);
+		[fignr,bNew]=getmakefig(fignr,[],[],sfTitle);
 	end
 	fignr=figure(abs(double(fignr)));
 end
@@ -632,7 +635,7 @@ if bAddPlot
 		end
 	end
 	fignr=abs(double(fignr));
-else
+elseif ~bNew
 	clf
 end
 if ischar(titleFig)
@@ -895,6 +898,10 @@ if nargout
 		lijnen=reshape([lijnen(:,1);cell(nrij*nkol-size(lijnen,1),1)],nkol,nrij)';
 	end
 	assen=ass;
+	if bReturnFIG
+		ngevonden = fignr;
+		kols = bNew;
+	end
 end
 
 function MenuCall(h,~)

@@ -28,18 +28,19 @@ fseek(fid,0,'eof');
 flen=ftell(fid);
 fseek(fid,0,'bof');
 
+Dhead = struct();
 if bSimpleHead
-	fgetl(fid);	% skip first line
 	l = 'a';
 	while ~isempty(l)
 		l = fgetl(fid);
+		[w,~,~,in] = sscanf(l,'%s',1);
+		Dhead = ReadHeadLine(Dhead,w,l,in);
 	end
 	Dextra = [];
 else
 	x1='';
 	xs='';	% not used - replaced by Dhead?
 	CR=char([13 10]);
-	Dhead = struct();
 	Dextra = struct('t',cell(0,1),'CAN',0,'type','','data',[]);
 	while ~strcmpi(x1(1:min(end,5)),'begin')||~strcmpi(x1(1:min(end,5)),'start')
 		x1=fgetl(fid);
@@ -50,20 +51,7 @@ else
 			Dhead.begin = struct('typ',w,'t',datenum(x1(in+4:end)));
 			break
 		end
-		if strcmpi(w,'date')
-			Dhead.date = datenum(x1(in+4:end));
-		elseif strcmpi(w,'base')
-			w = regexp(x1,' ','split');
-			i = 1;
-			while i<length(w)
-				if isempty(w{i})
-					i = i+1;
-				else
-					Dhead.(w{i}) = w{i+1};
-					i = i+2;
-				end
-			end
-		end
+		Dhead = ReadHeadLine(Dhead,w,x1,in);
 		if feof(fid)
 			fclose(fid);
 			error('Kan begin van data niet vinden');
@@ -251,4 +239,20 @@ end
 X=X(1:nx,:);
 if nargout>1
 	nX={'ID','d1','d2','d3','d4','d5','d6','d7','d8','t','DLC','Tx','CANnr','Length','BitCount'};
+end
+
+function Dhead = ReadHeadLine(Dhead,w,x1,in)
+if strcmpi(w,'date')
+	Dhead.date = datenum(x1(in+4:end));
+elseif strcmpi(w,'base')
+	w = regexp(x1,' ','split');
+	i = 1;
+	while i<length(w)
+		if isempty(w{i})
+			i = i+1;
+		else
+			Dhead.(w{i}) = w{i+1};
+			i = i+2;
+		end
+	end
 end

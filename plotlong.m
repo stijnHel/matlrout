@@ -218,16 +218,16 @@ elseif size(X,1)==1&&size(X,2)==2	% show plots (internal use)
 	l=findobj(par,'Tag','longData');
 	nPtMaxFull=[];
 	nPtDec=[];
-	if length(l)>1
+	if ~isempty(l)
 		f1=ancestor(l(1),'figure');
 		nPtMaxFull=getappdata(f1,'nPtMaxFull');
 		nPtDec=getappdata(f1,'nPtDec');
 	end
 	if isempty(nPtMaxFull)
-		nPtMaxFull=5000;
+		nPtMaxFull=1000000;
 	end
 	if isempty(nPtDec)
-		nPtDec=2000;
+		nPtDec=500000;
 	end
 	for i=1:length(l)
 		XX=getappdata(l(i),'Xdata');
@@ -286,7 +286,13 @@ elseif size(X,1)==1&&size(X,2)==2	% show plots (internal use)
 	end
 else
 	tShow=1;
-	if nargin==1
+	if ~isscalar(X) && isrow(X)
+		X = X';
+	end
+	if nargin>1 && isrow(Y)
+		Y = Y';
+	end
+			if nargin==1
 		Y=X;
 		X=(1:size(X,1))';
 	elseif numel(X)==1

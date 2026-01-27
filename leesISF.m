@@ -14,15 +14,11 @@ if isstruct(fName) && length(fName)>1
 	for i=1:length(fName)
 		[E{i,:}] = leesISF(fName(i));
 	end
-	e = E(:,1);
-	ne = E(:,2);
-	de = E(:,3);
-	e2 = E(:,4);
-	gegs = E(:,5);
+	[e,ne,de,e2,gegs] = SeparateE(E);
 	return
 elseif iscell(fName) && length(fName)==2 && isnumeric(fName{1})
 	E = cell(length(fName{2}),5);
-	for i=1:length(fName)
+	for i=1:length(fName{2})
 		[E{i,:}] = leesISF(sprintf('T%04dCH%d.ISF',fName{1},fName{2}(i)));
 		if length(E{i,2})==2 && strcmp(E{i,2}(2),'ENV')
 			E{i} = E{i}(:,1);
@@ -31,11 +27,7 @@ elseif iscell(fName) && length(fName)==2 && isnumeric(fName{1})
 			E{i,5} = E{i,5}(1);
 		end
 	end
-	e = [E{:,1}];
-	ne = E(:,2);
-	de = E(:,3);
-	e2 = E(:,4);
-	gegs = E(:,5);
+	[e,ne,de,e2,gegs] = SeparateE(E);
 	return
 end
 
@@ -131,9 +123,43 @@ catch err
 	warning('Couldn''t combine "gegs"-parts?!')
 	return
 end
-if isscalar(gegs) && iscell(gegs)
-	gegs = gegs{1};
+if iscell(gegs)
+	if isscalar(gegs)
+		gegs = gegs{1};
+	else
+	end
 end
 ne = {gegs.PT_F};
 de = cell(1,length(gegs));
 [de{:}] = deal('V');
+
+function [e,ne,de,e2,gegs] = SeparateE(E)
+if size(E,1)==1
+	e    = E{1};
+	ne   = E{2};
+	de   = E{3};
+	e2   = E{4};
+	gegs = E{5};
+else
+	e    = E(:,1);
+	ne   = E(:,2);
+	de   = E(:,3);
+	e2   = E(:,4);
+	gegs = [E{:,5}];
+	% make a single gegs-struct, with one value if all equal, otherwise "list"
+	fn = fieldnames(gegs(1));
+	for i=1:length(fn)
+		V = {gegs.(fn{i})};
+		if ~all(cellfun(@(x) isequal(V{1},x),V))
+			if isnumeric(V{1})
+				gegs(1).(fn{i}) = [V{:}];
+			else
+				gegs(1).(fn{i}) = V;
+			end
+		end		% not all different
+	end		% for i
+	gegs = gegs(1);
+end
+if iscell(e)
+	e = [e{:}];
+end

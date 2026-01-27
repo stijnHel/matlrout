@@ -73,7 +73,7 @@ classdef cnavmsrs < handle
 				if isnumeric(fnaam)||(iscell(fnaam)&&isnumeric(fnaam{1}))
 					funcnaam=[];
 				else
-					funcnaam='leesalg';
+					funcnaam='leesalg';	% function handle?
 				end
 			else
 				funcnaam=varargin{1};
@@ -173,7 +173,8 @@ classdef cnavmsrs < handle
 				opties.ne = fnaam.Properties.VariableNames;
 				Bok = false;
 				for i=1:length(opties.ne)
-					Bok(i) = isnumeric(fnaam.(opties.ne{i}));
+					Bok(i) = isnumeric(fnaam.(opties.ne{i}))	...
+						|| isdatetime(fnaam.(opties.ne{i}));
 				end
 				opties.ne = opties.ne(Bok);
 				nFiles=sum(Bok);
@@ -245,9 +246,11 @@ classdef cnavmsrs < handle
 				end
 			elseif ischar(funcnaam)
 				eval(['[e,ne]=' funcnaam '(''' f1 ''');']);
+					% (make a function_handle from funcnaam...)
 				opties.ne=ne;
 			elseif isa(funcnaam,'function_handle')
-				[e,ne]=feval(funcnaam,f1);
+				%[e,ne]=feval(funcnaam,f1);
+				[e,ne] = funcnaam(f1);
 				opties.ne=ne;
 			else
 				error('Verkeerde input voor de functie-input')

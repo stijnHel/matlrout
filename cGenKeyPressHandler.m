@@ -130,11 +130,12 @@ classdef cGenKeyPressHandler < handle
 			else
 				B = strcmp({c.Chars.char},ch);
 				if any(B)
-					if sum(B)>1
-						error('Sorry, chars with different modifiers is not (yet) implemented!\n')
+					Bm = CheckModifiers(c.Chars(B),C);
+					if any(Bm)
+						ii = find(B);
+						c.Chars(ii(Bm)) = C;
 					else
-						%(!!) check modifiers!
-						c.Chars(B) = C;
+						c.Chars(end+1) = C;
 					end
 				else
 					c.Chars(end+1) = C;

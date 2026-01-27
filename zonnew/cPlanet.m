@@ -57,10 +57,26 @@ classdef cPlanet < handle
 		end		% cPlanet
 
 		function [p,v] = CalcPos(c,t)
+			%cPlanet/CalcPos - calculate position (and speed) in cart. coors.
+			%      [p,v] = c.CalcPos(t)
 			if t(1)<1	% expecting julian century(!)
 				t = calcjd(t);
 			end
 			%CalcPos - Calculates position at time (t - JD)
+			if size(t,1)~=1
+				p = zeros(size(t,1),3);
+				if nargout>1
+					v = zeros(size(t,1),3);
+					for i=1:size(t,1)
+						[p(i,:),v(i,:)] = c.CalcPos(t(i,:));
+					end
+				else
+					for i=1:size(t,1)
+						p(i,:) = c.CalcPos(t(i,:));
+					end
+				end
+				return
+			end
 			dt = 86400*(t-c.elem_epoch);
 			M = c.elem_M+dt*sqrt(c.mu/c.elem_a^3);
 			E = CalcEccAnom(M,c.elem_e);
@@ -117,7 +133,17 @@ switch lower(name)
 		El = struct('epoch',{{2451545.0,'JD'}},'a',1,'e',0.016786	...
 			,'i',1.578690	...???????????
 			,'O',174.9,'o',288.1	... correct?
-			,'M',0);	% !!!!!!!!
+			,'M',0	...
+			,'extra',struct('diam',12756.26e3)	...
+			);	% !!!!!!!!
+	case 'moon'	% vooral voor "extra gegevens"!!!!
+		El = struct(	... Epoch J2000
+			'a',384399e3, 'e',0.054, 'i',5.1459	... (1/384 AU)
+			,'extra',struct('diam',3476.26e3	...
+				,'longAscNode',1/18.61	... 1 rev/18.61 year (from https://en.wikipedia.org/wiki/Moon)
+				,'ArgPerigee',1/8.85	... 1 rev/8.85 year
+				)	...
+			);
 	otherwise
 		%El = struct('epoch',{{60600.0,'MJD'}},'a',,'e',,'i',,'O',,'o',,'M',);
 		error('Unknown element')

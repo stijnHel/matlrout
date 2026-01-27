@@ -3,7 +3,11 @@ function tracks = FindGPStrack(Pts,maxD,varargin)
 %     tracks = FindGPStrack(Pts,maxD,varargin)
 %            Pts: points (coordinates [latitude,longitude] or names)
 %                 coordinates in degrees
-%            maxD: max tolerance (in (approximately) meters
+%            maxD: max tolerance (in (approximately) meters)
+%
+%            tracks: dir-struct of files of found tracks
+%
+%  Distance to logged points are used (not distances to lines between points)
 
 % Add minimum distance found (and index?)
 %    and maybe some extra ("summarizing data")?

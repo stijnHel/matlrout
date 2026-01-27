@@ -690,6 +690,17 @@ else
 				f.printf('%s',string(d))
 			else
 				bGenClassView=true;
+				if nrecurs>0 && isscalar(d) && ismethod(d,'get')
+					try
+						S = d.get();
+						if isstruct(S)
+							f.printf('&lt;class %s&gt;:\n',class(d));
+							printdata(f,d.get(),nrecurs-1,options,Sref0);
+							bGenClassView=false;
+						end
+					catch
+					end
+				end
 			end
 	end
 end

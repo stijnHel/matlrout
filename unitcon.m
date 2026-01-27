@@ -70,6 +70,7 @@ if isempty(UNITinfo)
 	addunit('J','M1L2T-2',1)
 	addunit('cal','M1L2T-2',4.1868)
 	addunit('eV','M1L2T-2',0.160219e-18)
+	addunit('hPlanck','M1L2T-1',6.62607015e-34)
 	
 	addunit('W','M1L2T-3',1)
 	addunit('pk','M1L2T-3',745.699871582)
@@ -395,15 +396,15 @@ end
 				u(1)='';
 				iu=find(strcmp(u,UNITinfo.unit));
 			end
-			if isempty(iu)
-				if bErrorIfNE
-					error('unit %s niet gevonden',u)
-				else
-					b = [];
-					return
-				end
+		end		% if isempty(iu) && ~scalar(u)
+		if isempty(iu)
+			if bErrorIfNE
+				error('unit %s niet gevonden',u)
+			else
+				b = [];
+				return
 			end
-		end
+		end		% if isempty?(iu)
 		v=v*UNITinfo.conv(iu);
 		b=UNITinfo.num(iu,:);
 		offset=UNITinfo.offset(iu);

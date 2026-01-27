@@ -90,6 +90,17 @@ yType=get(ax,'YScale');
 bXlog=strcmp(xType,'log');
 bYlog=strcmp(yType,'log');
 
+bRulerX = ~isnumeric(x);
+bRulerY = ~isnumeric(y);
+if bRulerX
+	x = ruler2num(x,ax.XAxis);
+	xl = ruler2num(xl,ax.XAxis);
+end
+if bRulerY
+	y = ruler2num(y,ax.YAxis);
+	yl = ruler2num(yl,ax.YAxis);
+end
+
 x0=p(1,1);
 if bXlog
 	x=log(x);
@@ -151,22 +162,35 @@ p(2) = p(2)+y0;
 y0=polyval(p,0);
 xunit=extractunit(get(get(ax,'xlabel'),'string'));
 yunit=extractunit(get(get(ax,'ylabel'),'string'));
+if isequal(getappdata(ax,'updateAxes'),@axtick2date)
+	sx0 = datestr(x0); %#ok<DATST> 
+else
+	sx0 = sprintf('%g',x0);
+end
 if ~isempty(xunit)&&~isempty(yunit)
 	%!!!!!!!!!!!!!!if [X/Y]log!!!!!!!!!!!!!!!!!!!
 	hellunit=sprintf('%s/%s',yunit,xunit);
-	fprintf('Helling rond (%g (+/-%g),%g #%d) is %g [%s]',x0,dx,y0,length(i),p(1),hellunit)
+	fprintf('Helling rond (%s (+/-%g),%g #%d) is %g [%s]',sx0,dx,y0,length(i),p(1),hellunit)
 	if bRevGrad
 		fprintf('   reversed: %g %s/%s',1/p(1),yunit,xunit) %#ok<UNRCH>
 		hellunit=sprintf('%s/%s',xunit,yunit);
 	end
 else
 	hellunit='';
-	fprintf('Helling rond (%g (+/-%g),%g #%d) is %g',x0,dx,y0,length(i),p(1))
+	fprintf('Helling rond (%s (+/-%g),%g #%d) is %g',sx0,dx,y0,length(i),p(1))
 	if bRevGrad
 		fprintf('   reversed: %g',1/p(1)) %#ok<UNRCH>
 	end
 end
 fprintf('\n')
+D1 = var2struct(x0,y0,p,xFit,yFit);
+if isappdata(ax,'berhell_data')
+	D = getappdata(ax,'berhell_data');
+	D(end+1) = D1;
+else
+	D = D1;
+end
+setappdata(ax,'berhell_data',D)
 
 if bShowOnPlot
 	Dx=3*dx;
@@ -215,6 +239,20 @@ if bShowOnPlot
 		yL2=exp(yL2);
 		yText=exp(yText);
 		y0=exp(y0);
+	end
+	if bRulerX
+		x1 = num2ruler(x1,ax.XAxis);
+		x2 = num2ruler(x2,ax.XAxis);
+		xb = num2ruler(xb,ax.XAxis);
+		xe = num2ruler(xe,ax.XAxis);
+		x0 = num2ruler(x0,ax.XAxis);
+	end
+	if bRulerY
+		y = num2ruler(y,ax.YAxis);
+		y0 = num2ruler(y0,ax.YAxis);
+		yL1 = num2ruler(yL1,ax.YAxis);
+		yL2 = num2ruler(yL2,ax.YAxis);
+		yText = num2ruler(yText,ax.YAxis);
 	end
 	l=line([x1 x2],y([1 end]));
 	l1=line([xb xb],yL1);

@@ -256,21 +256,50 @@ elseif bProcess
 		end
 	end
 	t0X = Xrecord(1);
-	t0Data = datenum(1989,12,31,1,0,0);
-	t0 = t0X/86400+t0Data;
-	if isDST(t0)
-		t0Data = t0Data+1/24;
-	end
 	if bRelTime
 		Xrecord(:,1) = Xrecord(:,1)-t0X;
 	else
+		t0Data = datenum(1989,12,31,1,0,0);
+		t0 = t0X/86400+t0Data;
+		bt0DST = isDST(t0);
+		if bt0DST
+			t0Data = t0Data+1/24;
+		end
 		Xrecord(:,1) = Xrecord(:,1)/86400+t0Data;
+		bteDST = isDST(Xrecord(end,1));
+		if bt0DST~=bteDST
+			warning('DST of start and end differs!!')
+			B_DST = isDST(Xrecord(:,1))==bteDST;
+			if bt0DST
+				t_offset = -1/24;
+			else
+				t_offset = 1/24;
+			end
+			Xrecord(B_DST,1) = Xrecord(B_DST,1)+t_offset;
+		end
 	end
 	if bProject
 		iX_V = find(strcmp(nX,'enhanced_speed'));
 		iX_H = find(strcmp(nX,'enhanced_altitude'));
 		[D,NE,V,G,Xrecord] = AnalyseGPSdata(Xrecord,'iVgps',iX_V,'iAltitude',iX_H	...
 			,'fTitle',fTitle,'bPlot',bPlot,Oextra{1:2,:});
+	end
+	if true		% testing!!!!!
+		msgTypes = {'activity','device_info','event','lap','session'};
+		for iT=1:length(msgTypes)
+			iiM = find(strcmp({DF.msgName},msgTypes{iT}));
+			if length(iiM)>1
+				F = R(iiM(1)).DEF.fldNames;
+				Bok = ~cellfun(@isempty,F);
+				%C = [F(Bok);num2cell(double([R(iiM(2)).data{Bok}])./R(iiM(1)).DEF.scale(Bok))];
+				C = [F(Bok);num2cell(R(iiM(2)).dataScaled(Bok))];
+				G.(msgTypes{iT}) = struct(C{:});
+				for iM=2:length(iiM)-1
+					C(2,:) = num2cell(R(iiM(iM+1)).dataScaled(Bok));
+					G.(msgTypes{iT})(iM) = struct(C{:});
+				end
+			end
+		end
 	end
 end		% if bProcess
 if bStdOut	% 
